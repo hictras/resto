@@ -30,7 +30,7 @@
             <div class="mb-3">
                 <label class="text-xs font-semibold text-gray-400 block mb-2">Quick messages:</label>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="setQuickMessage('Welcome To Our Restaurant')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">Welcome</button>
+                    <button onclick="setQuickMessage('Welcome! 👋 We are delighted to have you here. Browse our menu and ring the bell when you are ready to order.')" class="msg-quick bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">👋 Welcome</button>
                     <button onclick="setQuickMessage('Your order is being prepared 👨‍🍳')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">👨‍🍳 Preparing</button>
                     <button onclick="setQuickMessage('Your food is on the way! 🍽️')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">🍽️ On the way</button>
                     <button onclick="setQuickMessage('Enjoy your meal! 😊')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">😊 Enjoy</button>
@@ -43,6 +43,7 @@
                 <label class="text-xs font-semibold text-gray-400 block mb-2">Icon:</label>
                 <div class="flex flex-wrap gap-1.5" id="iconPicker">
                     <button onclick="pickIcon('💬')" data-icon="💬" class="icon-opt text-2xl p-1.5 bg-amber-600 rounded-lg">💬</button>
+                    <button onclick="pickIcon('👋')" data-icon="👋" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">👋</button>
                     <button onclick="pickIcon('🔔')" data-icon="🔔" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">🔔</button>
                     <button onclick="pickIcon('🎉')" data-icon="🎉" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">🎉</button>
                     <button onclick="pickIcon('⏳')" data-icon="⏳" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">⏳</button>
@@ -100,10 +101,10 @@
     </header>
 
     <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
-        <button onclick="switchTab('tables')" id="tab-tables" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-amber-500 text-white shadow transition">1. Tables</button>
-        <button onclick="switchTab('menu')" id="tab-menu" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">2. Menu Management</button>
-        <button onclick="switchTab('bills')" id="tab-bills" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">3. Bills & Payments</button>
-        <button onclick="switchTab('revenue')" id="tab-revenue" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">4. Daily Revenue</button>
+        <button onclick="switchTab('tables')" id="tab-tables" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-amber-500 text-white shadow transition">Tables</button>
+        <button onclick="switchTab('menu')" id="tab-menu" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">Menu Management</button>
+        <button onclick="switchTab('bills')" id="tab-bills" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">Bills & Payments</button>
+        <button onclick="switchTab('revenue')" id="tab-revenue" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">Daily Revenue</button>
     </div>
 
     <div id="section-tables" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 space-y-6">
@@ -395,14 +396,11 @@
                     const openCount = restoActiveSessions[k] || 0;
                     const isMenuOpen = openCount > 0;
 
-                    // The order button cycles through three states:
-                    //   requested + locked  → RED pulsing "Requested!"
-                    //   canOrder            → AMBER "Lock Order"
-                    //   locked (no request) → INDIGO "Open Order"
+                    // Order button: 3 states (requested → red, unlocked → amber, locked → indigo)
                     let orderBtnHtml;
                     if (isWaiting && !t.canOrder) {
                         orderBtnHtml = `<button data-action="toggle-order" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition bg-red-600 hover:bg-red-700 animate-pulse shadow-lg border border-red-400">
-                            🛎 Requested!
+                            🛎️ Requested! Tap to Approve
                         </button>`;
                     } else if (t.canOrder) {
                         orderBtnHtml = `<button data-action="toggle-order" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition bg-amber-600 hover:bg-amber-700">
@@ -410,7 +408,7 @@
                         </button>`;
                     } else {
                         orderBtnHtml = `<button data-action="toggle-order" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition bg-indigo-600 hover:bg-indigo-700">
-                             Open Order 🚀
+                            Open Order 🚀
                         </button>`;
                     }
 
@@ -433,7 +431,7 @@
                             </div>
                             <div class="flex flex-col gap-1.5 mt-1">
                                 <button data-action="toggle-open" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition ${t.isOpen ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'}">
-                                    ${t.isOpen ? 'Close Menu 🔒' : ' Open Menu 🔓'}
+                                    ${t.isOpen ? 'Close Menu 🔒' : 'Open Menu 🔓'}
                                 </button>
                                 ${orderBtnHtml}
                             </div>

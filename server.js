@@ -132,7 +132,7 @@ function buildAppState() {
         };
     });
 
-    // Only report tables with a live socket — fixes "1 active" phantom badge
+    // Only report tables with a live socket
     const activeSessions = {};
     const now = Date.now();
     db.prepare('SELECT restaurant, table_number, start_time, lifetime_minutes FROM sessions').all().forEach(s => {
@@ -209,6 +209,17 @@ function undeliveredMessagesForTable(resto, table) {
         .map(m => ({ id: m.id, message: m.message, icon: m.icon, createdAt: m.created_at }));
 }
 
+function seedWelcomeMessage(resto, table) {
+    // Insert a welcome message for a freshly-created session. Marked as undelivered
+    // so it will be replayed to any client that registers after this point.
+    const id = uuidv4();
+    const text = "Welcome! 👋 We're delighted to have you here. Browse our menu and ring the bell when you're ready to order.";
+    db.prepare(`INSERT INTO messages (id, restaurant, table_number, message, icon, created_at, delivered)
+                VALUES (?, ?, ?, ?, '👋', ?, 0)`)
+        .run(id, resto, String(table), text, Date.now());
+    return id;
+}
+
 // ---------- API ----------
 app.get('/api/verify-token', (req, res) => {
     const { token } = req.query;
@@ -231,16 +242,48 @@ app.post('/api/create-session', (req, res) => {
     try {
         const resto = path.basename(String(restaurant));
         const tKey = String(tableNumber);
-        const lifetimeMinutes = parseInt(lifetime) || 15;
+        const requestedLifetime = parseInt(lifetime) || 15;
         const now = Date.now();
 
-        db.prepare('DELETE FROM sessions WHERE restaurant = ? AND table_number = ?').run(resto, tKey);
-        const token = 'tok_' + uuidv4().replace(/-/g, '') + now.toString(36);
-        db.prepare(`INSERT INTO sessions (token, restaurant, table_number, start_time, lifetime_minutes) VALUES (?, ?, ?, ?, ?)`)
-            .run(token, resto, tKey, now, lifetimeMinutes);
+        // Multi-device: if a valid session already exists for this table, reuse it.
+        // This lets several phones on the same table share one token so nobody
+        // gets logged out when a second device scans the QR.
+        const existing = db.prepare('SELECT * FROM sessions WHERE restaurant = ? AND table_number = ?').get(resto, tKey);
+        if (existing && isSessionValid(existing)) {
+            const lifetimeMinutes = existing.lifetime_minutes || 15;
+            return res.json({
+                success: true,
+                token: existing.token,
+                expiresAt: existing.start_time + lifetimeMinutes * 60 * 1000,
+                lifetimeMinutes,
+                reused: true
+            });
+        }
 
+        // Otherwise, create a fresh session + seed a welcome message.
+        db.transaction(() => {
+            db.prepare('DELETE FROM sessions WHERE restaurant = ? AND table_number = ?').run(resto, tKey);
+            // Clear any stale messages from a previous party on this table
+            db.prepare('DELETE FROM messages WHERE restaurant = ? AND table_number = ?').run(resto, tKey);
+
+            const token = 'tok_' + uuidv4().replace(/-/g, '') + now.toString(36);
+            db.prepare(`INSERT INTO sessions (token, restaurant, table_number, start_time, lifetime_minutes) VALUES (?, ?, ?, ?, ?)`)
+                .run(token, resto, tKey, now, requestedLifetime);
+
+            seedWelcomeMessage(resto, tKey);
+
+            res.locals.newToken = token;
+        })();
+
+        const newToken = res.locals.newToken;
         broadcastState();
-        res.json({ success: true, token, expiresAt: now + lifetimeMinutes * 60 * 1000, lifetimeMinutes });
+        res.json({
+            success: true,
+            token: newToken,
+            expiresAt: now + requestedLifetime * 60 * 1000,
+            lifetimeMinutes: requestedLifetime,
+            reused: false
+        });
     } catch (e) {
         console.error(e);
         res.status(500).json({ success: false, message: 'Internal server error' });
@@ -272,7 +315,7 @@ io.on('connection', (socket) => {
         socket.tableToken = token;
         socket.join(`table_${resto}_${tKey}`);
 
-        // Replay queued messages
+        // Replay queued messages (including the welcome message on first connect)
         const undelivered = undeliveredMessagesForTable(resto, tKey);
         if (undelivered.length > 0) {
             socket.emit('admin_messages_bulk', { messages: undelivered });
@@ -338,9 +381,14 @@ io.on('connection', (socket) => {
     socket.on('table_request', ({ token }) => {
         const session = db.prepare('SELECT * FROM sessions WHERE token = ?').get(token);
         if (!isSessionValid(session)) return;
+        const resto = session.restaurant;
+        const tKey = session.table_number;
+        const now = Date.now();
         db.prepare(`INSERT INTO table_requests (restaurant, table_number, requested) VALUES (?, ?, 1)
                     ON CONFLICT(restaurant, table_number) DO UPDATE SET requested = 1`)
-            .run(session.restaurant, session.table_number);
+            .run(resto, tKey);
+        // Dedicated bell event so every ring alerts the admin reliably
+        io.emit('bell_ring', { restaurant: resto, tableNumber: tKey, at: now });
         broadcastState();
     });
 
@@ -437,7 +485,7 @@ io.on('connection', (socket) => {
             ).get(order.restaurant, order.table_number).c;
 
             if (remainingUnpaid === 0) {
-                // Session is over — wipe everything tied to this dining party
+                // Session over — wipe everything tied to this dining party
                 db.transaction(() => {
                     db.prepare('DELETE FROM sessions WHERE restaurant = ? AND table_number = ?')
                         .run(order.restaurant, order.table_number);
