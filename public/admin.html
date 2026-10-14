@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+                  <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin Dashboard - Restaurant Management</title>
@@ -73,7 +73,6 @@
 
         .wants-chip { display: inline-flex; align-items: center; gap: 5px; background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4); border-radius: 999px; padding: 3px 10px; font-size: 10px; font-weight: 700; }
 
-        /* SMALL FLOOR MAP */
         .map-tile { position: relative; border-radius: 14px; padding: 14px 8px; text-align: center; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; user-select: none; }
         .map-tile .map-tile-num { font-size: 20px; font-weight: 900; line-height: 1.1; letter-spacing: -0.5px; }
         .map-tile .map-tile-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; opacity: 0.85; }
@@ -95,7 +94,6 @@
         .map-dot-red   { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.7); }
         .map-dot-gray  { background: #64748b; }
 
-        /* LARGE FLOOR MAP */
         .map-tile-lg { position: relative; border-radius: 18px; padding: 42px 12px 14px; text-align: center; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; user-select: none; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
         .map-tile-lg:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.5); }
         .map-tile-lg-num { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
@@ -122,7 +120,7 @@
         .map-tile-lg-btn-lock       { background: rgba(217,119,6,0.28); border-color: rgba(217,119,6,0.75); color: #fcd34d; }
         .map-tile-lg-btn-requested  { background: rgba(239,68,68,0.35); border-color: rgba(239,68,68,0.9); color: #fecaca; animation: req-pulse 1.4s ease-in-out infinite; }
 
-        /* ================= SINGLE TABLE FOCUS VIEW (v2) ================= */
+        /* ================= SINGLE TABLE FOCUS VIEW ================= */
         .focus-shell { display: grid; grid-template-columns: 1fr; gap: 18px; padding: 4px 0; }
         @media (min-width: 1024px) { .focus-shell { grid-template-columns: minmax(340px, 420px) 1fr; align-items: stretch; min-height: calc(100vh - 280px); } }
         .focus-left, .focus-right { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
@@ -141,13 +139,30 @@
         .focus-status-requested { background: rgba(245,158,11,0.22); color: #fcd34d; border: 1px solid rgba(245,158,11,0.65); }
         .focus-status-idle      { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
 
-        .focus-hero-timer { margin-top: 14px; display: flex; align-items: baseline; justify-content: center; gap: 12px; font-family: 'SF Mono', 'Menlo', 'Consolas', monospace; font-size: 46px; font-weight: 900; letter-spacing: 3px; padding: 14px 16px; border-radius: 16px; background: rgba(2,6,23,0.6); border: 1px solid rgba(148,163,184,0.15); transition: color 0.2s, border-color 0.2s, background 0.2s; }
-        .focus-hero-timer.safe    { color: #6ee7b7; border-color: rgba(16,185,129,0.4); }
-        .focus-hero-timer.warn    { color: #fcd34d; border-color: rgba(245,158,11,0.5); }
-        .focus-hero-timer.danger  { color: #fca5a5; border-color: rgba(239,68,68,0.7); background: rgba(69,10,10,0.5); box-shadow: 0 0 20px rgba(239,68,68,0.25) inset; }
-        .focus-hero-timer.no-session { color: #64748b; font-size: 20px; letter-spacing: 1px; font-weight: 700; }
-        .focus-hero-timer.no-expiry  { color: #a5b4fc; font-size: 30px; letter-spacing: 1px; }
-        .focus-hero-timer-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8; text-align: center; margin-top: 8px; }
+        .focus-timer-ring-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px 0 10px; position: relative; }
+        .focus-timer-ring { position: relative; width: 190px; height: 190px; }
+        .focus-timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .focus-timer-ring .ring-bg { fill: none; stroke: rgba(148,163,184,0.15); stroke-width: 6; }
+        .focus-timer-ring .ring-fg { fill: none; stroke: #6ee7b7; stroke-width: 6; stroke-linecap: round; transition: stroke 0.4s, stroke-dashoffset 0.9s linear; filter: drop-shadow(0 0 8px currentColor); }
+        .focus-timer-ring-text { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; pointer-events: none; }
+        .focus-timer-ring-text .big { font-family: 'SF Mono', 'Menlo', 'Consolas', monospace; font-size: 30px; font-weight: 900; letter-spacing: 1px; color: #6ee7b7; transition: color 0.4s; line-height: 1; }
+        .focus-timer-ring-text .small { font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8; margin-top: 4px; }
+        .focus-timer-ring-text .icon { font-size: 22px; opacity: 0.8; margin-bottom: 4px; }
+        .focus-timer-ring.is-safe    .ring-fg  { stroke: #10b981; }
+        .focus-timer-ring.is-safe    .big      { color: #6ee7b7; }
+        .focus-timer-ring.is-warn    .ring-fg  { stroke: #f59e0b; }
+        .focus-timer-ring.is-warn    .big      { color: #fcd34d; }
+        .focus-timer-ring.is-danger  .ring-fg  { stroke: #ef4444; }
+        .focus-timer-ring.is-danger  .big      { color: #fca5a5; }
+        .focus-timer-ring.is-no-session .ring-fg { stroke: #475569; }
+        .focus-timer-ring.is-no-session .big { color: #64748b; font-size: 14px; letter-spacing: 0.5px; }
+        .focus-timer-ring.is-no-expiry .ring-fg { stroke: #6366f1; }
+        .focus-timer-ring.is-no-expiry .big { color: #a5b4fc; font-size: 34px; }
+        .focus-timer-ring::before { content: ''; position: absolute; inset: -8px; border-radius: 50%; background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 65%); z-index: -1; transition: background 0.4s; }
+        .focus-timer-ring.is-warn::before  { background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 65%); }
+        .focus-timer-ring.is-danger::before{ background: radial-gradient(circle, rgba(239,68,68,0.2)  0%, transparent 65%); }
+        .focus-timer-ring.is-no-expiry::before { background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 65%); }
+        .focus-timer-ring.is-no-session::before { background: none; }
 
         .focus-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .focus-info-cell { background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 14px; padding: 12px 14px; }
@@ -165,6 +180,38 @@
         .focus-action-btn .icn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
         .focus-action-btn .txt { flex: 1; text-align: left; }
         .focus-action-btn .arr { font-size: 20px; opacity: 0.75; }
+
+        /* Menu + Order on the same line */
+        .focus-actions-duo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .focus-action-col {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 18px;
+            padding: 14px 16px;
+        }
+        .focus-action-col .focus-action-btn {
+            padding: 14px 14px;
+            font-size: 14px;
+        }
+        .focus-action-col .focus-action-btn .icn {
+            width: 26px; height: 26px;
+            font-size: 17px;
+        }
+        .focus-action-col .focus-action-btn .arr {
+            font-size: 17px;
+        }
+        @media (max-width: 480px) {
+            .focus-actions-duo {
+                grid-template-columns: 1fr;
+            }
+        }
 
         .focus-orders-panel { background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; flex: 1; min-height: 0; }
         .focus-orders-scroll { flex: 1; min-height: 0; overflow-y: auto; padding-right: 4px; }
@@ -186,6 +233,16 @@
 
         .focus-empty-orders { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 40px 20px; color: #64748b; font-size: 13px; text-align: center; }
         .focus-empty-orders .big { font-size: 40px; opacity: 0.4; }
+
+        .focus-msg-composer { background: rgba(15,23,42,0.75); border: 1px solid rgba(59,130,246,0.35); border-radius: 18px; padding: 14px 16px; animation: slide-down 0.25s ease-out; box-shadow: 0 6px 20px rgba(59,130,246,0.15); }
+        @keyframes slide-down { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .focus-msg-composer textarea { width: 100%; background: rgba(2,6,23,0.6); border: 1px solid rgba(148,163,184,0.2); border-radius: 12px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; resize: none; outline: none; transition: border-color 0.15s; font-family: inherit; }
+        .focus-msg-composer textarea:focus { border-color: #3b82f6; }
+        .focus-msg-quick { display: inline-block; background: rgba(148,163,184,0.12); color: #cbd5e1; border: 1px solid rgba(148,163,184,0.2); border-radius: 8px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; margin: 0 4px 4px 0; transition: all 0.15s; }
+        .focus-msg-quick:hover { background: rgba(59,130,246,0.25); border-color: rgba(59,130,246,0.5); color: #bfdbfe; }
+        .focus-msg-icon-btn { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: rgba(148,163,184,0.12); border: 1px solid rgba(148,163,184,0.2); font-size: 16px; cursor: pointer; transition: all 0.15s; }
+        .focus-msg-icon-btn:hover { transform: scale(1.08); }
+        .focus-msg-icon-btn.selected { background: rgba(59,130,246,0.35); border-color: rgba(59,130,246,0.8); box-shadow: 0 0 10px rgba(59,130,246,0.5); }
     </style>
 </head>
 <body class="text-white min-h-screen p-6 max-w-6xl mx-auto">
@@ -293,19 +350,9 @@
             <div class="flex flex-wrap items-center gap-2">
                 <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm pointer-events-none">🔍</span>
-                    <input
-                        type="text"
-                        id="tableSearchInput"
-                        placeholder="Find table #..."
-                        autocomplete="off"
-                        class="bg-slate-700 border border-slate-600 pl-9 pr-9 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400 w-44 transition"
-                    >
-                    <button
-                        id="tableSearchClear"
-                        onclick="clearTableSearch()"
-                        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-sm font-bold hidden"
-                        title="Clear search"
-                    >✕</button>
+                    <input type="text" id="tableSearchInput" placeholder="Find table #..." autocomplete="off"
+                        class="bg-slate-700 border border-slate-600 pl-9 pr-9 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400 w-44 transition">
+                    <button id="tableSearchClear" onclick="clearTableSearch()" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-sm font-bold hidden" title="Clear search">✕</button>
                 </div>
                 <form onsubmit="addNewTable(event)" class="flex gap-2">
                     <input type="text" id="newTableNum" placeholder="Table Number/Name" required class="bg-slate-700 border border-slate-600 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
@@ -393,6 +440,10 @@
         let msgSelectedIcon = '💬';
         let tableSearchFilter = '';
 
+        let focusMsgComposerOpen = false;
+        let focusMsgDraftText = '';
+        let focusMsgDraftIcon = '💬';
+
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -408,6 +459,8 @@
             { value: 1440, label: '24 hours' },
             { value: 0,    label: 'No expiry' }
         ];
+
+        const RING_CIRCUMFERENCE = 552.92;
 
         function formatHMS(ms) {
             if (ms < 0) ms = 0;
@@ -477,30 +530,50 @@
                 el.innerText = formatHMS(remaining);
             });
 
-            // Single-table focus hero timer
-            document.querySelectorAll('[data-focus-countdown]').forEach(el => {
-                const tKey = el.getAttribute('data-focus-countdown');
-                const t = tables[tKey];
-                const wrapper = document.getElementById('focusBigTimer');
-                if (!t || !t.hasSession || !t.sessionStart) {
-                    if (wrapper) wrapper.className = 'focus-hero-timer no-session';
-                    el.innerText = '— no session —';
-                    return;
+            const focusRing = document.getElementById('focusBigTimer');
+            if (focusRing) {
+                const activeTable = container_getActiveFocusTable();
+                const big = document.getElementById('focusTimerBig');
+                const fg = document.getElementById('focusTimerRingFg');
+
+                if (!activeTable) {
+                    focusRing.className = 'focus-timer-ring is-no-session';
+                    if (big) big.innerText = '— no session —';
+                    if (fg) fg.setAttribute('stroke-dashoffset', RING_CIRCUMFERENCE);
+                } else {
+                    const t = tables[activeTable];
+                    if (!t || !t.hasSession || !t.sessionStart) {
+                        focusRing.className = 'focus-timer-ring is-no-session';
+                        if (big) big.innerText = '— no session —';
+                        if (fg) fg.setAttribute('stroke-dashoffset', RING_CIRCUMFERENCE);
+                    } else {
+                        const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
+                        if (idleMinutes === 0) {
+                            focusRing.className = 'focus-timer-ring is-no-expiry';
+                            if (big) big.innerText = '∞';
+                            if (fg) fg.setAttribute('stroke-dashoffset', 0);
+                        } else {
+                            const elapsed = now - t.sessionStart;
+                            const total = idleMinutes * 60 * 1000;
+                            const remaining = total - elapsed;
+                            const pct = Math.max(0, Math.min(1, remaining / total));
+
+                            let cls = 'is-safe';
+                            if (remaining <= 0)                    cls = 'is-danger';
+                            else if (remaining < 5 * 60 * 1000)    cls = 'is-danger';
+                            else if (remaining < 30 * 60 * 1000)   cls = 'is-warn';
+
+                            focusRing.className = `focus-timer-ring ${cls}`;
+
+                            if (fg) {
+                                fg.setAttribute('stroke-dasharray', RING_CIRCUMFERENCE);
+                                fg.setAttribute('stroke-dashoffset', RING_CIRCUMFERENCE * (1 - pct));
+                            }
+                            if (big) big.innerText = remaining > 0 ? formatHMS(remaining) : 'Expiring…';
+                        }
+                    }
                 }
-                const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
-                if (idleMinutes === 0) {
-                    if (wrapper) wrapper.className = 'focus-hero-timer no-expiry';
-                    el.innerText = '∞ No expiry';
-                    return;
-                }
-                const remaining = (t.sessionStart + idleMinutes * 60 * 1000) - now;
-                let cls = 'safe';
-                if (remaining <= 0) cls = 'danger';
-                else if (remaining < 5 * 60 * 1000) cls = 'danger';
-                else if (remaining < 30 * 60 * 1000) cls = 'warn';
-                if (wrapper) wrapper.className = `focus-hero-timer ${cls}`;
-                el.innerText = remaining > 0 ? formatHMS(remaining) : 'Expiring…';
-            });
+            }
         }
         setInterval(updateCountdowns, 1000);
 
@@ -757,6 +830,136 @@
             });
         }
 
+        function container_getActiveFocusTable() {
+            const restoTables = (globalData.tables && globalData.tables[currentAdminRestaurant]) || {};
+            const matched = Object.keys(restoTables).filter(tableMatchesSearch);
+            return matched.length === 1 ? matched[0] : null;
+        }
+
+        function toggleFocusMsgComposer() {
+            focusMsgComposerOpen = !focusMsgComposerOpen;
+            if (!focusMsgComposerOpen) {
+                focusMsgDraftText = '';
+                focusMsgDraftIcon = '💬';
+            }
+            renderSingleTableFocus();
+        }
+
+        function closeFocusMsgComposer() {
+            focusMsgComposerOpen = false;
+            focusMsgDraftText = '';
+            focusMsgDraftIcon = '💬';
+            renderSingleTableFocus();
+        }
+
+        function updateFocusMsgDraft() {
+            const ta = document.getElementById('focusMsgTextarea');
+            if (ta) focusMsgDraftText = ta.value;
+            const counter = document.getElementById('focusMsgCounter');
+            if (counter) counter.innerText = focusMsgDraftText.length;
+        }
+
+        function setFocusMsgQuick(text) {
+            focusMsgDraftText = text;
+            const ta = document.getElementById('focusMsgTextarea');
+            if (ta) ta.value = text;
+            const counter = document.getElementById('focusMsgCounter');
+            if (counter) counter.innerText = text.length;
+            if (ta) ta.focus();
+        }
+
+        function pickFocusMsgIcon(icon) {
+            focusMsgDraftIcon = icon;
+            document.querySelectorAll('[data-focus-msg-icon]').forEach(b => {
+                if (b.getAttribute('data-focus-msg-icon') === icon) {
+                    b.classList.add('selected');
+                } else {
+                    b.classList.remove('selected');
+                }
+            });
+        }
+
+        function sendFocusMsg() {
+            const ta = document.getElementById('focusMsgTextarea');
+            const text = ta ? ta.value.trim() : '';
+            if (!text) { if (ta) ta.focus(); return; }
+            const tableNum = container_getActiveFocusTable();
+            if (!tableNum) return;
+
+            const btn = document.getElementById('focusMsgSendBtn');
+            if (btn) { btn.disabled = true; btn.innerText = 'Sending...'; }
+
+            socket.emit('admin_message', {
+                restaurant: currentAdminRestaurant,
+                tableNum,
+                message: text,
+                icon: focusMsgDraftIcon
+            }, (res) => {
+                if (btn) { btn.disabled = false; btn.innerText = 'Send 📤'; }
+                if (res && res.success) {
+                    focusMsgDraftText = '';
+                    focusMsgDraftIcon = '💬';
+                    focusMsgComposerOpen = false;
+                    showModal('Message Sent', `Sent to Table #${tableNum}:\n"${text}"`, '💬');
+                    renderSingleTableFocus();
+                } else {
+                    showModal('Message Failed', (res && res.message) || 'Unknown error', '⚠️');
+                }
+            });
+        }
+
+        function renderInlineMsgComposer(tableKey) {
+            const ICONS = ['💬','👋','🔔','🎉','⏳','🍽️','⚠️','🙏','😊'];
+            const QUICKS = [
+                { t: 'Welcome! 👋 We are delighted to have you here.', icon: '👋', label: 'Welcome' },
+                { t: 'Your order is being prepared 👨‍🍳', icon: '👨‍🍳', label: 'Preparing' },
+                { t: 'Your food is on the way! 🍽️', icon: '🍽️', label: 'On the way' },
+                { t: 'Enjoy your meal! 😊', icon: '😊', label: 'Enjoy' },
+                { t: 'Would you like anything else? 🛎️', icon: '🛎️', label: 'Anything else?' },
+                { t: 'Thank you for dining with us! 🙏', icon: '🙏', label: 'Thank you' }
+            ];
+
+            return `
+                <div class="focus-msg-composer">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="focus-section-title" style="margin:0;">
+                            <span>💬 Message Table #${esc(tableKey)}</span>
+                        </div>
+                        <button onclick="closeFocusMsgComposer()" class="text-slate-400 hover:text-white text-lg font-bold leading-none" title="Close composer">×</button>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="mini-label mb-2">Quick messages</div>
+                        <div>
+                            ${QUICKS.map(q => `<button class="focus-msg-quick" onclick="setFocusMsgQuick('${esc(q.t).replace(/'/g, "\\'")}')">${q.icon} ${esc(q.label)}</button>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="mini-label mb-2">Icon</div>
+                        <div class="flex flex-wrap gap-1.5">
+                            ${ICONS.map(ic => `
+                                <button class="focus-msg-icon-btn ${ic === focusMsgDraftIcon ? 'selected' : ''}"
+                                        data-focus-msg-icon="${ic}"
+                                        onclick="pickFocusMsgIcon('${ic}')">${ic}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <textarea id="focusMsgTextarea" rows="3" maxlength="500"
+                        placeholder="Type a message to the customer..."
+                        oninput="updateFocusMsgDraft()">${esc(focusMsgDraftText)}</textarea>
+
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-[10px] text-slate-500"><span id="focusMsgCounter">${focusMsgDraftText.length}</span>/500</span>
+                        <div class="flex gap-2">
+                            <button onclick="closeFocusMsgComposer()" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-bold transition">Cancel</button>
+                            <button id="focusMsgSendBtn" onclick="sendFocusMsg()" class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition">Send 📤</button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
         document.getElementById('section-tables').addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-action]');
             if (!btn) return;
@@ -808,7 +1011,7 @@
         document.getElementById('floorMap').addEventListener('click', (e) => {
             const tile = e.target.closest('[data-jump-to]');
             if (!tile) return;
-            scrollToTableCard(tile.getAttribute('data-jump-to'));
+            openTableFocus(tile.getAttribute('data-jump-to'));
         });
 
         document.getElementById('floorMapLarge').addEventListener('click', (e) => {
@@ -827,23 +1030,36 @@
 
             const tile = e.target.closest('[data-jump-to]');
             if (!tile) return;
-            const tableNum = tile.getAttribute('data-jump-to');
-            switchTab('tables');
-            setTimeout(() => scrollToTableCard(tableNum), 120);
+            openTableFocus(tile.getAttribute('data-jump-to'));
         });
 
-        function scrollToTableCard(tableNum) {
-            const card = document.getElementById(`table-card-${tableNum}`);
-            if (!card) return;
+        function openTableFocus(tableNum) {
+            tableSearchFilter = normalizeTableSearch(tableNum);
+            const input = document.getElementById('tableSearchInput');
+            if (input) input.value = tableNum;
+            const clearBtn = document.getElementById('tableSearchClear');
+            if (clearBtn) clearBtn.classList.remove('hidden');
 
-            const rect = card.getBoundingClientRect();
-            const targetY = window.scrollY + rect.top - 90;
-            window.scrollTo({ top: targetY, behavior: 'smooth' });
+            focusMsgComposerOpen = false;
+            focusMsgDraftText = '';
+            focusMsgDraftIcon = '💬';
 
-            card.classList.remove('is-highlighted');
-            void card.offsetWidth;
-            card.classList.add('is-highlighted');
-            setTimeout(() => card.classList.remove('is-highlighted'), 1700);
+            if (currentTab !== 'tables') switchTab('tables');
+
+            updateTableSearchNotice();
+            renderAdmin();
+            renderSingleTableFocus();
+            renderFloorMap();
+            if (currentTab === 'floor') renderFloorMapLarge();
+
+            setTimeout(() => {
+                const focusEl = document.getElementById('singleTableFocus');
+                if (focusEl) {
+                    const rect = focusEl.getBoundingClientRect();
+                    const targetY = window.scrollY + rect.top - 90;
+                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                }
+            }, 60);
         }
 
         function getSortedTableKeys(restoTables) {
@@ -869,6 +1085,9 @@
                 if (raw.trim()) clearBtn.classList.remove('hidden');
                 else clearBtn.classList.add('hidden');
             }
+            focusMsgComposerOpen = false;
+            focusMsgDraftText = '';
+            focusMsgDraftIcon = '💬';
             updateTableSearchNotice();
             renderAdmin();
             renderSingleTableFocus();
@@ -877,6 +1096,9 @@
         }
         function clearTableSearch() {
             tableSearchFilter = '';
+            focusMsgComposerOpen = false;
+            focusMsgDraftText = '';
+            focusMsgDraftIcon = '💬';
             const input = document.getElementById('tableSearchInput');
             if (input) input.value = '';
             const clearBtn = document.getElementById('tableSearchClear');
@@ -934,7 +1156,7 @@
                 const count = restoActiveSessions[k] || 0;
                 const badge = (count > 0) ? `<span class="map-tile-badge">${count}</span>` : '';
                 return `
-                    <div class="map-tile map-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open card)">
+                    <div class="map-tile map-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open)">
                         ${badge}
                         <div class="map-tile-num">${esc(k)}</div>
                         <div class="map-tile-label">${s.label}</div>
@@ -1005,7 +1227,7 @@
                 }
 
                 return `
-                    <div class="map-tile-lg map-tile-lg-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open card)">
+                    <div class="map-tile-lg map-tile-lg-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open)">
                         ${badge}
                         <button class="map-tile-lg-btn map-tile-lg-btn-menu-left ${menuBtnClass}" data-map-action="toggle-open" data-table="${esc(k)}" title="${menuBtnTitle}">${menuBtnIcon}</button>
                         <button class="map-tile-lg-btn map-tile-lg-btn-order-right ${orderBtnClass}" data-map-action="toggle-order" data-table="${esc(k)}" title="${orderBtnTitle}">${orderBtnIcon}</button>
@@ -1016,11 +1238,16 @@
             }).join('');
         }
 
-        // ---------- SINGLE TABLE FOCUS VIEW ----------
+        // ============ SINGLE TABLE FOCUS VIEW ============
         function renderSingleTableFocus() {
             const container = document.getElementById('singleTableFocus');
             const gridContainer = document.getElementById('tablesGrid');
             if (!container || !gridContainer) return;
+
+            if (focusMsgComposerOpen) {
+                const ta = document.getElementById('focusMsgTextarea');
+                if (ta) focusMsgDraftText = ta.value;
+            }
 
             const restoTables = (globalData.tables && globalData.tables[currentAdminRestaurant]) || {};
             const matchedKeys = getSortedTableKeys(restoTables).filter(tableMatchesSearch);
@@ -1057,15 +1284,18 @@
             else if (isOccupied)  { heroClass += ' is-occupied';  statusClass = 'focus-status-occupied';  statusLabel = 'Occupied'; }
             else if (isMenuOpen)  { heroClass += ' is-active';    statusClass = 'focus-status-active';    statusLabel = 'Active'; }
 
-            let timerClass = 'no-session';
-            let timerContent = '— no session —';
+            let timerClassClass = 'is-no-session';
+            let timerInsideContent = `<div class="icon">⏱</div><div class="big">— no session —</div>`;
+
             if (hasSession && t.sessionStart) {
                 if (idleMinutes === 0) {
-                    timerClass = 'no-expiry';
-                    timerContent = '∞ No expiry';
+                    timerClassClass = 'is-no-expiry';
+                    timerInsideContent = `<div class="big">∞</div><div class="small">No expiry</div>`;
                 } else {
-                    timerClass = 'safe';
-                    timerContent = `<span data-focus-countdown="${esc(k)}">--:--:--</span>`;
+                    timerClassClass = 'is-safe';
+                    timerInsideContent = `
+                        <div class="big" id="focusTimerBig">--:--:--</div>
+                        <div class="small">remaining</div>`;
                 }
             }
 
@@ -1080,7 +1310,7 @@
             let orderBtn;
             if (isWaiting && !t.canOrder) {
                 orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="focus-action-btn btn-requested">
-                    <span class="icn">🛎️</span><span class="txt">Requested — Approve</span><span class="arr">→</span>
+                    <span class="icn">🛎️</span><span class="txt">Approve</span><span class="arr">→</span>
                 </button>`;
             } else if (t.canOrder) {
                 orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="focus-action-btn btn-lock-order">
@@ -1138,10 +1368,19 @@
                                 </div>
                                 <span class="focus-status-pill ${statusClass}">${statusLabel}</span>
                             </div>
-                            <div class="focus-hero-timer ${timerClass}" id="focusBigTimer">
-                                ${timerContent}
+
+                            <div class="focus-timer-ring-wrap">
+                                <div class="focus-timer-ring ${timerClassClass}" id="focusBigTimer">
+                                    <svg viewBox="0 0 200 200">
+                                        <circle class="ring-bg" cx="100" cy="100" r="88"></circle>
+                                        <circle class="ring-fg" id="focusTimerRingFg" cx="100" cy="100" r="88"
+                                            stroke-dasharray="${RING_CIRCUMFERENCE}" stroke-dashoffset="0"></circle>
+                                    </svg>
+                                    <div class="focus-timer-ring-text">
+                                        ${timerInsideContent}
+                                    </div>
+                                </div>
                             </div>
-                            <div class="focus-hero-timer-label">Session time remaining</div>
                         </div>
 
                         <div class="focus-info-grid">
@@ -1166,8 +1405,8 @@
                         </div>
 
                         <div class="focus-info-grid">
-                            <button data-action="message" data-table="${esc(k)}" class="focus-action-btn" style="background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.5);">
-                                <span class="icn">💬</span><span class="txt">Message</span>
+                            <button onclick="toggleFocusMsgComposer()" class="focus-action-btn" style="background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.5);${focusMsgComposerOpen ? 'box-shadow:0 0 0 2px rgba(59,130,246,0.6);' : ''}">
+                                <span class="icn">💬</span><span class="txt">${focusMsgComposerOpen ? 'Close Message' : 'Message'}</span>
                             </button>
                             <button data-action="reset" data-table="${esc(k)}" class="focus-action-btn" style="background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.5);">
                                 <span class="icn">🔄</span><span class="txt">Reset</span>
@@ -1180,15 +1419,18 @@
                     </div>
 
                     <div class="focus-right">
-                        <div class="mini-panel">
-                            <div class="focus-section-title">Menu Access</div>
-                            ${menuBtn}
+                        <div class="focus-actions-duo">
+                            <div class="focus-action-col">
+                                <div class="focus-section-title">Menu Access</div>
+                                ${menuBtn}
+                            </div>
+                            <div class="focus-action-col">
+                                <div class="focus-section-title">Order Access</div>
+                                ${orderBtn}
+                            </div>
                         </div>
 
-                        <div class="mini-panel">
-                            <div class="focus-section-title">Order Access</div>
-                            ${orderBtn}
-                        </div>
+                        ${focusMsgComposerOpen ? renderInlineMsgComposer(k) : ''}
 
                         <div class="focus-orders-panel">
                             <div class="focus-section-title">
@@ -1201,6 +1443,16 @@
                         </div>
                     </div>
                 </div>`;
+
+            if (focusMsgComposerOpen) {
+                const ta = document.getElementById('focusMsgTextarea');
+                if (ta && focusMsgDraftText) {
+                    if (document.activeElement !== ta) {
+                        ta.focus();
+                        ta.setSelectionRange(ta.value.length, ta.value.length);
+                    }
+                }
+            }
 
             setTimeout(updateCountdowns, 0);
         }
@@ -1528,6 +1780,13 @@
                 closeCustomModal();
                 closeMessageModal();
                 closeConfirmModal();
+                if (focusMsgComposerOpen) {
+                    closeFocusMsgComposer();
+                    return;
+                }
+                if (tableSearchFilter) {
+                    clearTableSearch();
+                }
             }
         });
     </script>
