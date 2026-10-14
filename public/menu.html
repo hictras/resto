@@ -14,7 +14,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", Tahoma, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding-bottom: 140px; }
         .hidden { display: none !important; }
-        .sticky-top-wrapper { position: sticky; top: 28px; z-index: 50; background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        .sticky-top-wrapper { position: sticky; top: 0; z-index: 50; background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
         header { border-bottom: 1px solid var(--border); padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; max-width: 960px; margin: 0 auto; }
         .header-titles { text-align: left; }
         html[dir="rtl"] .header-titles { text-align: right; }
@@ -28,7 +28,7 @@
         .nav-tabs button { background: none; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; cursor: pointer; color: var(--text); transition: all 0.2s; }
         .nav-tabs button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
         .container { max-width: 960px; margin: 1rem auto; padding: 0 1rem; }
-        .menu-section { scroll-margin-top: 180px; }
+        .menu-section { scroll-margin-top: 140px; }
         .section-title { font-size: 1.25rem; margin: 1.8rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 2px solid var(--primary); display: flex; justify-content: space-between; align-items: baseline; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.9rem; }
         .card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
@@ -47,7 +47,6 @@
         .variant-price { font-weight: 700; color: var(--primary-dark); font-size: 0.85rem; white-space: nowrap; }
         .variant-add { background: var(--primary); color: #fff; border: none; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.75rem; white-space: nowrap; transition: background 0.2s; }
         .variant-add:hover { background: var(--primary-dark); }
-        .variant-add.disabled { background: #cbd5e1; cursor: not-allowed; }
         .variant-qty { background: #ef4444; color: #fff; font-size: 0.7rem; padding: 1px 7px; border-radius: 9999px; font-weight: bold; }
 
         .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 0.8rem 1rem; box-shadow: 0 -3px 15px rgba(0,0,0,0.1); max-width: 960px; margin: 0 auto; z-index: 40; border-radius: 16px 16px 0 0; }
@@ -62,10 +61,6 @@
     </style>
 </head>
 <body>
-
-    <div id="sessionTimerBanner" class="bg-amber-500 text-white text-xs font-bold py-1.5 px-4 text-center sticky top-0 z-50 flex justify-center items-center gap-2 shadow-sm">
-        <span>⏳ Session expires in:</span> <span id="countdownDisplay" class="bg-amber-600 px-2 py-0.5 rounded tracking-widest font-mono">--:--</span>
-    </div>
 
     <div id="customModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
@@ -168,7 +163,6 @@
         let currentTable = null;
         let currentRestaurant = null;
         let currentToken = null;
-        let expiresAt = null;
         let sessionStart = 0;
         let tableIsOpen = false;
         let canOrder = false;
@@ -179,7 +173,6 @@
         let menuCategories = [];
         let itemLookup = {};
         let latestServerState = { tables: {}, tableRequests: {}, orders: [] };
-        let countdownInterval = null;
 
         let messages = [];
         let unreadMsgIds = new Set();
@@ -198,28 +191,16 @@
         // Detects menu items whose description contains multiple sub-options with
         // their own prices, e.g. "Fried eggs (5.50), Omelette (8.50), ...".
         // Splits them into individually addable variants with synthetic IDs.
-        //
-        // Handles:
-        //   - Parent price present or null
-        //   - English (comma) and Arabic (" - ") separators
-        //   - Prices in parentheses "(5.50)" OR bare "5.50" at end of clause
-        //   - Clauses without a price (falls back to parent price, else skip)
-        //   - Non-Latin numerals (Arabic-Indic digits ٠١٢٣٤٥٦٧٨٩ / ۰۱۲۳۴۵۶۷۸۹)
-        //
-        // Returns: null if the item should be rendered as a normal single-price card,
-        //          otherwise an array of { id, nameEn, nameAr, price } variants.
-
         const ARABIC_DIGITS = { '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
                                 '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9' };
         function normalizeDigits(str) {
             return String(str).replace(/[٠-٩۰-۹]/g, d => ARABIC_DIGITS[d] || d);
         }
 
-        const PRICE_PAREN_RE = /\(\s*([0-9]+(?:\.[0-9]+)?)\s*\)\s*$/;   // "(5.50)" at end
-        const PRICE_BARE_RE  = /\s([0-9]+(?:\.[0-9]+)?)\s*$/;          // "5.50" at end (space-separated)
+        const PRICE_PAREN_RE = /\(\s*([0-9]+(?:\.[0-9]+)?)\s*\)\s*$/;
+        const PRICE_BARE_RE  = /\s([0-9]+(?:\.[0-9]+)?)\s*$/;
 
         function parseVariants(item, lang) {
-            // Only parse if price is null/0/missing AND description looks like a list
             const parentPrice = parseFloat(item.price);
             const hasParentPrice = !isNaN(parentPrice) && parentPrice > 0;
 
@@ -227,14 +208,11 @@
                 ? (item.descAr || item.descEn || '')
                 : (item.descEn || item.descAr || '');
             const desc = normalizeDigits(descRaw);
-            if (!desc) return hasParentPrice ? null : null;
+            if (!desc) return null;
 
-            // Heuristic: must contain at least 2 separators AND at least one price-like number
             const hasPriceLike = /[0-9]+\.[0-9]{2}/.test(desc) || /\(\s*[0-9]+(?:\.[0-9]+)?\s*\)/.test(desc);
             if (!hasPriceLike) return null;
 
-            // Split on Arabic-friendly " - " OR on " , " / ","
-            // (Arabic descriptions use " - ", English uses ",")
             const rawParts = desc.split(/\s+-\s+|,\s*|\s+—\s+/).map(s => s.trim()).filter(Boolean);
             if (rawParts.length < 2) return null;
 
@@ -243,13 +221,11 @@
                 let name = part;
                 let price = null;
 
-                // Try "(5.50)" first
                 let m = name.match(PRICE_PAREN_RE);
                 if (m) {
                     price = parseFloat(m[1]);
                     name = name.slice(0, m.index).trim();
                 } else {
-                    // Try bare number at end " 5.50"
                     m = name.match(PRICE_BARE_RE);
                     if (m) {
                         price = parseFloat(m[1]);
@@ -257,20 +233,16 @@
                     }
                 }
 
-                // If a parent price exists and this clause has none, fall back to parent
                 if (price === null && hasParentPrice) price = parentPrice;
 
-                // Skip empty names
                 name = name.replace(/[.\s]+$/, '').trim();
                 if (!name) return;
-
-                // If we still have no price, skip this variant (can't bill a null)
                 if (price === null || isNaN(price) || price <= 0) return;
 
                 variants.push({
                     id: `${item.id}__${i}`,
-                    nameEn: lang === 'ar' ? name : name,      // use the current-lang name as-is
-                    nameAr: lang === 'ar' ? name : name,
+                    nameEn: name,
+                    nameAr: name,
                     price
                 });
             });
@@ -286,7 +258,6 @@
         // ============================================
 
         function showErrorPage(message = "Invalid or expired session token.") {
-            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
             isExpired = true;
             document.body.innerHTML = `
                 <div class="min-h-screen bg-gray-950 flex items-center justify-center p-6">
@@ -319,13 +290,9 @@
 
                 currentRestaurant = data.restaurant;
                 currentTable = data.tableNumber;
-                expiresAt = data.expiresAt || (Date.now() + (data.lifetimeMinutes || 15) * 60 * 1000);
                 sessionStart = data.sessionStart || Date.now();
 
-                if (!localStorage.getItem(`restaurant_session_token_${currentToken}`)) {
-                    localStorage.setItem(`restaurant_session_token_${currentToken}`, Date.now());
-                }
-                localStorage.setItem(`restaurant_session_expires_${currentToken}`, expiresAt);
+                localStorage.setItem(`restaurant_session_token_${currentToken}`, Date.now());
             } catch (e) {
                 showErrorPage("Unable to verify session with the server.");
                 return;
@@ -334,8 +301,6 @@
             socket.emit('register_session', { token: currentToken }, (res) => {
                 if (!res.success) showErrorPage("Session registration failed.");
             });
-
-            startSessionCountdown();
 
             document.getElementById('brandTitle').innerText = currentRestaurant.toUpperCase();
             document.getElementById('tableBtnDisplay').innerText = `Table #${currentTable}`;
@@ -350,26 +315,6 @@
             await loadMenuFromServer(currentRestaurant);
             await loadMessageHistory();
         };
-
-        function startSessionCountdown() {
-            const tick = () => {
-                if (isExpired) return;
-                const remaining = expiresAt - Date.now();
-                if (remaining <= 0) {
-                    if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
-                    localStorage.removeItem(`restaurant_session_token_${currentToken}`);
-                    localStorage.removeItem(`restaurant_session_expires_${currentToken}`);
-                    showErrorPage("Your session has ended. Thank you for dining with us!");
-                    return;
-                }
-                const minutes = Math.floor(remaining / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                document.getElementById('countdownDisplay').innerText =
-                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            };
-            tick();
-            countdownInterval = setInterval(tick, 1000);
-        }
 
         async function subscribeToPush() {
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -435,9 +380,7 @@
         });
 
         socket.on('session_ended', () => {
-            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
             localStorage.removeItem(`restaurant_session_token_${currentToken}`);
-            localStorage.removeItem(`restaurant_session_expires_${currentToken}`);
             showErrorPage("Your bill has been settled. Thank you for dining with us!");
         });
 
@@ -792,12 +735,9 @@
             itemLookup = {};
             menuCategories.forEach(cat => {
                 cat.items.forEach(item => {
-                    // Try to parse the item as a variadic (multi-option) item
                     const variants = parseVariants(item, currentLang);
                     if (variants) {
-                        // Register the parent so cart lookups can display a header if needed
                         itemLookup[item.id] = { ...item, isVariadic: true, variants };
-                        // Register each variant under its synthetic ID
                         variants.forEach(v => {
                             itemLookup[v.id] = {
                                 id: v.id,
@@ -825,7 +765,6 @@
             document.getElementById('brandSubtitle').innerText = t.brandSubtitle;
             document.getElementById('langToggleBtn').innerText = t.langBtnText;
             document.getElementById('lblViewList').innerText = t.viewList;
-            // Re-parse variants for the new language (names change)
             rebuildLookup();
             renderMenu();
             renderMessages();
@@ -841,7 +780,6 @@
 
         function addToCart(id) {
             if (isExpired) return;
-            // Guard: only allow IDs that exist in the lookup
             if (!itemLookup[id]) return;
             cart[id] = (cart[id] || 0) + 1;
             updateCartUI();
@@ -944,7 +882,6 @@
                         const isVariadic = lookupEntry && lookupEntry.isVariadic;
 
                         if (isVariadic && lookupEntry.variants && lookupEntry.variants.length > 0) {
-                            // ---- Variadic card: parent title + per-variant rows ----
                             const parentName = currentLang === 'ar'
                                 ? (item.nameAr || item.nameEn)
                                 : (item.nameEn || item.nameAr);
@@ -974,7 +911,6 @@
                             </div>`;
                         }
 
-                        // ---- Normal single-price card ----
                         const itemName = currentLang === 'ar' ? (item.nameAr || item.nameEn) : item.nameEn;
                         const altName = currentLang === 'ar' ? item.nameEn : (item.nameAr || '');
                         const itemDesc = currentLang === 'ar' ? (item.descAr || item.descEn || '') : (item.descEn || '');
@@ -1012,8 +948,6 @@
                 const item = itemLookup[id];
                 if (!item) return;
                 total += item.price * cart[id];
-                // If this is a variant, prefix the parent name so kitchen staff can
-                // identify the dish clearly in the ticket.
                 let displayName = getItemDisplayName(item, currentLang);
                 if (item.parentId) {
                     const parentName = currentLang === 'ar'

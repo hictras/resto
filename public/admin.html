@@ -6,81 +6,539 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
+        body { background: radial-gradient(circle at 30% 0%, #0f172a 0%, #020617 60%); }
         .restaurant-select { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f28538%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 9px auto; padding-right: 30px; }
         .msg-quick { transition: all 0.15s; }
         .msg-quick:hover { transform: scale(1.05); }
+
+        /* ================= TABLE CARD ================= */
+        .table-card {
+            position: relative;
+            border-radius: 22px;
+            padding: 14px;
+            background: linear-gradient(180deg, rgba(30,41,59,0.85) 0%, rgba(15,23,42,0.95) 100%);
+            border: 1px solid rgba(148,163,184,0.15);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+        .table-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 22px;
+            padding: 1px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+            pointer-events: none;
+        }
+        .table-card.is-occupied {
+            background: linear-gradient(180deg, rgba(69,10,10,0.7) 0%, rgba(15,23,42,0.95) 100%);
+            border-color: rgba(248,113,113,0.35);
+        }
+        .table-card.is-waiting {
+            background: linear-gradient(180deg, rgba(69,36,7,0.7) 0%, rgba(15,23,42,0.95) 100%);
+            border-color: rgba(251,191,36,0.4);
+        }
+        @keyframes card-highlight {
+            0%   { box-shadow: 0 0 0 0 rgba(250,204,21,0.9), 0 0 0 0 rgba(250,204,21,0.5); }
+            50%  { box-shadow: 0 0 0 6px rgba(250,204,21,0.55), 0 0 24px 6px rgba(250,204,21,0.35); }
+            100% { box-shadow: 0 0 0 0 rgba(250,204,21,0), 0 0 0 0 rgba(250,204,21,0); }
+        }
+        .table-card.is-highlighted {
+            animation: card-highlight 1.6s ease-out;
+            border-color: #facc15 !important;
+        }
+
+        .icon-btn {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px;
+            border: 1px solid;
+            transition: all 0.15s;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .icon-btn:hover { transform: translateY(-1px); filter: brightness(1.2); }
+        .icon-btn-msg { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.4); color: #93c5fd; }
+        .icon-btn-reset { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
+        .icon-btn-del { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.5); color: #f87171; }
+
+        .table-icon-block {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border: 1px solid rgba(148,163,184,0.18);
+            display: flex; align-items: center; justify-content: center;
+            color: #60a5fa;
+            flex-shrink: 0;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .pill-active {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(16,185,129,0.15);
+            color: #6ee7b7;
+            border-radius: 999px;
+            padding: 3px 10px 3px 6px;
+            font-size: 11px; font-weight: 700;
+        }
+        .pill-valid {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(16,185,129,0.08);
+            color: #6ee7b7;
+            border: 1px solid rgba(16,185,129,0.5);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 11px; font-weight: 700;
+        }
+        .pill-occupied {
+            background: rgba(239,68,68,0.15);
+            color: #fca5a5;
+            border-color: rgba(239,68,68,0.55);
+        }
+        .dot-live {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 8px #34d399, 0 0 2px #34d399;
+            animation: pulse-dot 1.6s ease-in-out infinite;
+        }
+        .dot-offline { width: 8px; height: 8px; border-radius: 50%; background: #475569; }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        .countdown-bar {
+            display: flex; align-items: center; gap: 10px;
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .countdown-bar.safe {
+            background: linear-gradient(90deg, rgba(16,185,129,0.18), rgba(16,185,129,0.08));
+            border-color: rgba(16,185,129,0.45);
+            color: #6ee7b7;
+        }
+        .countdown-bar.warn {
+            background: linear-gradient(90deg, rgba(245,158,11,0.22), rgba(245,158,11,0.08));
+            border-color: rgba(245,158,11,0.5);
+            color: #fcd34d;
+        }
+        .countdown-bar.danger {
+            background: linear-gradient(90deg, rgba(239,68,68,0.28), rgba(239,68,68,0.08));
+            border-color: rgba(239,68,68,0.7);
+            color: #fecaca;
+            box-shadow: 0 0 14px rgba(239,68,68,0.35), inset 0 0 12px rgba(239,68,68,0.15);
+        }
+        .countdown-bar.no-session {
+            background: rgba(148,163,184,0.06);
+            border-color: rgba(148,163,184,0.15);
+            color: #94a3b8;
+            font-size: 12px;
+            justify-content: center;
+            font-weight: 600;
+        }
+        .countdown-bar.no-expiry {
+            background: linear-gradient(90deg, rgba(99,102,241,0.22), rgba(99,102,241,0.08));
+            border-color: rgba(99,102,241,0.5);
+            color: #a5b4fc;
+        }
+        .countdown-clock {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            opacity: 0.9;
+        }
+
+        .mini-panel {
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 16px;
+            padding: 10px 12px;
+        }
+        .mini-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+        }
+
+        .timer-select-wrap {
+            position: relative;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .timer-select-icon {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(148,163,184,0.4);
+            display: flex; align-items: center; justify-content: center;
+            color: #cbd5e1;
+            flex-shrink: 0;
+        }
+        .timer-select {
+            flex: 1;
+            appearance: none;
+            background: rgba(15,23,42,0.6);
+            border: 1px solid rgba(148,163,184,0.2);
+            border-radius: 12px;
+            padding: 8px 34px 8px 12px;
+            color: #e2e8f0;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%3E%3Cpath%20fill%3D%22%23cbd5e1%22%20d%3D%22M6%208L0%200h12z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+        }
+        .timer-select:focus { outline: none; border-color: #f59e0b; }
+
+        .status-split {
+            display: flex; align-items: stretch;
+            gap: 10px;
+        }
+        .status-cell {
+            flex: 1;
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 6px;
+        }
+        .status-divider {
+            width: 1px;
+            background: rgba(148,163,184,0.15);
+            align-self: stretch;
+        }
+        .status-cell-icon {
+            width: 32px; height: 32px;
+            border-radius: 10px;
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(148,163,184,0.15);
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            font-size: 15px;
+        }
+        .status-cell-text { font-size: 11px; line-height: 1.25; }
+        .status-cell-text .label { color: #94a3b8; font-weight: 600; }
+        .status-cell-text .value { color: #e2e8f0; font-weight: 800; letter-spacing: 0.3px; display: flex; align-items: center; gap: 6px; }
+        .lock-red { color: #f87171; font-size: 13px; }
+        .unlock-green { color: #34d399; font-size: 13px; }
+
+        .action-btn {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            overflow: hidden;
+        }
+        .action-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+        .action-btn:active { transform: translateY(0); }
+        .action-btn .left-icon {
+            width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+        }
+        .action-btn .arrow { font-size: 18px; opacity: 0.85; }
+        .btn-open-menu {
+            background: linear-gradient(180deg, #059669 0%, #047857 100%);
+            box-shadow: 0 6px 16px rgba(5,150,105,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-close-menu {
+            background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+            box-shadow: 0 6px 16px rgba(220,38,38,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-open-order {
+            background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%);
+            box-shadow: 0 6px 16px rgba(79,70,229,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-lock-order {
+            background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
+            box-shadow: 0 6px 16px rgba(217,119,6,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-requested {
+            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+            box-shadow: 0 6px 16px rgba(239,68,68,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+            animation: req-pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes req-pulse {
+            0%, 100% { box-shadow: 0 6px 16px rgba(239,68,68,0.5), inset 0 1px 0 rgba(255,255,255,0.2); }
+            50% { box-shadow: 0 6px 24px rgba(239,68,68,0.85), inset 0 1px 0 rgba(255,255,255,0.2); }
+        }
+
+        .wants-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: rgba(245,158,11,0.2);
+            color: #fcd34d;
+            border: 1px solid rgba(245,158,11,0.4);
+            border-radius: 999px;
+            padding: 3px 10px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* ================= SMALL FLOOR MAP ================= */
+        .map-tile {
+            position: relative;
+            border-radius: 14px;
+            padding: 14px 8px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+            user-select: none;
+        }
+        .map-tile .map-tile-num {
+            font-size: 20px;
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+        }
+        .map-tile .map-tile-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 3px;
+            opacity: 0.85;
+        }
+        .map-tile .map-tile-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 6px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.35);
+            color: #fff;
+        }
+        .map-tile:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+        }
+        .map-tile.map-active {
+            background: linear-gradient(180deg, rgba(16,185,129,0.28), rgba(16,185,129,0.08));
+            border-color: #10b981;
+            color: #d1fae5;
+            box-shadow: 0 4px 14px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .map-tile.map-active:hover { box-shadow: 0 8px 22px rgba(16,185,129,0.55); }
+        .map-tile.map-active::after {
+            content: '';
+            position: absolute;
+            top: 8px; left: 8px;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 8px #34d399;
+            animation: pulse-dot 1.6s ease-in-out infinite;
+        }
+        .map-tile.map-requested {
+            background: linear-gradient(180deg, rgba(245,158,11,0.3), rgba(245,158,11,0.1));
+            border-color: #f59e0b;
+            color: #fef3c7;
+            box-shadow: 0 4px 14px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            animation: map-pulse 1.4s ease-in-out infinite;
+        }
+        .map-tile.map-requested:hover { box-shadow: 0 8px 22px rgba(245,158,11,0.6); }
+        @keyframes map-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .map-tile.map-occupied {
+            background: linear-gradient(180deg, rgba(239,68,68,0.28), rgba(239,68,68,0.08));
+            border-color: #ef4444;
+            color: #fee2e2;
+            box-shadow: 0 4px 14px rgba(239,68,68,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .map-tile.map-occupied:hover { box-shadow: 0 8px 22px rgba(239,68,68,0.55); }
+        .map-tile.map-idle {
+            background: rgba(148,163,184,0.08);
+            border-color: rgba(148,163,184,0.2);
+            color: #94a3b8;
+        }
+
+        .map-dot {
+            width: 10px; height: 10px;
+            border-radius: 3px;
+            display: inline-block;
+        }
+        .map-dot-green { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.7); }
+        .map-dot-amber { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.7); }
+        .map-dot-red   { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.7); }
+        .map-dot-gray  { background: #64748b; }
+
+        /* ================= LARGE FLOOR MAP (new tab) ================= */
+        .map-tile-lg {
+            position: relative;
+            border-radius: 18px;
+            padding: 18px 12px 14px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+            user-select: none;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .map-tile-lg:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.5);
+        }
+        .map-tile-lg-num {
+            font-size: 38px;
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -1px;
+        }
+        .map-tile-lg-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.85;
+        }
+        .map-tile-lg-countdown {
+            font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.3);
+        }
+        .map-tile-lg-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(0,0,0,0.4);
+            color: #fff;
+        }
+        .map-tile-lg-active {
+            background: linear-gradient(180deg, rgba(16,185,129,0.32), rgba(16,185,129,0.08));
+            border-color: #10b981;
+            color: #d1fae5;
+            box-shadow: 0 6px 20px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .map-tile-lg-active::after {
+            content: '';
+            position: absolute;
+            top: 12px; left: 12px;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #34d399;
+            box-shadow: 0 0 10px #34d399;
+            animation: pulse-dot 1.6s ease-in-out infinite;
+        }
+        .map-tile-lg-requested {
+            background: linear-gradient(180deg, rgba(245,158,11,0.32), rgba(245,158,11,0.1));
+            border-color: #f59e0b;
+            color: #fef3c7;
+            box-shadow: 0 6px 20px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+            animation: map-pulse 1.4s ease-in-out infinite;
+        }
+        .map-tile-lg-occupied {
+            background: linear-gradient(180deg, rgba(239,68,68,0.3), rgba(239,68,68,0.08));
+            border-color: #ef4444;
+            color: #fee2e2;
+            box-shadow: 0 6px 20px rgba(239,68,68,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .map-tile-lg-idle {
+            background: rgba(148,163,184,0.08);
+            border-color: rgba(148,163,184,0.2);
+            color: #94a3b8;
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-6 max-w-6xl mx-auto">
+<body class="text-white min-h-screen p-6 max-w-6xl mx-auto">
+
+    <!-- ============ CUSTOM MODAL ============ -->
     <div id="customModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center text-white">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
             <div id="modalIcon" class="text-3xl mb-2">🔔</div>
             <h3 id="modalTitle" class="text-lg font-bold mb-1">Notification</h3>
-            <p id="modalMessage" class="text-sm text-gray-300 mb-5 whitespace-pre-line">Message goes here...</p>
+            <p id="modalMessage" class="text-sm text-slate-300 mb-5 whitespace-pre-line">Message goes here...</p>
             <button onclick="closeCustomModal()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl font-semibold text-sm transition">OK</button>
         </div>
     </div>
 
+    <!-- ============ MESSAGE MODAL ============ -->
     <div id="messageModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-md w-full shadow-2xl text-white">
-            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl text-white">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
                 <h3 class="text-lg font-bold text-amber-400">💬 Send to <span id="msgTableLabel" class="text-white">Table --</span></h3>
-                <button onclick="closeMessageModal()" class="text-gray-400 hover:text-white text-xl font-bold leading-none">×</button>
+                <button onclick="closeMessageModal()" class="text-slate-400 hover:text-white text-xl font-bold leading-none">×</button>
             </div>
             <div class="mb-3">
-                <label class="text-xs font-semibold text-gray-400 block mb-2">Quick messages:</label>
+                <label class="text-xs font-semibold text-slate-400 block mb-2">Quick messages:</label>
                 <div class="flex flex-wrap gap-2">
                     <button onclick="setQuickMessage('Welcome! 👋 We are delighted to have you here. Browse our menu and ring the bell when you are ready to order.')" class="msg-quick bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">👋 Welcome</button>
-                    <button onclick="setQuickMessage('Your order is being prepared 👨‍🍳')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">👨‍🍳 Preparing</button>
-                    <button onclick="setQuickMessage('Your food is on the way! 🍽️')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">🍽️ On the way</button>
-                    <button onclick="setQuickMessage('Enjoy your meal! 😊')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">😊 Enjoy</button>
-                    <button onclick="setQuickMessage('Would you like anything else? 🛎️')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">🛎️ Anything else?</button>
-                    <button onclick="setQuickMessage('Thank you for dining with us! 🙏')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">🙏 Thank you</button>
-                    <button onclick="setQuickMessage('Your table is almost ready ⏳')" class="msg-quick bg-gray-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">⏳ Almost ready</button>
+                    <button onclick="setQuickMessage('Your order is being prepared 👨‍🍳')" class="msg-quick bg-slate-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">👨‍🍳 Preparing</button>
+                    <button onclick="setQuickMessage('Your food is on the way! 🍽️')" class="msg-quick bg-slate-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">🍽️ On the way</button>
+                    <button onclick="setQuickMessage('Enjoy your meal! 😊')" class="msg-quick bg-slate-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">😊 Enjoy</button>
+                    <button onclick="setQuickMessage('Would you like anything else? 🛎️')" class="msg-quick bg-slate-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">🛎️ Anything else?</button>
+                    <button onclick="setQuickMessage('Thank you for dining with us! 🙏')" class="msg-quick bg-slate-700 hover:bg-amber-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold">🙏 Thank you</button>
                 </div>
             </div>
             <div class="mb-3">
-                <label class="text-xs font-semibold text-gray-400 block mb-2">Icon:</label>
+                <label class="text-xs font-semibold text-slate-400 block mb-2">Icon:</label>
                 <div class="flex flex-wrap gap-1.5" id="iconPicker">
                     <button onclick="pickIcon('💬')" data-icon="💬" class="icon-opt text-2xl p-1.5 bg-amber-600 rounded-lg">💬</button>
-                    <button onclick="pickIcon('👋')" data-icon="👋" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">👋</button>
-                    <button onclick="pickIcon('🔔')" data-icon="🔔" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">🔔</button>
-                    <button onclick="pickIcon('🎉')" data-icon="🎉" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">🎉</button>
-                    <button onclick="pickIcon('⏳')" data-icon="⏳" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">⏳</button>
-                    <button onclick="pickIcon('🍽️')" data-icon="🍽️" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">🍽️</button>
-                    <button onclick="pickIcon('⚠️')" data-icon="⚠️" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">⚠️</button>
-                    <button onclick="pickIcon('🙏')" data-icon="🙏" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">🙏</button>
-                    <button onclick="pickIcon('😊')" data-icon="😊" class="icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600">😊</button>
+                    <button onclick="pickIcon('👋')" data-icon="👋" class="icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600">👋</button>
+                    <button onclick="pickIcon('🔔')" data-icon="🔔" class="icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600">🔔</button>
+                    <button onclick="pickIcon('🎉')" data-icon="🎉" class="icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600">🎉</button>
+                    <button onclick="pickIcon('⏳')" data-icon="⏳" class="icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600">⏳</button>
+                    <button onclick="pickIcon('🍽️')" data-icon="🍽️" class="icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600">🍽️</button>
+                    <button onclick="pickIcon('⚠️')" data-icon="⚠️" class="icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600">⚠️</button>
+                    <button onclick="pickIcon('🙏')" data-icon="🙏" class="icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600">🙏</button>
+                    <button onclick="pickIcon('😊')" data-icon="😊" class="icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600">😊</button>
                 </div>
             </div>
             <div class="mb-4">
-                <label class="text-xs font-semibold text-gray-400 block mb-1">Message:</label>
+                <label class="text-xs font-semibold text-slate-400 block mb-1">Message:</label>
                 <textarea id="msgText" rows="3" maxlength="500" placeholder="Type a message to the customer..."
-                    class="w-full bg-gray-700 border border-gray-600 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-400 resize-none"></textarea>
-                <div class="text-right text-[10px] text-gray-500 mt-1"><span id="msgCharCount">0</span>/500</div>
+                    class="w-full bg-slate-700 border border-slate-600 rounded-lg p-2.5 text-sm text-white focus:outline-none focus:border-amber-400 resize-none"></textarea>
+                <div class="text-right text-[10px] text-slate-500 mt-1"><span id="msgCharCount">0</span>/500</div>
             </div>
             <div class="flex gap-2">
-                <button onclick="closeMessageModal()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2.5 rounded-xl font-semibold text-sm transition">Cancel</button>
+                <button onclick="closeMessageModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2.5 rounded-xl font-semibold text-sm transition">Cancel</button>
                 <button onclick="sendAdminMessage()" id="sendMsgBtn" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl font-semibold text-sm transition">Send 📤</button>
             </div>
         </div>
     </div>
 
+    <!-- ============ QR PRINT MODAL ============ -->
     <div id="qrPrintModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-gray-800">
             <div class="flex flex-wrap justify-between items-center mb-4 border-b pb-3 gap-3">
                 <h2 id="qrModalTitle" class="text-xl font-bold">🖨️ Table QR Codes</h2>
                 <div class="flex items-center gap-3">
-                    <label class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
-                        Token Lifetime:
-                        <select id="tokenLifetimeSelect" onchange="openPrintQRCodesModal()" class="bg-gray-100 border border-gray-300 rounded-lg p-1.5 text-xs font-bold text-gray-800 focus:outline-none">
-                            <option value="1">1 Minute</option>
-                            <option value="2">2 Minutes</option>
-                            <option value="5">5 Minutes</option>
-                            <option value="10">10 Minutes</option>
-                            <option value="15" selected>15 Minutes</option>
-                        </select>
-                    </label>
                     <button onclick="downloadAllQRZip()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition">Download ZIP 📦</button>
                     <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition">Print Sheet 🖨️</button>
                     <button onclick="document.getElementById('qrPrintModal').classList.add('hidden')" class="bg-gray-200 px-3 py-2 rounded-xl text-xs font-bold">Close ✕</button>
@@ -90,64 +548,100 @@
         </div>
     </div>
 
-    <header class="flex flex-wrap justify-between items-center mb-6 bg-gray-800 border border-gray-700 p-5 rounded-2xl shadow-lg gap-4">
+    <!-- ============ HEADER ============ -->
+    <header class="flex flex-wrap justify-between items-center mb-6 bg-slate-800/70 backdrop-blur border border-slate-700 p-5 rounded-2xl shadow-lg gap-4">
         <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">🍔 Management Console <span id="connStatus" class="w-3 h-3 rounded-full bg-red-500 inline-block" title="Disconnected"></span></h1>
         <div class="flex flex-wrap items-center gap-3">
-            <select id="adminRestaurantSelector" class="restaurant-select bg-gray-700 border border-gray-600 p-2.5 rounded-xl text-sm font-semibold text-amber-400 focus:outline-none cursor-pointer" onchange="switchAdminRestaurant(this.value)" title="Select Restaurant"></select>
+            <select id="adminRestaurantSelector" class="restaurant-select bg-slate-700 border border-slate-600 p-2.5 rounded-xl text-sm font-semibold text-amber-400 focus:outline-none cursor-pointer" onchange="switchAdminRestaurant(this.value)" title="Select Restaurant"></select>
             <button onclick="openPrintQRCodesModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-semibold transition">🖨️ Print QR Codes</button>
             <button onclick="requestNotificationPermission()" class="text-xs bg-amber-500 text-white px-3 py-2 rounded-xl font-semibold hover:bg-amber-600 transition">Enable Push 🔔</button>
-            <a href="kitchen.html" class="bg-gray-900 border border-gray-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-black transition">Kitchen Display →</a>
+            <a href="kitchen.html" class="bg-slate-900 border border-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-black transition">Kitchen Display →</a>
         </div>
     </header>
 
+    <!-- ============ TABS ============ -->
     <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
         <button onclick="switchTab('tables')" id="tab-tables" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-amber-500 text-white shadow transition">Tables</button>
-        <button onclick="switchTab('menu')" id="tab-menu" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">Menu Management</button>
-        <button onclick="switchTab('bills')" id="tab-bills" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">Bills & Payments</button>
-        <button onclick="switchTab('revenue')" id="tab-revenue" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">Daily Revenue</button>
+        <button onclick="switchTab('floor')" id="tab-floor" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition">🗺️ Floor Map</button>
+        <button onclick="switchTab('menu')" id="tab-menu" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition">Menu Management</button>
+        <button onclick="switchTab('bills')" id="tab-bills" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition">Bills & Payments</button>
+        <button onclick="switchTab('revenue')" id="tab-revenue" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition">Daily Revenue</button>
     </div>
 
-    <div id="section-tables" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 space-y-6">
-        <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+    <!-- ============ TABLES ============ -->
+    <div id="section-tables" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-700 pb-3">
             <h2 class="text-lg font-bold text-amber-400">🪑 Table Status & Activation Board</h2>
             <form onsubmit="addNewTable(event)" class="flex gap-2">
-                <input type="text" id="newTableNum" placeholder="Table Number/Name" required class="bg-gray-700 border border-gray-600 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+                <input type="text" id="newTableNum" placeholder="Table Number/Name" required class="bg-slate-700 border border-slate-600 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
                 <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">+ Add Table</button>
             </form>
         </div>
-        <div id="tablesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"></div>
+
+        <!-- Small floor map -->
+        <div class="mini-panel">
+            <div class="flex items-center justify-between mb-3 flex-wrap gap-3">
+                <div class="mini-label text-base">🗺️ Live Floor Map</div>
+                <div class="flex items-center gap-4 text-[11px] font-semibold">
+                    <span class="flex items-center gap-1.5"><span class="map-dot map-dot-green"></span>Active</span>
+                    <span class="flex items-center gap-1.5"><span class="map-dot map-dot-amber"></span>Requested</span>
+                    <span class="flex items-center gap-1.5"><span class="map-dot map-dot-red"></span>Occupied</span>
+                    <span class="flex items-center gap-1.5"><span class="map-dot map-dot-gray"></span>Idle</span>
+                </div>
+            </div>
+            <div id="floorMap" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3"></div>
+        </div>
+
+        <div id="tablesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
     </div>
 
-    <div id="section-menu" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
-        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
-            <h2 id="formTitle" class="text-lg font-bold text-amber-400">📋 Add / Edit Menu Item</h2>
-            <span id="activeMenuRestoLabel" class="text-xs bg-gray-700 text-amber-300 px-3 py-1 rounded-lg font-bold border border-gray-600"></span>
+    <!-- ============ FLOOR MAP (full view) ============ -->
+    <div id="section-floor" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
+        <div class="flex items-center justify-between mb-5 flex-wrap gap-3 border-b border-slate-700 pb-4">
+            <h2 class="text-lg font-bold text-amber-400">🗺️ Live Floor Map</h2>
+            <div class="flex items-center gap-4 text-[11px] font-semibold">
+                <span class="flex items-center gap-1.5"><span class="map-dot map-dot-green"></span>Active</span>
+                <span class="flex items-center gap-1.5"><span class="map-dot map-dot-amber"></span>Requested</span>
+                <span class="flex items-center gap-1.5"><span class="map-dot map-dot-red"></span>Occupied</span>
+                <span class="flex items-center gap-1.5"><span class="map-dot map-dot-gray"></span>Idle</span>
+            </div>
         </div>
-        <form onsubmit="saveMenu(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6 bg-gray-700/50 p-4 rounded-xl border border-gray-700">
+        <div id="floorMapLarge" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
+    </div>
+
+    <!-- ============ MENU ============ -->
+    <div id="section-menu" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+            <h2 id="formTitle" class="text-lg font-bold text-amber-400">📋 Add / Edit Menu Item</h2>
+            <span id="activeMenuRestoLabel" class="text-xs bg-slate-700 text-amber-300 px-3 py-1 rounded-lg font-bold border border-slate-600"></span>
+        </div>
+        <form onsubmit="saveMenu(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6 bg-slate-700/50 p-4 rounded-xl border border-slate-700">
             <input type="hidden" id="mId">
-            <input type="text" id="mName" placeholder="Item Name (EN)" required class="border border-gray-600 p-2.5 rounded-lg text-sm bg-gray-700 text-white focus:outline-none focus:border-amber-400">
-            <input type="number" step="0.01" id="mPrice" placeholder="Price ($)" required class="border border-gray-600 p-2.5 rounded-lg text-sm bg-gray-700 text-white focus:outline-none focus:border-amber-400">
-            <select id="mCat" class="border border-gray-600 p-2.5 rounded-lg text-sm bg-gray-700 text-white focus:outline-none focus:border-amber-400">
+            <input type="text" id="mName" placeholder="Item Name (EN)" required class="border border-slate-600 p-2.5 rounded-lg text-sm bg-slate-700 text-white focus:outline-none focus:border-amber-400">
+            <input type="number" step="0.01" id="mPrice" placeholder="Price ($)" required class="border border-slate-600 p-2.5 rounded-lg text-sm bg-slate-700 text-white focus:outline-none focus:border-amber-400">
+            <select id="mCat" class="border border-slate-600 p-2.5 rounded-lg text-sm bg-slate-700 text-white focus:outline-none focus:border-amber-400">
                 <option value="Salads & Veggies">Salads & Veggies</option>
                 <option value="Cold Mezza">Cold Mezza</option>
                 <option value="Coffee, Tea & Shisha">Coffee, Tea & Shisha</option>
             </select>
             <div class="flex gap-2">
                 <button id="submitBtn" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold text-sm transition py-2.5">Add Item</button>
-                <button type="button" id="cancelEditBtn" onclick="resetMenuForm()" class="hidden bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-semibold text-sm px-3 py-2.5">Cancel</button>
+                <button type="button" id="cancelEditBtn" onclick="resetMenuForm()" class="hidden bg-slate-600 hover:bg-slate-500 text-white rounded-lg font-semibold text-sm px-3 py-2.5">Cancel</button>
             </div>
         </form>
         <div id="menuList" class="space-y-3"></div>
     </div>
 
-    <div id="section-bills" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
+    <!-- ============ BILLS ============ -->
+    <div id="section-bills" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
         <h2 class="text-lg font-bold mb-4 text-amber-400">💵 Unpaid Bills & Active Accounts</h2>
-        <div id="billsList" class="space-y-3"><p class="text-gray-400 italic text-sm">No active bills.</p></div>
+        <div id="billsList" class="space-y-3"><p class="text-slate-400 italic text-sm">No active bills.</p></div>
     </div>
 
-    <div id="section-revenue" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
+    <!-- ============ REVENUE ============ -->
+    <div id="section-revenue" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
         <h2 class="text-lg font-bold mb-4 text-amber-400">📊 Total Revenue by Table & Day</h2>
-        <div id="revenueContainer" class="space-y-6"><p class="text-gray-400 italic text-sm">No settled revenue data available yet.</p></div>
+        <div id="revenueContainer" class="space-y-6"><p class="text-slate-400 italic text-sm">No settled revenue data available yet.</p></div>
     </div>
 
     <script>
@@ -164,6 +658,91 @@
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
+        const IDLE_OPTIONS = [
+            { value: 1,    label: '1 min' },
+            { value: 5,    label: '5 min' },
+            { value: 15,   label: '15 min' },
+            { value: 30,   label: '30 min' },
+            { value: 60,   label: '1 hour' },
+            { value: 120,  label: '2 hours' },
+            { value: 360,  label: '6 hours' },
+            { value: 720,  label: '12 hours' },
+            { value: 1440, label: '24 hours' },
+            { value: 0,    label: 'No expiry' }
+        ];
+
+        function formatHMS(ms) {
+            if (ms < 0) ms = 0;
+            const total = Math.floor(ms / 1000);
+            const h = Math.floor(total / 3600);
+            const m = Math.floor((total % 3600) / 60);
+            const s = total % 60;
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function updateCountdowns() {
+            const tables = (globalData.tables && globalData.tables[currentAdminRestaurant]) || {};
+            const now = Date.now();
+
+            // Small card countdowns
+            document.querySelectorAll('[data-countdown-for]').forEach(el => {
+                const tKey = el.getAttribute('data-countdown-for');
+                const t = tables[tKey];
+                if (!t || !t.hasSession || !t.sessionStart) {
+                    el.className = 'countdown-bar no-session';
+                    el.innerHTML = `<span>— no session —</span>`;
+                    return;
+                }
+                const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
+                if (idleMinutes === 0) {
+                    el.className = 'countdown-bar no-expiry';
+                    el.innerHTML = `<div class="countdown-clock">∞</div><span>No expiry</span>`;
+                    return;
+                }
+                const expiresAt = t.sessionStart + idleMinutes * 60 * 1000;
+                const remaining = expiresAt - now;
+
+                if (remaining <= 0) {
+                    el.className = 'countdown-bar danger';
+                    el.innerHTML = `<div class="countdown-clock">⏱</div><span>Expiring…</span>`;
+                    return;
+                }
+
+                let cls = 'safe';
+                if (remaining < 5 * 60 * 1000) cls = 'danger';
+                else if (remaining < 30 * 60 * 1000) cls = 'warn';
+
+                el.className = `countdown-bar ${cls}`;
+                el.innerHTML = `<div class="countdown-clock">⏱</div><span>${formatHMS(remaining)}</span>`;
+            });
+
+            // Large floor-map countdowns
+            document.querySelectorAll('[data-countdown-lg-for]').forEach(el => {
+                const tKey = el.getAttribute('data-countdown-lg-for');
+                const t = tables[tKey];
+                if (!t || !t.hasSession || !t.sessionStart) {
+                    el.innerText = '--:--:--';
+                    el.style.color = '';
+                    return;
+                }
+                const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
+                if (idleMinutes === 0) {
+                    el.innerText = '∞ no expiry';
+                    el.style.color = '#a5b4fc';
+                    return;
+                }
+                const remaining = (t.sessionStart + idleMinutes * 60 * 1000) - now;
+                if (remaining <= 0) {
+                    el.innerText = 'expiring…';
+                    el.style.color = '#fca5a5';
+                    return;
+                }
+                el.style.color = '';
+                el.innerText = formatHMS(remaining);
+            });
+        }
+        setInterval(updateCountdowns, 1000);
+
         window.onload = async () => {
             if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
             await loadAdminRestaurantsList();
@@ -171,6 +750,7 @@
             ta.addEventListener('input', () => {
                 document.getElementById('msgCharCount').innerText = ta.value.length;
             });
+            updateCountdowns();
         };
 
         async function loadAdminRestaurantsList() {
@@ -192,6 +772,8 @@
                 selector.value = currentAdminRestaurant;
                 document.getElementById('activeMenuRestoLabel').innerText = `Active: ${currentAdminRestaurant}`;
                 renderAdmin();
+                renderFloorMap();
+                renderFloorMapLarge();
             } catch (e) { console.error('Failed to load restaurants list', e); }
         }
 
@@ -201,6 +783,8 @@
             if (currentTab === 'menu') loadMenuAdmin();
             else if (currentTab === 'revenue') loadRevenueAdmin();
             renderAdmin();
+            renderFloorMap();
+            if (currentTab === 'floor') renderFloorMapLarge();
         }
 
         function requestNotificationPermission() {
@@ -230,6 +814,9 @@
             }
             previousPendingCount = pendingCount;
             renderAdmin();
+            renderFloorMap();
+            if (currentTab === 'floor') renderFloorMapLarge();
+            updateCountdowns();
         });
 
         socket.on('menu_updated', (data) => { if (data && data.restaurant === currentAdminRestaurant) loadMenuAdmin(); });
@@ -238,11 +825,13 @@
             currentTab = tabName;
             document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
             document.getElementById('section-' + tabName).classList.remove('hidden');
-            document.querySelectorAll('[id^="tab-"]').forEach(b => b.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition");
+            document.querySelectorAll('[id^="tab-"]').forEach(b => b.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition");
             document.getElementById('tab-' + tabName).className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-amber-500 text-white shadow transition";
             if (tabName === 'tables') document.getElementById('tab-tables').classList.remove('animate-pulse', 'bg-red-600');
             if (tabName === 'menu') loadMenuAdmin();
             if (tabName === 'revenue') loadRevenueAdmin();
+            if (tabName === 'floor') renderFloorMapLarge();
+            setTimeout(updateCountdowns, 0);
         }
 
         async function addNewTable(e) {
@@ -273,6 +862,24 @@
             } catch (err) { console.error('Failed to delete table:', err); }
         }
 
+        function resetTableSession(tableNum) {
+            if (!confirm(`Reset session for Table #${tableNum}?\n\nThis will:\n• Close the table\n• Lock the order button\n• Clear all messages\n• Kick any connected devices\n\nActive orders will block this action.`)) return;
+
+            const restaurantOrders = (globalData.orders || []).filter(o =>
+                (o.restaurant || 'Default') === currentAdminRestaurant &&
+                String(o.tableNumber) === String(tableNum)
+            );
+            if (restaurantOrders.length > 0) {
+                showModal('Cannot Reset', `Table #${tableNum} has ${restaurantOrders.length} active order(s). Mark them Paid or clear them first.`, '⚠️');
+                return;
+            }
+
+            socket.emit('reset_table_session', { restaurant: currentAdminRestaurant, tableNum }, (res) => {
+                if (res && res.success) showModal('Session Reset', `Table #${tableNum} has been cleared and its devices were disconnected.`, '🔄');
+                else showModal('Reset Failed', (res && res.message) || 'Unknown error', '⚠️');
+            });
+        }
+
         function openMessageComposer(tableNum) {
             msgTargetTable = tableNum;
             msgSelectedIcon = '💬';
@@ -282,7 +889,7 @@
             document.querySelectorAll('.icon-opt').forEach(b => {
                 b.className = b.getAttribute('data-icon') === '💬'
                     ? 'icon-opt text-2xl p-1.5 bg-amber-600 rounded-lg'
-                    : 'icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600';
+                    : 'icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600';
             });
             document.getElementById('messageModal').classList.remove('hidden');
             setTimeout(() => document.getElementById('msgText').focus(), 100);
@@ -303,7 +910,7 @@
             document.querySelectorAll('.icon-opt').forEach(b => {
                 b.className = b.getAttribute('data-icon') === icon
                     ? 'icon-opt text-2xl p-1.5 bg-amber-600 rounded-lg'
-                    : 'icon-opt text-2xl p-1.5 bg-gray-700 rounded-lg hover:bg-gray-600';
+                    : 'icon-opt text-2xl p-1.5 bg-slate-700 rounded-lg hover:bg-slate-600';
             });
         }
 
@@ -327,13 +934,9 @@
                 const target = msgTargetTable;
                 closeMessageModal();
                 if (res && res.success) {
-                    const status = res.delivered
-                        ? 'Delivered to customer ✓'
-                        : 'Queued — will be shown when customer reconnects 📥';
+                    const status = res.delivered ? 'Delivered to customer ✓' : 'Queued — will be shown when customer reconnects 📥';
                     showModal('Message Sent', `To Table #${target}:\n"${text}"\n\n${status}`, msgSelectedIcon);
-                } else {
-                    showModal('Message Failed', (res && res.message) || 'Unknown error', '⚠️');
-                }
+                } else showModal('Message Failed', (res && res.message) || 'Unknown error', '⚠️');
             });
         }
 
@@ -344,8 +947,26 @@
             const action = btn.getAttribute('data-action');
             if (action === 'delete') deleteTable(tableNum);
             else if (action === 'message') openMessageComposer(tableNum);
+            else if (action === 'reset') resetTableSession(tableNum);
             else if (action === 'toggle-open') socket.emit('toggle_table', { restaurant: currentAdminRestaurant, tableNum });
             else if (action === 'toggle-order') socket.emit('toggle_order_permission', { restaurant: currentAdminRestaurant, tableNum });
+        });
+
+        document.getElementById('tablesGrid').addEventListener('change', (e) => {
+            const sel = e.target.closest('select[data-idle-for]');
+            if (!sel) return;
+            const tableNum = sel.getAttribute('data-idle-for');
+            const idleMinutes = parseInt(sel.value) || 0;
+            socket.emit('set_table_idle', {
+                restaurant: currentAdminRestaurant, tableNum, idleMinutes
+            }, (res) => {
+                if (res && res.success) {
+                    if (!globalData.tables[currentAdminRestaurant]) globalData.tables[currentAdminRestaurant] = {};
+                    if (!globalData.tables[currentAdminRestaurant][tableNum]) globalData.tables[currentAdminRestaurant][tableNum] = {};
+                    globalData.tables[currentAdminRestaurant][tableNum].idleMinutes = idleMinutes;
+                    updateCountdowns();
+                }
+            });
         });
 
         document.getElementById('billsList').addEventListener('click', (e) => {
@@ -366,6 +987,149 @@
             }
         });
 
+        // Small map click → scroll to card
+        document.getElementById('floorMap').addEventListener('click', (e) => {
+            const tile = e.target.closest('[data-jump-to]');
+            if (!tile) return;
+            scrollToTableCard(tile.getAttribute('data-jump-to'));
+        });
+
+        // Large map click → jump to Tables tab and scroll to card
+        document.getElementById('floorMapLarge').addEventListener('click', (e) => {
+            const tile = e.target.closest('[data-jump-to]');
+            if (!tile) return;
+            const tableNum = tile.getAttribute('data-jump-to');
+            switchTab('tables');
+            setTimeout(() => scrollToTableCard(tableNum), 120);
+        });
+
+        function scrollToTableCard(tableNum) {
+            const card = document.getElementById(`table-card-${tableNum}`);
+            if (!card) return;
+
+            const rect = card.getBoundingClientRect();
+            const targetY = window.scrollY + rect.top - 90;
+            window.scrollTo({ top: targetY, behavior: 'smooth' });
+
+            card.classList.remove('is-highlighted');
+            void card.offsetWidth;
+            card.classList.add('is-highlighted');
+            setTimeout(() => card.classList.remove('is-highlighted'), 1700);
+        }
+
+        function getSortedTableKeys(restoTables) {
+            const keys = Object.keys(restoTables);
+            keys.sort((a, b) => {
+                const na = Number(a), nb = Number(b);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return String(a).localeCompare(String(b));
+            });
+            return keys;
+        }
+
+        function computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions) {
+            const t = restoTables[k];
+            const isWaiting = !!restoRequests[k];
+            const isOccupied = occupiedTables.has(String(k));
+            const isActive = !!(t.hasSession || (restoActiveSessions[k] > 0));
+            let cls = 'idle', label = 'Idle';
+            if (isWaiting)        { cls = 'requested'; label = 'Requested'; }
+            else if (isOccupied)  { cls = 'occupied';  label = 'Occupied'; }
+            else if (isActive)    { cls = 'active';    label = 'Active'; }
+            return { t, isWaiting, isOccupied, isActive, cls, label };
+        }
+
+        // ---------- Small floor map ----------
+        function renderFloorMap() {
+            const container = document.getElementById('floorMap');
+            if (!container) return;
+
+            const { tables, tableRequests, orders, activeSessions } = globalData;
+            const restoTables = (tables && tables[currentAdminRestaurant]) || {};
+            const restoRequests = (tableRequests && tableRequests[currentAdminRestaurant]) || {};
+            const restoActiveSessions = (activeSessions && activeSessions[currentAdminRestaurant]) || {};
+
+            const restaurantOrders = (orders || []).filter(o => (o.restaurant || 'Default') === currentAdminRestaurant);
+            const occupiedTables = new Set(restaurantOrders.map(o => String(o.tableNumber)));
+
+            const tableKeys = getSortedTableKeys(restoTables);
+
+            if (tableKeys.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 italic text-sm col-span-full text-center py-6">No tables yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = tableKeys.map(k => {
+                const s = computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions);
+                const count = restoActiveSessions[k] || 0;
+                const badge = (s.cls === 'active' && count > 0)
+                    ? `<span class="map-tile-badge">${count}</span>`
+                    : '';
+                return `
+                    <div class="map-tile map-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open card)">
+                        ${badge}
+                        <div class="map-tile-num">${esc(k)}</div>
+                        <div class="map-tile-label">${s.label}</div>
+                    </div>`;
+            }).join('');
+        }
+
+        // ---------- Large floor map (new tab) ----------
+        function renderFloorMapLarge() {
+            const container = document.getElementById('floorMapLarge');
+            if (!container) return;
+
+            const { tables, tableRequests, orders, activeSessions } = globalData;
+            const restoTables = (tables && tables[currentAdminRestaurant]) || {};
+            const restoRequests = (tableRequests && tableRequests[currentAdminRestaurant]) || {};
+            const restoActiveSessions = (activeSessions && activeSessions[currentAdminRestaurant]) || {};
+
+            const restaurantOrders = (orders || []).filter(o => (o.restaurant || 'Default') === currentAdminRestaurant);
+            const occupiedTables = new Set(restaurantOrders.map(o => String(o.tableNumber)));
+
+            const tableKeys = getSortedTableKeys(restoTables);
+
+            if (tableKeys.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 italic text-sm col-span-full text-center py-12">No tables yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = tableKeys.map(k => {
+                const s = computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions);
+                const count = restoActiveSessions[k] || 0;
+                const badge = (s.cls === 'active' && count > 0)
+                    ? `<span class="map-tile-lg-badge">${count} device${count > 1 ? 's' : ''}</span>`
+                    : '';
+
+                const idleMinutes = (s.t.idleMinutes == null) ? 360 : s.t.idleMinutes;
+                let countdownHtml = '';
+
+                if (s.t.hasSession && s.t.sessionStart) {
+                    if (idleMinutes === 0) {
+                        countdownHtml = `<div class="map-tile-lg-countdown" style="color:#a5b4fc">∞ no expiry</div>`;
+                    } else {
+                        const now = Date.now();
+                        const remaining = (s.t.sessionStart + idleMinutes * 60 * 1000) - now;
+                        if (remaining <= 0) {
+                            countdownHtml = `<div class="map-tile-lg-countdown" style="color:#fca5a5">expiring…</div>`;
+                        } else {
+                            countdownHtml = `<div class="map-tile-lg-countdown" data-countdown-lg-for="${esc(k)}">${formatHMS(remaining)}</div>`;
+                        }
+                    }
+                } else {
+                    countdownHtml = `<div class="map-tile-lg-countdown" style="opacity:0.5">--:--:--</div>`;
+                }
+
+                return `
+                    <div class="map-tile-lg map-tile-lg-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open card)">
+                        ${badge}
+                        <div class="map-tile-lg-num">${esc(k)}</div>
+                        <div class="map-tile-lg-label">${s.label}</div>
+                        ${countdownHtml}
+                    </div>`;
+            }).join('');
+        }
+
         function renderAdmin() {
             const { tables, tableRequests, orders, activeSessions } = globalData;
             const restoTables = (tables && tables[currentAdminRestaurant]) || {};
@@ -380,14 +1144,14 @@
             if (hasPendingRequests && currentTab !== 'tables') {
                 tablesTabBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-red-600 text-white animate-pulse shadow-lg border-2 border-red-300";
             } else if (currentTab !== 'tables') {
-                tablesTabBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition";
+                tablesTabBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition";
             }
 
-            const tableKeys = Object.keys(restoTables);
+            const tableKeys = getSortedTableKeys(restoTables);
             const gridContainer = document.getElementById('tablesGrid');
 
             if (tableKeys.length === 0) {
-                gridContainer.innerHTML = `<p class="text-gray-400 italic text-sm col-span-full text-center py-6">No tables found. Add a table above to get started!</p>`;
+                gridContainer.innerHTML = `<p class="text-slate-400 italic text-sm col-span-full text-center py-6">No tables found. Add a table above to get started!</p>`;
             } else {
                 gridContainer.innerHTML = tableKeys.map(k => {
                     const t = restoTables[k];
@@ -395,57 +1159,136 @@
                     const isOccupied = activeTablesForResto.has(String(k));
                     const openCount = restoActiveSessions[k] || 0;
                     const isMenuOpen = openCount > 0;
+                    const hasSession = !!t.hasSession;
+                    const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
 
-                    // Order button: 3 states (requested → red, unlocked → amber, locked → indigo)
-                    let orderBtnHtml;
+                    const cardClasses = `table-card ${isOccupied ? 'is-occupied' : ''} ${isWaiting ? 'is-waiting' : ''}`;
+
+                    const idleSelect = `
+                        <div class="timer-select-wrap">
+                            <div class="timer-select-icon">🕐</div>
+                            <select data-idle-for="${esc(k)}" class="timer-select">
+                                ${IDLE_OPTIONS.map(o => `<option value="${o.value}" ${o.value === idleMinutes ? 'selected' : ''}>${o.label}</option>`).join('')}
+                            </select>
+                        </div>`;
+
+                    const countdownHtml = hasSession
+                        ? `<div data-countdown-for="${esc(k)}" class="countdown-bar safe"><div class="countdown-clock">⏱</div><span>--:--:--</span></div>`
+                        : `<div data-countdown-for="${esc(k)}" class="countdown-bar no-session"><span>— no session —</span></div>`;
+
+                    let orderBtn;
                     if (isWaiting && !t.canOrder) {
-                        orderBtnHtml = `<button data-action="toggle-order" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition bg-red-600 hover:bg-red-700 animate-pulse shadow-lg border border-red-400">
-                            🛎️ Requested! Tap to Approve
+                        orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-requested">
+                            <span class="left-icon">🛎️</span><span>Requested! Approve</span><span class="arrow">→</span>
                         </button>`;
                     } else if (t.canOrder) {
-                        orderBtnHtml = `<button data-action="toggle-order" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition bg-amber-600 hover:bg-amber-700">
-                            Lock Order 🔒
+                        orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-lock-order">
+                            <span class="left-icon">🔒</span><span>Lock Order</span><span class="arrow">→</span>
                         </button>`;
                     } else {
-                        orderBtnHtml = `<button data-action="toggle-order" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition bg-indigo-600 hover:bg-indigo-700">
-                            Open Order 🚀
+                        orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-open-order">
+                            <span class="left-icon">🚀</span><span>Open Order</span><span class="arrow">→</span>
                         </button>`;
                     }
 
                     return `
-                        <div class="border border-gray-700 p-3 rounded-xl text-center flex flex-col justify-between ${isOccupied ? 'bg-red-900/30 border-red-500 text-red-200' : isWaiting ? 'bg-amber-900/40 border-amber-500 animate-pulse text-amber-200' : 'bg-gray-700/40 text-gray-200'} relative">
-                            <button data-action="delete" data-table="${esc(k)}" title="Delete Table" class="absolute top-2 right-2 text-gray-400 hover:text-red-400 text-xs font-bold transition">✕</button>
-                            <button data-action="message" data-table="${esc(k)}" title="Send message to table" class="absolute top-1.5 left-1.5 text-gray-400 hover:text-indigo-400 text-base transition leading-none">💬</button>
-                            <div>
-                                <div class="text-left mb-1 pl-5"><span class="font-bold text-sm text-amber-300">Table #${esc(k)}</span></div>
-                                <div class="flex justify-between items-center mb-1.5 pr-4">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="w-2.5 h-2.5 rounded-full ${isMenuOpen ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]' : 'bg-gray-600'}" title="${isMenuOpen ? `${openCount} menu page(s) open` : 'Menu closed'}"></span>
-                                        ${isMenuOpen ? `<span class="bg-emerald-900/80 text-emerald-300 text-[10px] px-1.5 py-0.2 rounded-full font-bold">${openCount} active</span>` : ''}
-                                    </div>
-                                    <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${isOccupied ? 'bg-red-500 text-white' : 'bg-gray-800 border border-gray-600'}">${isOccupied ? 'Occupied' : esc(t.status)}</span>
+                        <div class="${cardClasses}" id="table-card-${esc(k)}">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <button data-action="message" data-table="${esc(k)}" class="icon-btn icon-btn-msg" title="Send message">💬</button>
+                                    <button data-action="reset" data-table="${esc(k)}" class="icon-btn icon-btn-reset" title="Reset session">🔄</button>
                                 </div>
-                                ${isWaiting ? '<span class="inline-block bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold mb-1.5">🛎️ Wants to Order!</span>' : ''}
-                                <p class="text-[11px] text-gray-400 mb-0.5">Menu: <b>${t.isOpen ? 'OPEN 🟢' : 'LOCKED 🔒'}</b></p>
-                                <p class="text-[11px] text-gray-400 mb-2">Order: <b>${t.canOrder ? 'ACTIVE 🟢' : 'LOCKED 🔒'}</b></p>
+                                <button data-action="delete" data-table="${esc(k)}" class="icon-btn icon-btn-del" title="Delete table">✕</button>
                             </div>
-                            <div class="flex flex-col gap-1.5 mt-1">
-                                <button data-action="toggle-open" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition ${t.isOpen ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'}">
-                                    ${t.isOpen ? 'Close Menu 🔒' : 'Open Menu 🔓'}
-                                </button>
-                                ${orderBtnHtml}
+
+                            <div class="flex items-center gap-3">
+                                <div class="table-icon-block">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M6 12h12"/>
+                                        <path d="M8 12v6"/>
+                                        <path d="M16 12v6"/>
+                                        <path d="M5 8h14l-1 4H6z"/>
+                                        <path d="M12 8V5"/>
+                                        <circle cx="12" cy="4" r="1"/>
+                                        <path d="M9 18h6"/>
+                                    </svg>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-2xl font-black text-white leading-tight">
+                                        Table <span class="text-amber-400">#${esc(k)}</span>
+                                    </div>
+                                </div>
                             </div>
+
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="${isMenuOpen ? 'dot-live' : 'dot-offline'}"></span>
+                                        ${isMenuOpen ? `<span class="pill-active">${openCount} active</span>` : `<span class="text-[11px] text-slate-500 font-semibold">offline</span>`}
+                                    </div>
+                                    <div class="mini-label">${isMenuOpen ? `${openCount} menu page(s) open` : 'no page open'}</div>
+                                </div>
+                                <span class="pill-valid ${isOccupied ? 'pill-occupied' : ''}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 12l2 2 4-4"/>
+                                        <path d="M21 12c0 5-3 8-9 10-6-2-9-5-9-10V5l9-3 9 3z"/>
+                                    </svg>
+                                    ${isOccupied ? 'Occupied' : esc(t.status || 'Valid')}
+                                </span>
+                            </div>
+
+                            ${isWaiting ? `<div><span class="wants-chip">🛎️ Wants to order!</span></div>` : ''}
+
+                            ${countdownHtml}
+
+                            <div class="mini-panel">
+                                <div class="mini-label mb-2">Session timer</div>
+                                ${idleSelect}
+                            </div>
+
+                            <div class="mini-panel status-split">
+                                <div class="status-cell">
+                                    <div class="status-cell-icon">📖</div>
+                                    <div class="status-cell-text">
+                                        <div class="label">Menu:</div>
+                                        <div class="value">
+                                            ${t.isOpen ? 'OPEN' : 'LOCKED'}
+                                            <span class="${t.isOpen ? 'unlock-green' : 'lock-red'}">${t.isOpen ? '🔓' : '🔒'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="status-divider"></div>
+                                <div class="status-cell">
+                                    <div class="status-cell-icon">🛒</div>
+                                    <div class="status-cell-text">
+                                        <div class="label">Order:</div>
+                                        <div class="value">
+                                            ${t.canOrder ? 'OPEN' : 'LOCKED'}
+                                            <span class="${t.canOrder ? 'unlock-green' : 'lock-red'}">${t.canOrder ? '🔓' : '🔒'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button data-action="toggle-open" data-table="${esc(k)}" class="action-btn ${t.isOpen ? 'btn-close-menu' : 'btn-open-menu'}">
+                                <span class="left-icon">${t.isOpen ? '🔒' : '🔓'}</span>
+                                <span>${t.isOpen ? 'Close Menu' : 'Open Menu'}</span>
+                                <span class="arrow">→</span>
+                            </button>
+
+                            ${orderBtn}
                         </div>`;
                 }).join('');
+                setTimeout(updateCountdowns, 0);
             }
 
             document.getElementById('billsList').innerHTML = restaurantOrders.length === 0
-                ? '<p class="text-gray-400 italic text-sm">No active bills for this restaurant.</p>'
+                ? '<p class="text-slate-400 italic text-sm">No active bills for this restaurant.</p>'
                 : restaurantOrders.map(o => `
-                <div class="flex justify-between items-center border-b border-gray-700 pb-3 text-sm text-gray-300">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-3 text-sm text-slate-300">
                     <div>
                         <b>Table #${esc(o.tableNumber)}</b> — Total: <span class="text-amber-400 font-bold">$${o.total.toFixed(2)}</span>
-                        <span class="text-xs ml-2 px-2 py-0.5 rounded bg-gray-700 text-gray-300">Kitchen: ${esc(o.kitchenStatus)}</span>
+                        <span class="text-xs ml-2 px-2 py-0.5 rounded bg-slate-700 text-slate-300">Kitchen: ${esc(o.kitchenStatus)}</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-900/60 text-amber-300">${esc(o.billStatus)}</span>
@@ -459,18 +1302,18 @@
             const res = await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}`);
             const cats = await res.json();
             document.getElementById('menuList').innerHTML = cats.map(cat => `
-                <h3 class="font-bold text-amber-400 mt-4 mb-2 text-sm uppercase tracking-wide border-b border-gray-700 pb-1">${esc(cat.categoryEn)}</h3>
+                <h3 class="font-bold text-amber-400 mt-4 mb-2 text-sm uppercase tracking-wide border-b border-slate-700 pb-1">${esc(cat.categoryEn)}</h3>
                 ${cat.items.map(m => {
                     const itemJson = esc(JSON.stringify(m));
                     return `
-                    <div class="flex justify-between items-center border-b border-gray-700 py-2 text-sm text-gray-300">
+                    <div class="flex justify-between items-center border-b border-slate-700 py-2 text-sm text-slate-300">
                         <span><b>${esc(m.nameEn)}</b> — <span class="text-amber-400 font-bold">$${(m.price || 0).toFixed(2)}</span></span>
                         <div class="flex gap-2">
                             <button data-action="edit" data-cat="${esc(cat.categoryEn)}" data-item="${itemJson}" class="bg-amber-500 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-amber-600 transition">Edit</button>
                             <button data-action="delete" data-id="${esc(m.id)}" class="bg-rose-500 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-rose-600 transition">Delete</button>
                         </div>
                     </div>`;
-                }).join('')}`).join('') || '<p class="text-gray-400 text-xs">No items found.</p>';
+                }).join('')}`).join('') || '<p class="text-slate-400 text-xs">No items found.</p>';
         }
 
         function startEditMenu(item, category) {
@@ -531,20 +1374,20 @@
             const restoData = revenueData[currentAdminRestaurant];
 
             if (!restoData || Object.keys(restoData).length === 0) {
-                revContainer.innerHTML = `<p class="text-gray-400 italic text-sm">No settled revenue data available for ${esc(currentAdminRestaurant)}.</p>`;
+                revContainer.innerHTML = `<p class="text-slate-400 italic text-sm">No settled revenue data available for ${esc(currentAdminRestaurant)}.</p>`;
             } else {
                 revContainer.innerHTML = Object.keys(restoData).map(date => {
                     const tableRevenues = restoData[date];
                     const dailyTotal = Object.values(tableRevenues).reduce((a, b) => a + b, 0);
                     return `
-                        <div class="border border-gray-700 rounded-xl p-4 bg-gray-700/30 mb-3 text-gray-300">
-                            <div class="flex justify-between items-center mb-3 border-b border-gray-600 pb-2">
+                        <div class="border border-slate-700 rounded-xl p-4 bg-slate-700/30 mb-3 text-slate-300">
+                            <div class="flex justify-between items-center mb-3 border-b border-slate-600 pb-2">
                                 <h4 class="font-bold text-amber-400">📅 Date: ${esc(date)}</h4>
                                 <span class="bg-emerald-900/60 text-emerald-300 text-xs px-3 py-1 rounded-full font-bold">Total: $${dailyTotal.toFixed(2)}</span>
                             </div>
                             <div class="space-y-1">${Object.keys(tableRevenues).map(tbl => `
-                                <div class="flex justify-between border-b border-gray-700/50 py-1.5 text-sm">
-                                    <span class="font-medium text-gray-300">Table #${esc(tbl)}</span> <span class="font-bold text-emerald-400">$${tableRevenues[tbl].toFixed(2)}</span>
+                                <div class="flex justify-between border-b border-slate-700/50 py-1.5 text-sm">
+                                    <span class="font-medium text-slate-300">Table #${esc(tbl)}</span> <span class="font-bold text-emerald-400">$${tableRevenues[tbl].toFixed(2)}</span>
                                 </div>`).join('')}</div>
                         </div>`;
                 }).join('');
@@ -553,10 +1396,9 @@
 
         async function openPrintQRCodesModal() {
             if (!currentAdminRestaurant) return showModal('No Restaurant', 'Select or create a restaurant first.', '⚠️');
-            const lifetime = document.getElementById('tokenLifetimeSelect').value;
-            document.getElementById('qrModalTitle').innerText = `🖨️ Table QR Codes (${currentAdminRestaurant}) - ${lifetime} min`;
+            document.getElementById('qrModalTitle').innerText = `🖨️ Table QR Codes (${currentAdminRestaurant})`;
 
-            const res = await fetch(`/api/qr-links?restaurant=${encodeURIComponent(currentAdminRestaurant)}&lifetime=${lifetime}`);
+            const res = await fetch(`/api/qr-links?restaurant=${encodeURIComponent(currentAdminRestaurant)}`);
             const links = await res.json();
             const container = document.getElementById('qrGridContainer');
 
@@ -567,9 +1409,9 @@
                     const fullUrl = window.location.origin + l.encodedUrl;
                     const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(fullUrl)}`;
                     return `
-                        <a href="${esc(l.encodedUrl)}" target="_blank" rel="noopener" title="Click to open Table #${esc(l.tableNumber)} view" class="border border-gray-200 p-4 rounded-xl shadow-sm bg-gray-50 hover:bg-indigo-50/50 hover:border-indigo-300 transition flex flex-col items-center cursor-pointer qr-card" data-table="${esc(l.tableNumber)}">
+                        <a href="${esc(l.encodedUrl)}" target="_blank" rel="noopener" class="border border-gray-200 p-4 rounded-xl shadow-sm bg-gray-50 hover:bg-indigo-50/50 hover:border-indigo-300 transition flex flex-col items-center cursor-pointer qr-card" data-table="${esc(l.tableNumber)}">
                             <h3 class="font-bold text-base text-gray-800 mb-1">${esc(l.restaurant)}</h3>
-                            <span class="text-sm font-semibold text-indigo-600 mb-3">Table #${esc(l.tableNumber)} (Click to View 🔗)</span>
+                            <span class="text-sm font-semibold text-indigo-600 mb-3">Table #${esc(l.tableNumber)}</span>
                             <img src="${qrApi}" crossorigin="anonymous" alt="QR Table ${esc(l.tableNumber)}" class="w-32 h-32 mb-3 border p-1 bg-white rounded qr-img">
                             <span class="text-[10px] text-gray-400 break-all font-mono">${esc(l.encodedUrl)}</span>
                         </a>`;
