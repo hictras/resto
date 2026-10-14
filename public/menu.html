@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Menu & Order Status</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root {
+            --primary: #f28538; --primary-dark: #d9681b; --bg: #faf6f0;
+            --card-bg: #ffffff; --text: #2f2a24; --text-muted: #7b736b; --border: #f0e6dc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", Tahoma, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 140px; }
+        .hidden { display: none !important; }
+        .sticky-top-wrapper { position: sticky; top: 28px; z-index: 50; background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05); }
+        header { border-bottom: 1px solid var(--border); padding: 0.8rem 1rem; display: flex; justify-content: space-between; align-items: center; max-width: 960px; margin: 0 auto; }
+        .header-titles { text-align: left; }
+        html[dir="rtl"] .header-titles { text-align: right; }
+        header h1 { font-size: 1.3rem; color: var(--primary); letter-spacing: 0.5px; line-height: 1.2; }
+        header p { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+        .lang-btn, .table-pill, .push-btn { background: #fff; border: 1.5px solid var(--primary); color: var(--primary); padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; white-space: nowrap; outline: none; }
+        .main-nav-tabs { display: flex; background: #fdfbf7; border-bottom: 1px solid var(--border); max-width: 960px; margin: 0 auto; }
+        .main-tab-btn { flex: 1; padding: 12px 6px; text-align: center; font-weight: bold; font-size: 0.85rem; background: none; border: none; cursor: pointer; color: var(--text-muted); border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .main-tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #fff; }
+        .nav-tabs { display: flex; overflow-x: auto; padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); gap: 0.5rem; white-space: nowrap; scrollbar-width: thin; max-width: 960px; margin: 0 auto; background: #fff; }
+        .nav-tabs button { background: none; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; cursor: pointer; color: var(--text); transition: all 0.2s; }
+        .nav-tabs button.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .container { max-width: 960px; margin: 1rem auto; padding: 0 1rem; }
+        .menu-section { scroll-margin-top: 180px; }
+        .section-title { font-size: 1.25rem; margin: 1.8rem 0 0.8rem; padding-bottom: 0.3rem; border-bottom: 2px solid var(--primary); display: flex; justify-content: space-between; align-items: baseline; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.9rem; }
+        .card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border); padding: 0.9rem; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .card-info h3 { font-size: 0.95rem; color: var(--text); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+        .card-info .alt-name { font-size: 0.85rem; color: var(--primary-dark); margin-bottom: 4px; }
+        .card-info p { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; line-height: 1.35; }
+        .card-action { display: flex; justify-content: space-between; align-items: center; margin-top: 0.8rem; padding-top: 0.5rem; border-top: 1px dashed var(--border); }
+        .price { font-weight: 700; color: var(--primary-dark); font-size: 0.95rem; }
+        .btn-add { background: var(--primary); color: #fff; border: none; padding: 5px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.82rem; transition: background 0.2s; }
+        .btn-add:hover { background: var(--primary-dark); }
+        .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 0.8rem 1rem; box-shadow: 0 -3px 15px rgba(0,0,0,0.1); max-width: 960px; margin: 0 auto; z-index: 40; border-radius: 16px 16px 0 0; }
+        .qty-badge-red { background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 7px; border-radius: 9999px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="sessionTimerBanner" class="bg-amber-500 text-white text-xs font-bold py-1.5 px-4 text-center sticky top-0 z-50 flex justify-center items-center gap-2 shadow-sm">
+        <span>⏳ Session expires in:</span> <span id="countdownDisplay" class="bg-amber-600 px-2 py-0.5 rounded tracking-widest font-mono">--:--</span>
+    </div>
+
+    <div id="customModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div id="modalIcon" class="text-3xl mb-2">🔔</div>
+            <h3 id="modalTitle" class="text-lg font-bold text-gray-800 mb-1">Notification</h3>
+            <p id="modalMessage" class="text-sm text-gray-600 mb-5">Message goes here...</p>
+            <button onclick="closeCustomModal()" class="w-full bg-[#f28538] text-white py-2.5 rounded-xl font-semibold text-sm">OK</button>
+        </div>
+    </div>
+
+    <div id="mainInterfaceWrapper">
+        <div class="sticky-top-wrapper">
+            <header>
+                <div class="header-titles">
+                    <h1 id="brandTitle">RESTAURANT MENU</h1>
+                    <p id="brandSubtitle">Prices in USD (Includes VAT & Service)</p>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <button class="push-btn" onclick="subscribeToPush()" title="Enable Notifications">🔔</button>
+                    <div class="table-pill" id="tableBtnDisplay">Table --</div>
+                    <button class="lang-btn" id="langToggleBtn" onclick="toggleLanguage()">عربي</button>
+                </div>
+            </header>
+
+            <div class="main-nav-tabs">
+                <button onclick="switchMainTab('menu')" id="mainTabMenu" class="main-tab-btn active">📖 Menu</button>
+                <button onclick="switchMainTab('status')" id="mainTabStatus" class="main-tab-btn">📦 Status <span id="headerOrderStatusCount" class="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span></button>
+                <button onclick="switchMainTab('served')" id="mainTabServed" class="main-tab-btn">🍽️ Served <span id="headerServedCount" class="bg-emerald-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span></button>
+            </div>
+
+            <div id="categoryNavWrapper">
+                <div class="nav-tabs" id="categoryNav"></div>
+            </div>
+        </div>
+
+        <div id="view-menu" class="container"></div>
+
+        <div id="view-status" class="container hidden">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border max-w-xl mx-auto">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span>📋 Active Orders for Table</span> <span id="statusTableLabel" class="text-indigo-600">--</span>
+                </h2>
+                <div id="fullStatusTrackerContainer" class="space-y-4">
+                    <p class="text-gray-400 italic text-sm">No active orders found.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-served" class="container hidden">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border max-w-xl mx-auto">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span>🍽️ Orders Served to Table</span> <span id="servedTableLabel" class="text-emerald-600">--</span>
+                </h2>
+                <div id="servedTrackerContainer" class="space-y-4">
+                    <p class="text-gray-400 italic text-sm">Nothing served yet.</p>
+                </div>
+                <div id="servedGrandTotal" class="hidden mt-5 pt-4 border-t-2 border-emerald-200 flex justify-between items-center">
+                    <span class="font-bold text-gray-700">Grand Total</span>
+                    <span id="servedGrandTotalValue" class="text-xl font-bold text-emerald-600">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-bar" id="cartBarWrapper">
+            <div id="activationWarning" class="text-xs text-amber-700 bg-amber-50 p-2 rounded-lg mb-2 hidden font-medium">
+                ⏳ Order button is locked. Ring the bell below when ready to order.
+            </div>
+            <div onclick="toggleCartDrawer()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span id="itemCountBadge" style="background: var(--primary); color: white; padding: 3px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: bold;">0 items</span>
+                    <span style="font-weight: 600; font-size: 0.95rem;" id="lblViewList">🛒 View Order List</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.1rem; font-weight: bold; color: var(--primary-dark);" id="barTotal">$0.00</span>
+                    <span id="chevronIcon" style="font-weight: bold; transition: transform 0.2s;">▲</span>
+                </div>
+            </div>
+            <div id="cartDetails" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border);">
+                <div id="cartItemsList" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px;"></div>
+                <button id="sendOrderBtn" onclick="sendOrder()" style="width: 100%; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer;">Send Order 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let currentLang = 'en';
+        let currentTable = null;
+        let currentRestaurant = null;
+        let currentToken = null;
+        let expiresAt = null;
+        let sessionStart = 0;
+        let tableIsOpen = false;
+        let canOrder = false;
+        let isWaitingForOrderPermission = false;
+        let isExpired = false;
+        let isCartOpen = false;
+        let cart = {};
+        let menuCategories = [];
+        let itemLookup = {};
+        let latestServerState = { tables: {}, tableRequests: {}, orders: [] };
+        let countdownInterval = null;
+        const activationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3');
+
+        // HTML escape helper — prevents XSS from any server-provided strings
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        const i18n = {
+            en: { brandSubtitle: "Prices in USD (Includes VAT & Service)", langBtnText: "عربي", viewList: "🛒 View Order List", items: "items", add: "+ Add", emptyCart: "Your list is empty.", sendOrder: "Send Order 🚀", notifyManager: "Ring Bell & Request Order Approval 🛎️", waitingOrderPermission: "⏳ Waiting for Manager Order Approval..." },
+            ar: { brandSubtitle: "الأسعار بالدولار شاملة الخدمة والضريبة", langBtnText: "English", viewList: "🛒 عرض تفاصيل الطلب", items: "أصناف", add: "+ إضافة", emptyCart: "سلة الطلبات فارغة.", sendOrder: "إرسال الطلب 🚀", notifyManager: "طلب إذن إرسال الطلب من المدير 🛎️", waitingOrderPermission: "⏳ في انتظار تفعيل زر الطلب من المدير..." }
+        };
+
+        function showErrorPage(message = "Invalid or expired session token.") {
+            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+            isExpired = true;
+            document.body.innerHTML = `
+                <div class="min-h-screen bg-gray-950 flex items-center justify-center p-6">
+                    <div class="bg-gray-900 border border-red-500/40 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl space-y-4">
+                        <div class="text-5xl">✅</div>
+                        <h2 class="text-xl font-bold text-emerald-400">Thank You!</h2>
+                        <p class="text-sm text-gray-300 leading-relaxed">${esc(message)}</p>
+                        <div class="pt-2"><span class="text-xs text-gray-500 font-mono">You may close this page.</span></div>
+                    </div>
+                </div>`;
+        }
+
+        window.onload = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentToken = urlParams.get('token');
+
+            if (!currentToken) {
+                showErrorPage("No session token was provided in the URL.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/verify-token?token=${encodeURIComponent(currentToken)}`);
+                const data = await res.json();
+
+                if (!data.success) {
+                    showErrorPage("The session token is invalid, tampered with, or expired.");
+                    return;
+                }
+
+                currentRestaurant = data.restaurant;
+                currentTable = data.tableNumber;
+                expiresAt = data.expiresAt || (Date.now() + (data.lifetimeMinutes || 15) * 60 * 1000);
+                sessionStart = data.sessionStart || Date.now();
+
+                if (!localStorage.getItem(`restaurant_session_token_${currentToken}`)) {
+                    localStorage.setItem(`restaurant_session_token_${currentToken}`, Date.now());
+                }
+                localStorage.setItem(`restaurant_session_expires_${currentToken}`, expiresAt);
+            } catch (e) {
+                showErrorPage("Unable to verify session with the server.");
+                return;
+            }
+
+            socket.emit('register_session', { token: currentToken }, (res) => {
+                if (!res.success) showErrorPage("Session registration failed.");
+            });
+
+            startSessionCountdown();
+
+            document.getElementById('brandTitle').innerText = currentRestaurant.toUpperCase();
+            document.getElementById('tableBtnDisplay').innerText = `Table #${currentTable}`;
+            document.getElementById('statusTableLabel').innerText = `#${currentTable}`;
+            document.getElementById('servedTableLabel').innerText = `#${currentTable}`;
+
+            if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
+            if ('serviceWorker' in navigator) {
+                try { await navigator.serviceWorker.register('/sw.js'); } catch (e) { console.warn('SW registration failed', e); }
+            }
+
+            await loadMenuFromServer(currentRestaurant);
+        };
+
+        function startSessionCountdown() {
+            const tick = () => {
+                if (isExpired) return;
+                const remaining = expiresAt - Date.now();
+                if (remaining <= 0) {
+                    if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+                    localStorage.removeItem(`restaurant_session_token_${currentToken}`);
+                    localStorage.removeItem(`restaurant_session_expires_${currentToken}`);
+                    showErrorPage("Your session has ended. Thank you for dining with us!");
+                    return;
+                }
+                const minutes = Math.floor(remaining / 60000);
+                const seconds = Math.floor((remaining % 60000) / 1000);
+                document.getElementById('countdownDisplay').innerText =
+                    `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            };
+            tick();
+            countdownInterval = setInterval(tick, 1000);
+        }
+
+        async function subscribeToPush() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                return showModal('Not Supported', 'Push notifications are not supported in this browser.', '⚠️');
+            }
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    return showModal('Permission Denied', 'You must allow notifications to receive order updates.', '⚠️');
+                }
+                const reg = await navigator.serviceWorker.ready;
+                const keyRes = await fetch('/api/vapid-public-key');
+                const { publicKey } = await keyRes.json();
+
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicKey)
+                });
+
+                await fetch('/api/subscribe-push', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        restaurant: currentRestaurant,
+                        tableNumber: currentTable,
+                        subscription: sub
+                    })
+                });
+
+                showModal('Push Enabled 🔔', 'You will now receive notifications about your order.', '🎉');
+            } catch (e) {
+                console.error(e);
+                showModal('Push Error', 'Could not enable push notifications.', '⚠️');
+            }
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+            return outputArray;
+        }
+
+        socket.on('cart_synced', (data) => {
+            if (isExpired) return;
+            cart = data.cart || {};
+            updateCartUI();
+            renderMenu();
+        });
+
+        socket.on('order_placed_success', () => {
+            if (isExpired) return;
+            cart = {};
+            isCartOpen = false;
+            isWaitingForOrderPermission = false;
+            document.getElementById('cartDetails').style.display = 'none';
+            document.getElementById('chevronIcon').style.transform = 'rotate(0deg)';
+            updateCartUI();
+            renderMenu();
+            switchMainTab('status');
+        });
+
+        socket.on('session_ended', () => {
+            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+            localStorage.removeItem(`restaurant_session_token_${currentToken}`);
+            localStorage.removeItem(`restaurant_session_expires_${currentToken}`);
+            showErrorPage("Your bill has been settled. Thank you for dining with us!");
+        });
+
+        function broadcastCart() {
+            if (currentToken) socket.emit('update_cart', { token: currentToken, cart });
+        }
+
+        function switchMainTab(tab) {
+            if (isExpired) return;
+            const isMenu = tab === 'menu';
+            const isStatus = tab === 'status';
+            const isServed = tab === 'served';
+
+            document.getElementById('mainTabMenu').classList.toggle('active', isMenu);
+            document.getElementById('mainTabStatus').classList.toggle('active', isStatus);
+            document.getElementById('mainTabServed').classList.toggle('active', isServed);
+
+            document.getElementById('view-status').classList.toggle('hidden', !isStatus);
+            document.getElementById('view-served').classList.toggle('hidden', !isServed);
+
+            const showMenu = tableIsOpen && isMenu;
+            document.getElementById('view-menu').classList.toggle('hidden', !showMenu);
+            document.getElementById('categoryNavWrapper').style.display = showMenu ? 'block' : 'none';
+        }
+
+        async function loadMenuFromServer(restaurantName) {
+            if (isExpired) return;
+            try {
+                const res = await fetch(`/api/menu/${encodeURIComponent(restaurantName)}`);
+                menuCategories = await res.json();
+                rebuildLookup();
+                renderMenu();
+            } catch(e) { console.error('Failed to load menu', e); }
+        }
+
+        socket.on('menu_updated', (data) => {
+            if (isExpired) return;
+            if (data && data.restaurant === currentRestaurant) {
+                menuCategories = data.menu;
+                rebuildLookup();
+                renderMenu();
+            }
+        });
+
+        function triggerSystemNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') new Notification(title, { body: body });
+        }
+
+        function showModal(title, message, icon = '🔔') {
+            if (isExpired) return;
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalIcon').innerText = icon;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+        function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
+
+        socket.on('state_update', (data) => {
+            if (isExpired) return;
+            latestServerState = data;
+            evaluateTableState();
+        });
+
+        function evaluateTableState() {
+            if (isExpired || !currentTable || !currentRestaurant) return;
+            const data = latestServerState;
+
+            const restoTables = (data.tables && data.tables[currentRestaurant]) || {};
+            const restoTable = restoTables[currentTable] || { isOpen: false, canOrder: false, status: 'Valid' };
+
+            const wasTableOpen = tableIsOpen;
+            const wasCanOrder = canOrder;
+
+            tableIsOpen = !!restoTable.isOpen;
+            canOrder = !!restoTable.canOrder;
+
+            if (!wasTableOpen && tableIsOpen) {
+                activationSound.play().catch(() => {});
+                showModal('Table Menu Activated!', 'The manager has activated your table menu. You can browse and add items!', '🎉');
+            }
+            if (!wasCanOrder && canOrder) {
+                activationSound.play().catch(() => {});
+                isWaitingForOrderPermission = false;
+                showModal('Order Approved! 🚀', 'The manager has unlocked your order button. You can now send your order!', '🚀');
+            }
+
+            const restoRequests = (data.tableRequests && data.tableRequests[currentRestaurant]) || {};
+            if (restoRequests[currentTable]) isWaitingForOrderPermission = true;
+            else if (canOrder) isWaitingForOrderPermission = false;
+
+            const menuContainer = document.getElementById('view-menu');
+            const categoryNavWrapper = document.getElementById('categoryNavWrapper');
+            let lockedNotice = document.getElementById('tableLockedNotice');
+            const isMenuTabActive = document.getElementById('mainTabMenu').classList.contains('active');
+
+            if (!tableIsOpen) {
+                if (!lockedNotice) {
+                    lockedNotice = document.createElement('div');
+                    lockedNotice.id = 'tableLockedNotice';
+                    lockedNotice.className = 'bg-white border border-amber-200 rounded-2xl p-8 text-center max-w-md mx-auto mt-12 shadow-xl';
+                    menuContainer.parentNode.insertBefore(lockedNotice, menuContainer);
+                }
+                lockedNotice.innerHTML = `
+                    <div class="text-5xl mb-3">⏳</div>
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Table Not Active</h2>
+                    <p class="text-sm text-gray-600 mb-6">Your table is currently locked. Please wait for the manager to activate your table.</p>`;
+                lockedNotice.style.display = 'block';
+                menuContainer.classList.add('hidden');
+                if (categoryNavWrapper) categoryNavWrapper.style.display = 'none';
+            } else {
+                if (lockedNotice) lockedNotice.style.display = 'none';
+                if (isMenuTabActive) {
+                    menuContainer.classList.remove('hidden');
+                    if (categoryNavWrapper) categoryNavWrapper.style.display = 'block';
+                } else {
+                    menuContainer.classList.add('hidden');
+                    if (categoryNavWrapper) categoryNavWrapper.style.display = 'none';
+                }
+            }
+
+            document.getElementById('activationWarning').classList.toggle('hidden', canOrder || isWaitingForOrderPermission || !tableIsOpen);
+            updateCartUI();
+
+            // All orders for this table
+            const tableOrders = (data.orders || []).filter(o =>
+                (o.restaurant || 'Default') === currentRestaurant &&
+                String(o.tableNumber) === String(currentTable)
+            );
+
+            const activeOrders = tableOrders.filter(o => o.kitchenStatus !== 'Sent to Table');
+            const servedOrders = tableOrders.filter(o => o.kitchenStatus === 'Sent to Table');
+
+            // ---- Served notification (persisted per session) ----
+            const notifyKey = `notified_${currentRestaurant}_${currentTable}`;
+            let persistentNotified = [];
+            try { persistentNotified = JSON.parse(localStorage.getItem(notifyKey) || '[]'); } catch(e) {}
+            const currentOrderIds = new Set(tableOrders.map(o => o.orderId));
+            persistentNotified = persistentNotified.filter(id => currentOrderIds.has(id));
+            const notifiedSet = new Set(persistentNotified);
+
+            let newlyServed = null;
+            servedOrders.forEach(ord => {
+                if (notifiedSet.has(ord.orderId)) return;
+                if (!ord.createdAt || ord.createdAt < sessionStart) return;
+                notifiedSet.add(ord.orderId);
+                persistentNotified.push(ord.orderId);
+                if (!newlyServed) newlyServed = ord;
+            });
+            if (newlyServed) {
+                localStorage.setItem(notifyKey, JSON.stringify(persistentNotified));
+                activationSound.play().catch(() => {});
+                showModal('On Its Way! 🍽️', `Your order for Table #${currentTable} has been served!`, '🍲');
+                triggerSystemNotification('Order Ready! 🍽️', 'Your food is on its way to your table!');
+                setTimeout(() => switchMainTab('served'), 50);
+            }
+
+            // ---- ACTIVE tab ----
+            const activeCountBadge = document.getElementById('headerOrderStatusCount');
+            if (activeOrders.length > 0) {
+                activeCountBadge.innerText = activeOrders.length;
+                activeCountBadge.classList.remove('hidden');
+            } else {
+                activeCountBadge.classList.add('hidden');
+            }
+
+            const activeContainer = document.getElementById('fullStatusTrackerContainer');
+            if (activeOrders.length === 0) {
+                activeContainer.innerHTML = `<p class="text-gray-400 italic text-sm text-center py-6">No active orders. Once your food is served, it moves to the <b>Served</b> tab.</p>`;
+            } else {
+                activeContainer.innerHTML = activeOrders.map((ord, idx) => `
+                    <div class="bg-gray-50 border p-4 rounded-xl space-y-3">
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <span class="font-bold text-indigo-600">Order #${idx + 1} (${esc(ord.timestamp || '')})</span>
+                            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${ord.kitchenStatus === 'Ready' ? 'bg-emerald-100 text-emerald-700' : ord.kitchenStatus === 'Cooking' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}">${esc(ord.kitchenStatus)}</span>
+                        </div>
+                        <ul class="text-sm space-y-2">
+                            ${(ord.items || []).map(i => {
+                                const check1 = i.checks && i.checks[0] ? '🔥 Cooking' : '';
+                                const check2 = i.checks && i.checks[1] ? '✅ Ready' : '';
+                                const statusLabel = check2 || check1 || '⏳ Pending';
+                                const statusBg = check2 ? 'bg-emerald-50 text-emerald-600' : check1 ? 'bg-amber-50 text-amber-600' : 'bg-gray-100 text-gray-500';
+                                return `
+                                <li class="flex justify-between items-center bg-white p-2 rounded border text-gray-700">
+                                    <div><span class="font-bold">${i.qty}x</span>${esc(i.name)}</div>
+                                    <div class="flex items-center gap-2 text-xs font-semibold"><span class="${statusBg} px-2 py-0.5 rounded">${statusLabel}</span></div>
+                                </li>`;
+                            }).join('')}
+                        </ul>
+                        <div class="flex justify-between items-center pt-2 border-t text-xs font-bold text-gray-600">
+                            <span>Bill Status: <span class="${ord.billStatus === 'Paid' ? 'text-emerald-600' : 'text-amber-600'}">${esc(ord.billStatus)}</span></span>
+                            <span class="text-base text-indigo-600">Total: $${(ord.total || 0).toFixed(2)}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // ---- SERVED tab ----
+            const servedCountBadge = document.getElementById('headerServedCount');
+            if (servedOrders.length > 0) {
+                servedCountBadge.innerText = servedOrders.length;
+                servedCountBadge.classList.remove('hidden');
+            } else {
+                servedCountBadge.classList.add('hidden');
+            }
+
+            const servedContainer = document.getElementById('servedTrackerContainer');
+            const grandTotalEl = document.getElementById('servedGrandTotal');
+            const grandTotalValueEl = document.getElementById('servedGrandTotalValue');
+
+            if (servedOrders.length === 0) {
+                servedContainer.innerHTML = `<p class="text-gray-400 italic text-sm text-center py-6">Nothing served yet.</p>`;
+                grandTotalEl.classList.add('hidden');
+            } else {
+                let grandTotal = 0;
+                servedContainer.innerHTML = servedOrders.map((ord, idx) => {
+                    grandTotal += (ord.total || 0);
+                    return `
+                    <div class="bg-emerald-50/60 border border-emerald-200 p-4 rounded-xl space-y-3">
+                        <div class="flex justify-between items-center border-b border-emerald-200 pb-2">
+                            <span class="font-bold text-emerald-700">Served Order #${idx + 1} (${esc(ord.timestamp || '')})</span>
+                            <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-600 text-white">✅ Served</span>
+                        </div>
+                        <ul class="text-sm space-y-2">
+                            ${(ord.items || []).map(i => `
+                                <li class="flex justify-between items-center bg-white p-2 rounded border border-emerald-100 text-gray-700">
+                                    <div><span class="font-bold">${i.qty}x</span>${esc(i.name)}</div>
+                                    <span class="text-xs font-semibold text-gray-500">$${((i.price || 0) * (i.qty || 1)).toFixed(2)}</span>
+                                </li>`).join('')}
+                        </ul>
+                        <div class="flex justify-between items-center pt-2 border-t border-emerald-200 text-xs font-bold text-gray-600">
+                            <span>Bill Status: <span class="${ord.billStatus === 'Paid' ? 'text-emerald-700' : 'text-amber-600'}">${esc(ord.billStatus)}</span></span>
+                            <span class="text-base text-emerald-700">Subtotal: $${(ord.total || 0).toFixed(2)}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+                grandTotalValueEl.innerText = `$${grandTotal.toFixed(2)}`;
+                grandTotalEl.classList.remove('hidden');
+            }
+        }
+
+        function requestOrderApproval() {
+            if (isExpired) return;
+            socket.emit('table_request', { token: currentToken });
+            isWaitingForOrderPermission = true;
+            updateCartUI();
+            showModal('Bell Rung! 🛎️', 'Notification sent to the manager to approve your order submission.', '🛎️');
+        }
+
+        function rebuildLookup() {
+            itemLookup = {};
+            menuCategories.forEach(cat => cat.items.forEach(item => itemLookup[item.id] = item));
+        }
+
+        function toggleLanguage() {
+            if (isExpired) return;
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            const t = i18n[currentLang];
+            document.getElementById('brandSubtitle').innerText = t.brandSubtitle;
+            document.getElementById('langToggleBtn').innerText = t.langBtnText;
+            document.getElementById('lblViewList').innerText = t.viewList;
+            renderMenu();
+            updateCartUI();
+        }
+
+        function toggleCartDrawer() {
+            if (isExpired) return;
+            isCartOpen = !isCartOpen;
+            document.getElementById('cartDetails').style.display = isCartOpen ? 'block' : 'none';
+            document.getElementById('chevronIcon').style.transform = isCartOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        function addToCart(id) {
+            if (isExpired) return;
+            cart[id] = (cart[id] || 0) + 1;
+            updateCartUI();
+            renderMenu();
+            broadcastCart();
+        }
+
+        function changeQty(id, delta) {
+            if (isExpired) return;
+            if (cart[id]) {
+                cart[id] += delta;
+                if (cart[id] <= 0) delete cart[id];
+            }
+            updateCartUI();
+            renderMenu();
+            broadcastCart();
+        }
+
+        // Event delegation — cart quantity buttons
+        document.getElementById('cartItemsList').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action="qty"]');
+            if (!btn) return;
+            const id = btn.getAttribute('data-id');
+            const delta = parseInt(btn.getAttribute('data-delta'));
+            changeQty(id, delta);
+        });
+
+        // Event delegation — "Add" buttons in menu
+        document.getElementById('view-menu').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-add-id]');
+            if (btn) addToCart(btn.getAttribute('data-add-id'));
+        });
+
+        // Event delegation — category nav
+        document.getElementById('categoryNav').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-sec-target]');
+            if (!btn) return;
+            document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById(btn.getAttribute('data-sec-target'));
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        function updateCartUI() {
+            if (isExpired) return;
+            const t = i18n[currentLang];
+            const itemIds = Object.keys(cart);
+            let total = 0, count = 0;
+            const listEl = document.getElementById('cartItemsList');
+            if (itemIds.length === 0) {
+                listEl.innerHTML = `<p style="text-align:center; color:#999; margin: 1rem 0; font-size:0.85rem;">${t.emptyCart}</p>`;
+            } else {
+                listEl.innerHTML = itemIds.map(id => {
+                    const item = itemLookup[id];
+                    if (!item) return '';
+                    const qty = cart[id], subtotal = item.price * qty;
+                    total += subtotal; count += qty;
+                    return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem;">
+                            <div><strong>${esc(currentLang === 'ar' ? (item.nameAr || item.nameEn) : item.nameEn)}</strong></div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <button data-action="qty" data-id="${esc(id)}" data-delta="-1" style="background:#eee; border:none; width:22px; height:22px; border-radius:50%; font-weight:bold; cursor:pointer;">-</button>
+                                <span>${qty}</span>
+                                <button data-action="qty" data-id="${esc(id)}" data-delta="1" style="background:#eee; border:none; width:22px; height:22px; border-radius:50%; font-weight:bold; cursor:pointer;">+</button>
+                                <span style="font-weight:600; min-width:50px; text-align:right;">$${subtotal.toFixed(2)}</span>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
+            document.getElementById('barTotal').innerText = '$' + total.toFixed(2);
+            document.getElementById('itemCountBadge').innerText = `${count} ${t.items}`;
+            const sendBtn = document.getElementById('sendOrderBtn');
+            sendBtn.disabled = count === 0;
+            if (canOrder) {
+                sendBtn.innerText = t.sendOrder; sendBtn.style.background = 'var(--primary)'; sendBtn.style.cursor = 'pointer';
+            } else if (isWaitingForOrderPermission) {
+                sendBtn.innerText = t.waitingOrderPermission; sendBtn.style.background = '#64748b'; sendBtn.style.cursor = 'not-allowed';
+            } else {
+                sendBtn.innerText = t.notifyManager; sendBtn.style.background = '#f59e0b'; sendBtn.style.cursor = 'pointer';
+            }
+        }
+
+        function renderMenu() {
+            if (isExpired) return;
+            const container = document.getElementById('view-menu');
+            const nav = document.getElementById('categoryNav');
+            const t = i18n[currentLang];
+            nav.innerHTML = ''; container.innerHTML = '';
+            menuCategories.forEach((sec, idx) => {
+                const catName = currentLang === 'ar' ? sec.categoryAr : sec.categoryEn;
+                const secId = 'sec-' + idx;
+                const tab = document.createElement('button');
+                tab.innerText = catName;
+                tab.setAttribute('data-sec-target', secId);
+                if (idx === 0) tab.classList.add('active');
+                nav.appendChild(tab);
+
+                let itemsHtml = '';
+                if (sec.items && Array.isArray(sec.items)) {
+                    itemsHtml = sec.items.map(item => {
+                        const itemName = currentLang === 'ar' ? (item.nameAr || item.nameEn) : item.nameEn;
+                        const altName = currentLang === 'ar' ? item.nameEn : (item.nameAr || '');
+                        const itemDesc = currentLang === 'ar' ? (item.descAr || item.descEn || '') : (item.descEn || '');
+                        const badge = cart[item.id] > 0 ? `<span class="qty-badge-red">x${cart[item.id]}</span>` : '';
+                        const priceVal = (item.price || 0).toFixed(2);
+                        return `
+                        <div class="card">
+                            <div class="card-info">
+                                <div class="alt-name">${esc(altName)}</div>
+                                <h3><span>${esc(itemName)}</span> ${badge}</h3>
+                                <p>${esc(itemDesc)}</p>
+                            </div>
+                            <div class="card-action">
+                                <span class="price">$${priceVal}</span>
+                                <button class="btn-add" data-add-id="${esc(item.id)}">${t.add}</button>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+                const secDiv = document.createElement('div');
+                secDiv.id = secId;
+                secDiv.classList.add('menu-section');
+                secDiv.innerHTML = `<div class="section-title"><span>${esc(catName)}</span></div><div class="grid">${itemsHtml}</div>`;
+                container.appendChild(secDiv);
+            });
+        }
+
+        function sendOrder() {
+            if (isExpired) return;
+            if (!canOrder) { requestOrderApproval(); return; }
+
+            let total = 0, orderItems = [];
+            Object.keys(cart).forEach(id => {
+                const item = itemLookup[id];
+                if (!item) return;
+                total += item.price * cart[id];
+                orderItems.push({ id, name: currentLang === 'ar' ? item.nameAr : item.nameEn, price: item.price, qty: cart[id] });
+            });
+
+            socket.emit('place_order', { items: orderItems, total, token: currentToken }, (res) => {
+                if (res.success) {
+                    cart = {}; isCartOpen = false; isWaitingForOrderPermission = false;
+                    document.getElementById('cartDetails').style.display = 'none';
+                    document.getElementById('chevronIcon').style.transform = 'rotate(0deg)';
+                    broadcastCart();
+                    showModal('Success!', 'Order sent successfully to the kitchen!', '🚀');
+                    updateCartUI(); renderMenu();
+                    switchMainTab('status');
+                } else { showModal('Notice', res.message, '⚠️'); }
+            });
+        }
+    </script>
+</body>
+</html>

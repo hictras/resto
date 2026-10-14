@@ -1,0 +1,95 @@
+[
+    {
+        "categoryEn": "Salads & Veggies",
+        "categoryAr": "سلطة وخضار",
+        "items": [
+            { "id": "artichoke_salad", "nameEn": "Artichoke Salad", "nameAr": "سلطة أرضي شوكي", "price": 15, "descEn": "Cooked artichoke with purslane, green peas, pine nuts, and lemon garlic oil dressing.", "descAr": "ارضي شوكي مع بقلة، بازلاء خضراء، الصنوبر وصلصة زيت وثوم وحامض." },
+            { "id": "mixed_green_confit", "nameEn": "Mixed Green Confit", "nameAr": "سلطة الخضار كونفي", "price": 16, "descEn": "Mixed greens with Fish cooked in olive oil. Lemon oil dressing.", "descAr": "خليط خس مع سمك مطبوخ بزيت الزيتون مع حامض وزيت الزيتون." },
+            { "id": "potato_salad", "nameEn": "Potato Salad", "nameAr": "سلطة البطاطا", "price": 10, "descEn": "Potato cubes with tomatoes, onions, green olives and herbs mix. Lemon oil dressing.", "descAr": "مكعبات البطاطس مع الطماطم والبصل والزيتون الأخضر ومزيج الأعشاب." },
+            { "id": "tabbouleh", "nameEn": "Tabbouleh", "nameAr": "تبولة", "price": 10, "descEn": "The legendary Lebanese salad with chopped parsley, tomatoes, onions, bulgur, lemon juice and extra virgin olive oil.", "descAr": "سلطة لبنانية مع البقدونس المفروم، البندورة، البصل، البرغل، الحامض وزيت الزيتون." },
+            { "id": "fattouch", "nameEn": "Fattouch", "nameAr": "فتوش", "price": 10, "descEn": "The traditional Lebanese green salad with toasted bread.", "descAr": "السلطة اللبنانية التقليدية مع الخبز المحمص ودبس الرمان." },
+            { "id": "raheb_salad", "nameEn": "Raheb Salad", "nameAr": "سلطة الراهب", "price": 10, "descEn": "Grilled eggplant with pomegranate, mint, chives, green pepper, cherry tomato, green onion, radish and basil.", "descAr": "الباذنجان المشوي مع حبوب الرمان، النعنع، الثوم، الفليفلة، البندورة الكرزية والحبق." }
+        ]
+    },
+    {
+        "categoryEn": "Cold Mezza",
+        "categoryAr": "مازة باردة",
+        "items": [
+            { "id": "hummus", "nameEn": "Hummus", "nameAr": "حمص", "price": 8.5, "descEn": "Mashed chickpeas with tahini and extra virgin olive oil.", "descAr": "حمص بطحينة مع زيت زيتون." },
+            { "id": "hummus_shrimps", "nameEn": "Hummus Shrimps", "nameAr": "حمص قريدس", "price": 16, "descEn": "Traditional hummus topped with shrimp and Bisque sauce.", "descAr": "حمص مع قريدس وصوص القريدس." },
+            { "id": "hummus_shawarma", "nameEn": "Hummus Shawarma", "nameAr": "حمص مع شاورما", "price": 18, "descEn": "Traditional hummus topped with shawarma and biwaz.", "descAr": "حمص مع شاورما وبيواز." },
+            { "id": "baba_ghannouj", "nameEn": "Baba Ghannouj", "nameAr": "بابا غنوج", "price": 8.5, "descEn": "Grilled eggplant, yogurt, tahini, fresh lemon, pomegranate seeds.", "descAr": "باذنجان مشوي، لبن، طحينة، عصير الحامض، رمان." },
+            { "id": "tajen_samak", "nameEn": "Tajen Samak", "nameAr": "طاجن سمك", "price": 13, "descEn": "Baked fish tajen with tahini sauce and toasted nuts.", "descAr": "سمك مطبوخ بالطحينة والمكسرات المحمصة." },
+            { "id": "stuffed_vine_leaves", "nameEn": "Stuffed Vine Leaves", "nameAr": "ورق عنب", "price": 9.5, "descEn": "Rolled vine leaves stuffed with spiced rice mix.", "descAr": "ورق عنب ملفوف ومحشي بخلطة الأرز." },
+            { "id": "hindbeh", "nameEn": "Hindbeh", "nameAr": "هندبة", "price": 10, "descEn": "Traditional parboiled chicory topped with caramelized onions and lemon juice.", "descAr": "هندبة مسلوقة مع البصل المحمر وعصير الحامض." },
+            { "id": "overturned_kaak", "nameEn": "Overturned Kaak", "nameAr": "كعك مقلوب بالشنكليش", "price": 14, "descEn": "Overturned kaak stuffed with shanklish (white cheese), diced tomatoes, white onions and olive oil.", "descAr": "كعك مقلوب محشي شنكليش مع بندورة وبصل وزيت زيتون." },
+            { "id": "fatayer_zaatar", "nameEn": "Fatayer Zaatar", "nameAr": "فطاير الزعتر", "price": 11, "descEn": "Lebanese wild zaatar pastries.", "descAr": "معجنات بالزعتر البري الأخضر." }
+        ]
+    },
+    {
+        "categoryEn": "Raw & Hot Mezza",
+        "categoryAr": "اطباق النية و مازة ساخنة",
+        "items": [
+            { "id": "ceviche", "nameEn": "Ceviche (Raw)", "nameAr": "سيفيتشي سمك ني", "price": 27, "descEn": "Fresh raw marinated fish.", "descAr": "سمكة نية متبلة بالحامض والأعشاب." },
+            { "id": "poutargue", "nameEn": "Poutargue (Raw)", "nameAr": "بطرخ", "price": 30, "descEn": "Poutargue, wild thyme, garlic slices, with extra virgin olive oil.", "descAr": "بطرخ، زعتر بري، شرائح ثوم بزيت الزيتون." },
+            { "id": "fried_calamari", "nameEn": "Fried Calamari", "nameAr": "كلامار مقلي", "price": 24, "descEn": "Fried Breaded Calamari served with tartar aside.", "descAr": "كلامار مقلي مقرمش مع صوص تارتار." },
+            { "id": "grilled_calamari", "nameEn": "Grilled Calamari", "nameAr": "كلامار مشوي", "price": 24, "descEn": "Grilled Calamari with lemon oil aside.", "descAr": "كلامار مشوي مع زيت وحامض." },
+            { "id": "bizri", "nameEn": "Bizri Fish", "nameAr": "سمك بزري", "price": 12, "descEn": "Crispy Fried Bizri Fish served with Tarator.", "descAr": "سمك بزري مقلي يقدم مع طرطور." },
+            { "id": "kebbet_samak", "nameEn": "Kebbet Samak", "nameAr": "كبة سمك", "price": 14, "descEn": "Fish Kebbe with onion, walnuts and saffron stuffing.", "descAr": "كبة سمك مع حشوة بصل، جوز وزعفران (مقلي أو مشوي)." },
+            { "id": "shrimps_provencal", "nameEn": "Shrimps Provencal", "nameAr": "قريدس بروفنسال", "price": 22, "descEn": "Sauteed shrimp with garlic, lemon and coriander.", "descAr": "قريدس مع حامض، ثوم، وكزبرة." },
+            { "id": "shrimp_fatteh", "nameEn": "Shrimp Fatteh", "nameAr": "فتة قريدس", "price": 17, "descEn": "Shrimps fatteh with cherry tomatoes, garlic yogurt and coriander.", "descAr": "فتة القريدس مع البندورة الكرزية واللبن المثوم والكزبرة." },
+            { "id": "octopus_coriander", "nameEn": "Octopus Coriander", "nameAr": "أخطبوط بالكزبرة", "price": 28, "descEn": "Sauteed octopus with garlic, lemon and coriander.", "descAr": "أخطبوط مع حامض، ثوم، وكزبرة." },
+            { "id": "grilled_octopus", "nameEn": "Grilled Octopus", "nameAr": "أخطبوط مشوي", "price": 33, "descEn": "Grilled octopus with lemon oil sauce aside.", "descAr": "أخطبوط مشوي مع زيت وحامض." }
+        ]
+    },
+    {
+        "categoryEn": "Main Dishes & Warm Starters",
+        "categoryAr": "الأطباق الرئيسية والمقبلات",
+        "items": [
+            { "id": "smashed_potatoes", "nameEn": "Smashed Potatoes", "nameAr": "بطاطا مهروسة", "price": 10, "descEn": "Smashed potato with roasted garlic, onions, chilli, dill and olives.", "descAr": "بطاطا مهروسة مع ثوم، بصل، حر، زيتون أخضر وشومر وزيت زيتون." },
+            { "id": "cheese_rolls", "nameEn": "Cheese Rolls (4 pcs)", "nameAr": "رقاقات جبنة", "price": 9, "descEn": "Fried or grilled rolls.", "descAr": "رقاقات جبنة مقلية أو مشوية (٤ قطع)." },
+            { "id": "crispy_potatoes", "nameEn": "Crispy Potatoes with Coriander", "nameAr": "بطاطا بالكزبرة", "price": 8, "descEn": "Fried Potato cubes mixed with garlic, fresh coriander and hot pepper.", "descAr": "مكعبات البطاطا المقلية مع الثوم، الكزبرة، والحر." },
+            { "id": "fries", "nameEn": "Fries", "nameAr": "بطاطا مقلية", "price": 8, "descEn": "Homemade allumette fries.", "descAr": "بطاطا مقلية منزلية مقرمشة." },
+            { "id": "makanek", "nameEn": "Makanek", "nameAr": "مقانق", "price": 16, "descEn": "Pan-fried Lebanese sausages served with pomegranate syrup and pine nuts.", "descAr": "مقانق مقلية مع دبس الرمان والصنوبر." },
+            { "id": "lahmeh_ras_asfour", "nameEn": "Lahmeh Ras Asfour", "nameAr": "لحمة راس عصفور", "price": 18, "descEn": "Diced veal served with homemade allumette fries.", "descAr": "لحمة العجل المقطعة تقدم مع البطاطا المقلية." },
+            { "id": "kun_ras_asfour", "nameEn": "Kun Ras Asfour", "nameAr": "كن راس عصفور", "price": 22, "descEn": "Diced Beef with tarragon, herbs creamy sauce, served with fries.", "descAr": "لحم بقر مقطع مع الطرخون، صلصة كريمة بالأعشاب، مع البطاطا المقلية." },
+            { "id": "beef_shawarma", "nameEn": "Beef Shawarma", "nameAr": "شاورما لحمة", "price": 26, "descEn": "Beef shawarma, biwaz served with tarator, grilled tomato and fries.", "descAr": "شاورما لحمة مع خلطة البيواز، طرطور، بندورة مشوية وبطاطا مقلية." },
+            { "id": "chicken_taouk", "nameEn": "Chicken Taouk", "nameAr": "شيش طاووق", "price": 18, "descEn": "Charcoal chicken barbecue served with grilled vegetables.", "descAr": "أسياخ دجاج مشوية عالفحم تقدم مع خضار مشوية." },
+            { "id": "beef_skewers", "nameEn": "Beef Skewers", "nameAr": "لحم مشوي", "price": 29, "descEn": "Charcoal baby veal barbecue served with grilled vegetables.", "descAr": "لحم عجل مشوي عالفحم يقدم مع خضار مشوية." }
+        ]
+    },
+    {
+        "categoryEn": "Lebnéné Sweets",
+        "categoryAr": "حلويات عاللبناني",
+        "items": [
+            { "id": "tarboush", "nameEn": "Tarboush", "nameAr": "طربوش", "price": 15, "descEn": "Made of almond caramel ice cream and covered in chocolate.", "descAr": "طربوش من البوظة بطعمة الكراميل واللوز مغطى بالشوكولا." },
+            { "id": "karabij", "nameEn": "The Famous Karabij", "nameAr": "الكرابيج الشهيرة", "price": 13, "descEn": "The famous pistachio stuffed maamoul with karabij cream.", "descAr": "عجينة المعمول المحشوة بالفستق مع كريمة الناطف الشهية." },
+            { "id": "ghazal_beirut", "nameEn": "Ghazal Beirut", "nameAr": "غزل بيروت", "price": 13, "descEn": "Cotton candy stuffed with mastic ice cream, topped with pistachios.", "descAr": "بوظة المستكة بين طبقتين من غزل البنات الأبيض مع برش الفستق الحلبي." },
+            { "id": "ice_cream", "nameEn": "Ice Cream Selection", "nameAr": "تشكيلة بوظة", "price": 12, "descEn": "3 scoops of your choice of flavours.", "descAr": "٣ كرات من البوظة بنكهات من اختيارك." },
+            { "id": "chocolat_mou", "nameEn": "Chocolat Mou", "nameAr": "شوكولا مو", "price": 12, "descEn": "Classic Lebanese chocolate mousse coupe.", "descAr": "شوكولا مو كلاسيكي مع الكريمة." },
+            { "id": "fraise_melba", "nameEn": "Fraise Melba", "nameAr": "فريز مالبا", "price": 14, "descEn": "Fresh strawberries with cream and syrup.", "descAr": "فريز طازج مع البوظة والكريمة." }
+        ]
+    },
+    {
+        "categoryEn": "Waters & Soft Drinks",
+        "categoryAr": "مياه و مشروبات غازية",
+        "items": [
+            { "id": "water_half", "nameEn": "Via 1/2 Water", "nameAr": "مياه نصف ليتر", "price": 3.5, "descEn": "Small bottled water", "descAr": "مياه معدنية صغيرة" },
+            { "id": "water_one", "nameEn": "Via 1/1 Water", "nameAr": "مياه ليتر كامل", "price": 6, "descEn": "Large bottled water", "descAr": "مياه معدنية كبيرة" },
+            { "id": "pellegrino_250", "nameEn": "250ml San Pellegrino", "nameAr": "سان بيليغرينو 250 مل", "price": 4, "descEn": "Sparkling water", "descAr": "مياه غازية" },
+            { "id": "pepsi", "nameEn": "Pepsi", "nameAr": "بيبسي", "price": 4.5, "descEn": "Soft drink", "descAr": "مشروب غازي" },
+            { "id": "seven_up", "nameEn": "Seven Up", "nameAr": "سفن اب", "price": 4.5, "descEn": "Soft drink", "descAr": "مشروب غازي" },
+            { "id": "red_bull", "nameEn": "Red Bull", "nameAr": "ريد بول", "price": 7.5, "descEn": "Energy drink", "descAr": "مشروب طاقة" }
+        ]
+    },
+    {
+        "categoryEn": "Coffee, Tea & Shisha",
+        "categoryAr": "قهوة، شاي وأرجيلة",
+        "items": [
+            { "id": "leb_coffee", "nameEn": "Lebanese Coffee", "nameAr": "قهوة لبنانية", "price": 4, "descEn": "Traditional dark roast brewed in a rakweh.", "descAr": "قهوة لبنانية محضرة في الركوة." },
+            { "id": "espresso", "nameEn": "Espresso", "nameAr": "اسبريسو", "price": 3.5, "descEn": "Single shot", "descAr": "شوت اسبريسو واحد" },
+            { "id": "cafe_latte", "nameEn": "Cafe Latte", "nameAr": "كافيه لاتيه", "price": 6, "descEn": "Espresso with steamed milk", "descAr": "اسبريسو مع الحليب المبخر" },
+            { "id": "shisha_mouaasal", "nameEn": "Shisha Mouaasal", "nameAr": "أرجيلة معسل", "price": 13, "descEn": "Choice of flavored fruit tobacco", "descAr": "أرجيلة معسل بنكهات متعددة" }
+        ]
+    }
+]

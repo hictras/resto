@@ -1,0 +1,592 @@
+[
+    {
+        "categoryEn": "Breakfast Favorites",
+        "categoryAr": "مفضلات الإفطار",
+        "items": [
+            {
+                "id": "6abca7c53ba1cd7ace53e3f0",
+                "nameEn": "Plain Croissant",
+                "nameAr": "كرواسون سادة",
+                "price": 4.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abca7c9ca71c4aa68823c7f",
+                "nameEn": "Pain Au Chocolat",
+                "nameAr": "بان أو شوكولا",
+                "price": 4.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abca7e294987f1af4a814ea",
+                "nameEn": "Cheese Croissant",
+                "nameAr": "كرواسون جبنة",
+                "price": 4.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abca8269af1755fd075647b",
+                "nameEn": "Zaatar Croissant",
+                "nameAr": "كرواسون زعتر",
+                "price": 4.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcb507a2c2562d1b0458eb",
+                "nameEn": "Blueberry Chia Pudding",
+                "nameAr": "بودنج الشيا بالتوت العليق",
+                "price": 14.00,
+                "descEn": "Coconut milk and chia seeds with blueberry and maple syrup, topped with fresh blackberries and strawberries.",
+                "descAr": "حليب جوز الهند وبذور الشيا مع التوت الأزرق وشراب القيقب، يعلوه التوت البري والفراولة الطازجة."
+            },
+            {
+                "id": "6abcb4e33ba1cd7ace545b13",
+                "nameEn": "Red Fruits Granola",
+                "nameAr": "جرانولا الفواكه الحمراء",
+                "price": 12.00,
+                "descEn": "Greek yogurt topped with homemade granola, fresh red fruits & drizzled with red fruits coulis",
+                "descAr": "لبن يوناني يعلوه الجرانولا المصنوعة منزلياً، فواكه حمراء طازجة ومعطرة بصوص الفواكه الحمراء"
+            },
+            {
+                "id": "6abcb51eff81138d8dccde92",
+                "nameEn": "Matcha Chia Pudding",
+                "nameAr": "بودنج الشيا بالماشا",
+                "price": 14.00,
+                "descEn": "Coconut milk and chia seeds infused with matcha, maple syrup and vanilla, topped with physalis, shredded coconut and a drizzle of honey.",
+                "descAr": "حليب جوز الهند وبذور الشيا المعطرة بالماشا، شراب القيقب والفانيليا، تعلوها الكلافي، جوز الهند المبشور ورشة عسل."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Merry Cream",
+        "categoryAr": "ميري كريم",
+        "items": [
+            {
+                "id": "6abccf65fa3e011644c9e89b",
+                "nameEn": "Plain Merry Cream",
+                "nameAr": "ميري كريم سادة",
+                "price": 8.00,
+                "descEn": "Chocolate, Vanilla, Choco-vanilla.",
+                "descAr": "شوكولاتة، فانيليا، شوكو-فانيليا."
+            },
+            {
+                "id": "6abccf790b1b50e722743605",
+                "nameEn": "Merry Cream - Gourmet Cups",
+                "nameAr": "ميري كريم - أكواب فاخرة",
+                "price": 10.00,
+                "descEn": "Red Fruits, Chocolate, Caramel",
+                "descAr": "فواكه حمراء، شوكولاتة، كراميل"
+            }
+        ]
+    },
+    {
+        "categoryEn": "Chocolate Faucet",
+        "categoryAr": "نافورة الشوكولاتة",
+        "items": [
+            {
+                "id": "6abcb2423ba1cd7ace543ead",
+                "nameEn": "Caramel Stroopwaffles",
+                "nameAr": "ستروب وافل بالكراميل",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcb25ef26d23112cdbc11d",
+                "nameEn": "Cookie Fingers",
+                "nameAr": "أصابع الكوكيز",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcb2ac1be3f93a2c8ce8fe",
+                "nameEn": "Fresh Strawberries",
+                "nameAr": "فراولة طازجة",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Desserts",
+        "categoryAr": "الحلويات",
+        "items": [
+            {
+                "id": "6abcb3bb29b447dd2586f390",
+                "nameEn": "Patchi Chocolate Cake",
+                "nameAr": "كيك الشوكولاتة من باتشي",
+                "price": 14.00,
+                "descEn": "Moist cocoa cake layered with creamy chocolate ganache and finished with a dark chocolate glaze, served with vanilla whipped cream.",
+                "descAr": "كيك الكاكاو الرطب المحشو بطبقات من غاناش الشوكولاتة الكريمي والمغطى بطلاء الشوكولاتة الداكنة، يقدم مع كريمة الفانيليا المخفوقة."
+            },
+            {
+                "id": "6abcb3df29b447dd2586f4e8",
+                "nameEn": "San Sebastian Cheesecake",
+                "nameAr": "تشيز كيك سان سباستيان",
+                "price": 15.00,
+                "descEn": "Creamy San Sebastian cheesecake topped with fresh mixed berries and served with chocolate sauce.",
+                "descAr": "تشيز كيك سان سباستيان الكريمية تعلوها التوت المشكل الطازج وتقدم مع صوص الشوكولاتة."
+            },
+            {
+                "id": "6abcb3f588a982d4c042e696",
+                "nameEn": "Honey Cake",
+                "nameAr": "كيك العسل",
+                "price": 12.00,
+                "descEn": "Honey biscuit layered with light caramel cream.",
+                "descAr": "بسكويت العسل المحشو بطبقات من كريمة الكراميل الخفيفة."
+            },
+            {
+                "id": "6abcb40f1be3f93a2c8cf2bf",
+                "nameEn": "Cookie in a pan",
+                "nameAr": "كوكيز في مقلاة",
+                "price": 15.00,
+                "descEn": "Chocolate cookie served with creamy vanilla merry cream.",
+                "descAr": "كوكيز الشوكولاتة تقدم مع ميري كريم الفانيليا الكريمي."
+            },
+            {
+                "id": "6abcb42a38529eea61b1e1d4",
+                "nameEn": "Lemon English Cake",
+                "nameAr": "كيك إنجليزي بالليمون",
+                "price": 6.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcb44222fc339ba86c29e5",
+                "nameEn": "Chocolate English Cake",
+                "nameAr": "كيك إنجليزي بالشوكولاتة",
+                "price": 6.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcafb68d1b0087b79f5812",
+                "nameEn": "Gourmet Pecan Cookie",
+                "nameAr": "كوكيز البقان الفاخرة",
+                "price": 7.00,
+                "descEn": "Milk chocolate cookie with hazelnut praline and caramelized pecans.",
+                "descAr": "كوكيز شوكولاتة الحليب مع برالين البندق والبقان المكرمل."
+            },
+            {
+                "id": "6abcb03e1be3f93a2c8cd048",
+                "nameEn": "Gourmet Pistachio Cookie",
+                "nameAr": "كوكيز الفستق الفاخرة",
+                "price": 7.00,
+                "descEn": "White chocolate cookie with pistachio praline and caramelized pistachios.",
+                "descAr": "كوكيز الشوكولاتة البيضاء مع برالين الفستق والفستق المكرمل."
+            },
+            {
+                "id": "6abcafbf3ba1cd7ace542cf1",
+                "nameEn": "Gourmet Hazelnut Cookie",
+                "nameAr": "كوكيز البندق الفاخرة",
+                "price": 7.00,
+                "descEn": "Dark chocolate cookie with caramel and caramelized hazelnuts.",
+                "descAr": "كوكيز الشوكولاتة الداكنة مع الكراميل والبندق المكرمل."
+            },
+            {
+                "id": "6abcb56238529eea61b1eeea",
+                "nameEn": "Chocolate Crunch",
+                "nameAr": "تشوكليت كرانش",
+                "price": 9.00,
+                "descEn": "Rich chocolate mousse layered with chocolate fudge and crispy feuilletine.",
+                "descAr": "موس الشوكولاتة الغني مع طبقات من فادج الشوكولاتة والفيولتين المقرمش."
+            },
+            {
+                "id": "6abcb54aca71c4aa6882d86e",
+                "nameEn": "Tiramisu",
+                "nameAr": "تيراميسو",
+                "price": 12.00,
+                "descEn": "Coffee-soaked ladyfingers layered with creamy mascarpone and cream cheese, finished with coffee crumbs.",
+                "descAr": "أصابع البسكويت المنقوعة في القهوة مع طبقات من الماسكاربوني الجبن الكريمي، مزينة بفتات القهوة."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Beverages",
+        "categoryAr": "المشروبات",
+        "items": [
+            {
+                "id": "6abcb9f5457458292b858563",
+                "nameEn": "Iced Spanish Latte",
+                "nameAr": "آيس سبانيش لاتيه",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcba0694987f1af4a8cab0",
+                "nameEn": "Iced Vanilla Latte",
+                "nameAr": "آيس فانيليا لاتيه",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcba798d68e9c3b5f2f888",
+                "nameEn": "Iced Caramel Latte",
+                "nameAr": "آيس كراميل لاتيه",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcba843ba1cd7ace549a22",
+                "nameEn": "Choco Coffee Frappé",
+                "nameAr": "فرابيه قهوة بالشوكولاتة",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcba8c457458292b85896f",
+                "nameEn": "Milk Chocolate Frappé",
+                "nameAr": "فرابيه شوكولاتة الحليب",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcba95c60fda609f9b513a",
+                "nameEn": "Iced Whipped Coffee",
+                "nameAr": "قهوة مخفوقة مثلجة",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcba9dca71c4aa688315da",
+                "nameEn": "Caramel Coffee Frappé",
+                "nameAr": "فرابيه قهوة بالكراميل",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbaa69af1755fd076369b",
+                "nameEn": "Toffee Nut Caramel Frappé",
+                "nameAr": "فرابيه كراميل جوز التوفي",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbaaeca71c4aa68831625",
+                "nameEn": "Iced Coffee Frappé",
+                "nameAr": "فرابيه قهوة مثلجة",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbabeca71c4aa68831660",
+                "nameEn": "Iced Matcha Latte",
+                "nameAr": "آيس ماتشا لاتيه",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbac66f31a295c6bb9282",
+                "nameEn": "Iced Mango Matcha",
+                "nameAr": "آيس مانجو ماتشا",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbace6f31a295c6bb92e4",
+                "nameEn": "Yuzu Lemonade",
+                "nameAr": "عصير ليمون اليوزو",
+                "price": 8.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbad98d68e9c3b5f2fac3",
+                "nameEn": "Blueberry Collagen Shake",
+                "nameAr": "ميلك شيك بالكولاجين والتوت الأزرق",
+                "price": 12.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbaef22fc339ba86c6412",
+                "nameEn": "Chocolate Protein Shake",
+                "nameAr": "بروتين شيك بالشوكولاتة",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbae2c60fda609f9b5562",
+                "nameEn": "Affogato",
+                "nameAr": "أفوغاتو",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbbccc60fda609f9b6030",
+                "nameEn": "Americano",
+                "nameAr": "أمريكانو",
+                "price": 7.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbc0888fb14b5d6a2c51c",
+                "nameEn": "Cappuccino",
+                "nameAr": "كابتشينو",
+                "price": 7.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbc0e3ba1cd7ace54b58d",
+                "nameEn": "Mochaccino",
+                "nameAr": "موشاتشينو",
+                "price": 8.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd268d1b0087b79fcffe",
+                "nameEn": "Café Latte",
+                "nameAr": "كافيه لاتيه",
+                "price": 7.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd30ff81138d8dcd2e53",
+                "nameEn": "Cortado",
+                "nameAr": "كورتادو",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd37ff81138d8dcd2f10",
+                "nameEn": "Flat White",
+                "nameAr": "فلات وايت",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd61ff81138d8dcd3071",
+                "nameEn": "Spanish Latte",
+                "nameAr": "سبانيش لاتيه",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd69ff81138d8dcd30a4",
+                "nameEn": "Matcha Latte",
+                "nameAr": "ماتشا لاتيه",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd77e6ce139862e14a44",
+                "nameEn": "Beauty Latte",
+                "nameAr": "بيوتي لاتيه",
+                "price": 10.00,
+                "descEn": "Classic latte boosted with collagen",
+                "descAr": "لاتيه كلاسيكي معزز بالكولاجين"
+            },
+            {
+                "id": "6abcbd83bbc24194ede8df55",
+                "nameEn": "Vanilla Latte",
+                "nameAr": "فانيليا لاتيه",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd8b034a76858c7280e9",
+                "nameEn": "Salted Caramel Latte",
+                "nameAr": "سولتيد كراميل لاتيه",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd93081798d22ca2ffca",
+                "nameEn": "Dark Hot Chocolate 70%",
+                "nameAr": "شوكولاتة ساخنة داكنة 70%",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbd9c034a76858c72819f",
+                "nameEn": "Milk Hot Chocolate",
+                "nameAr": "شوكولاتة ساخنة بالحليب",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbdad034a76858c72821c",
+                "nameEn": "Double Espresso",
+                "nameAr": "دبل إسبريسو",
+                "price": 8.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbda499968349d9bd233d",
+                "nameEn": "Espresso",
+                "nameAr": "إسبريسو",
+                "price": 5.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abcbdbd1d1d5e3e7f6dc632",
+                "nameEn": "Tea",
+                "nameAr": "شاي",
+                "price": 7.50,
+                "descEn": "Qimen - Earl Grey - Grand Jasmin - Chamomile",
+                "descAr": "شاي كيمين - إيرل غراي - ياسمين - بابونج"
+            },
+            {
+                "id": "6abcbdcbbbc24194ede8eccd",
+                "nameEn": "Ginger Infusion",
+                "nameAr": "مشروب الزنجبيل",
+                "price": 8.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abccc3274a8b693d99878d6",
+                "nameEn": "Sunshine Glow",
+                "nameAr": "صن شاين غلو",
+                "price": 9.00,
+                "descEn": "Orange, carrot & ginger",
+                "descAr": "برتقال، جزر وزنجبيل"
+            },
+            {
+                "id": "6abccc5974a8b693d9987b1d",
+                "nameEn": "Red Splash",
+                "nameAr": "ريد سبلاش",
+                "price": 9.00,
+                "descEn": "Beetroot, orange & pomegranate",
+                "descAr": "شمندر، برتقال ورمان"
+            },
+            {
+                "id": "6abccc6d5c9a66b9861c6c36",
+                "nameEn": "Green Breeze",
+                "nameAr": "غرين بريز",
+                "price": 9.00,
+                "descEn": "Pineapple, orange, kale, mint & blueberry",
+                "descAr": "أناناس، برتقال، كالي، نعناع وتوت أزرق"
+            },
+            {
+                "id": "6abccc885c9a66b9861c6fc0",
+                "nameEn": "Exotic Float Lemonade",
+                "nameAr": "عصير ليمون إكزوتيك فلوت",
+                "price": 9.00,
+                "descEn": "Pineapple, passion fruit & lemon, with mango sorbet",
+                "descAr": "أناناس، باشن فروت وليمون، مع سوربي المانجو"
+            },
+            {
+                "id": "6abccc9e233be8e37334123e",
+                "nameEn": "Pineapple Ginger",
+                "nameAr": "أناناس بالزنجبيل",
+                "price": 9.00,
+                "descEn": "Pineapple, ginger, lemon & mint",
+                "descAr": "أناناس، زنجبيل، ليمون ونعناع"
+            },
+            {
+                "id": "6abccccd74a8b693d99880ba",
+                "nameEn": "Tropical Evasion",
+                "nameAr": "تروبيكال إيشن",
+                "price": 10.00,
+                "descEn": "Pineapple, lime, passion fruit, mango & cinnamon",
+                "descAr": "أناناس، ليمون حامض، باشن فروت، مانجو وقرفة"
+            },
+            {
+                "id": "6abccce2233be8e373341655",
+                "nameEn": "Lemonade Addict",
+                "nameAr": "ليمونيد أ딕ت",
+                "price": 9.00,
+                "descEn": "Yuzu, lime & fresh basil",
+                "descAr": "يوزو، ليمون حامض وريحان طازج"
+            },
+            {
+                "id": "6abccd058763abdc29d2d0af",
+                "nameEn": "Aqua Fresca",
+                "nameAr": "أكوا فريسكا",
+                "price": 9.00,
+                "descEn": "Mango, strawberry & lemon, with raspberry sorbet",
+                "descAr": "مانجو، فراولة وليمون، مع سوربي التوت الأحمر"
+            },
+            {
+                "id": "6abccd315c9a66b9861c79a2",
+                "nameEn": "Water",
+                "nameAr": "مياه",
+                "price": 3.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abccd414b1fdb3767fd55fa",
+                "nameEn": "San Pellegrino",
+                "nameAr": "سان بيليغرينو",
+                "price": 4.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abccd464b98cd87f0a741b9",
+                "nameEn": "Soft Drink",
+                "nameAr": "مشروب غازي",
+                "price": 4.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abccd66c8923143fb7d95c0",
+                "nameEn": "Fresh Orange Juice",
+                "nameAr": "عصير برتقال طازج",
+                "price": 7.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abccd78e79fe98ad2874f9f",
+                "nameEn": "Detox Juice",
+                "nameAr": "عصير ديتوكس",
+                "price": 8.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abccd9c0b1b50e7227420d9",
+                "nameEn": "Almaza",
+                "nameAr": "ألمازا",
+                "price": 6.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "6abccdb9b6f1b5f8e1614177",
+                "nameEn": "Wine Glass",
+                "nameAr": "كأس نبيذ",
+                "price": 8.00,
+                "descEn": "Red, White, Rose",
+                "descAr": "أحمر، أبيض، روزيه"
+            }
+        ]
+    }
+]

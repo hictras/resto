@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Display System (KDS)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-6 max-w-7xl mx-auto">
+    <header class="flex flex-wrap justify-between items-center mb-6 bg-gray-800 border border-gray-700 p-5 rounded-2xl shadow-lg gap-4">
+        <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
+            🍳 Kitchen Display <span id="connStatus" class="w-3 h-3 rounded-full bg-red-500 inline-block" title="Disconnected"></span>
+        </h1>
+        <div id="restaurantNavButtons" class="flex flex-wrap items-center gap-2"></div>
+        <a href="admin.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition">← Admin Panel</a>
+    </header>
+
+    <main class="space-y-6">
+        <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+            <h2 id="activeRestoTitle" class="text-xl font-bold text-amber-300">Active Kitchen Orders</h2>
+            <span id="orderCountBadge" class="bg-indigo-600 text-white text-xs px-3 py-1 rounded-full font-bold">0 Active Orders</span>
+        </div>
+        <div id="kitchenOrdersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <p class="text-gray-400 italic">Loading kitchen orders...</p>
+        </div>
+    </main>
+
+    <script>
+        const socket = io();
+        let latestState = { tables: {}, tableRequests: {}, orders: [] };
+        let selectedKitchenRestaurant = '';
+        const alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        let previousOrderCount = -1;
+
+        const esc = s => String(s).replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        socket.on('connect', () => { document.getElementById('connStatus').className = "w-3 h-3 rounded-full bg-emerald-500 inline-block"; });
+        socket.on('disconnect', () => { document.getElementById('connStatus').className = "w-3 h-3 rounded-full bg-red-500 inline-block"; });
+
+        socket.on('state_update', (data) => {
+            latestState = data;
+            const activeKitchenOrders = (data.orders || []).filter(o => o.kitchenStatus !== 'Sent to Table');
+            if (activeKitchenOrders.length > previousOrderCount && previousOrderCount >= 0) {
+                alertSound.play().catch(() => {});
+            }
+            previousOrderCount = activeKitchenOrders.length;
+            renderKitchen();
+        });
+
+        // Event delegation — no inline onclick with restaurant name in attributes
+        document.getElementById('restaurantNavButtons').addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-resto]');
+            if (btn) {
+                selectedKitchenRestaurant = btn.getAttribute('data-resto');
+                renderKitchen();
+            }
+        });
+
+        document.getElementById('kitchenOrdersGrid').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+            const orderId = btn.getAttribute('data-order');
+            if (action === 'toggle-item') {
+                socket.emit('toggle_item_check', {
+                    orderId,
+                    itemIndex: parseInt(btn.getAttribute('data-item')),
+                    checkIndex: parseInt(btn.getAttribute('data-check'))
+                });
+            } else if (action === 'set-cooking') {
+                socket.emit('update_kitchen_status', { orderId, kitchenStatus: 'Cooking' });
+            } else if (action === 'send-table') {
+                socket.emit('update_kitchen_status', { orderId, kitchenStatus: 'Sent to Table' });
+            }
+        });
+
+        function renderKitchen() {
+            const allOrders = latestState.orders || [];
+            const activeOrders = allOrders.filter(o => o.kitchenStatus !== 'Sent to Table');
+            const restaurantsWithOrders = [...new Set(activeOrders.map(o => o.restaurant || 'Default'))];
+
+            if (!restaurantsWithOrders.includes(selectedKitchenRestaurant) && restaurantsWithOrders.length > 0) {
+                selectedKitchenRestaurant = restaurantsWithOrders[0];
+            } else if (restaurantsWithOrders.length === 0) {
+                selectedKitchenRestaurant = '';
+            }
+
+            const navContainer = document.getElementById('restaurantNavButtons');
+            if (restaurantsWithOrders.length === 0) {
+                navContainer.innerHTML = `<span class="text-xs text-gray-400 italic">No restaurants with active orders</span>`;
+            } else {
+                navContainer.innerHTML = restaurantsWithOrders.map(resto => {
+                    const isActive = resto === selectedKitchenRestaurant;
+                    const count = activeOrders.filter(o => (o.restaurant || 'Default') === resto).length;
+                    return `
+                        <button data-resto="${esc(resto)}" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${isActive ? 'bg-amber-500 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}">
+                            <span>🍽️ ${esc(resto)}</span>
+                            <span class="bg-black/30 text-white px-1.5 py-0.2 rounded-full text-[10px]">${count}</span>
+                        </button>`;
+                }).join('');
+            }
+
+            const filteredOrders = activeOrders.filter(o => (o.restaurant || 'Default') === selectedKitchenRestaurant);
+            document.getElementById('activeRestoTitle').innerText = selectedKitchenRestaurant ? `Orders for: ${selectedKitchenRestaurant}` : `Kitchen Display`;
+            document.getElementById('orderCountBadge').innerText = `${filteredOrders.length} Active Orders`;
+
+            const grid = document.getElementById('kitchenOrdersGrid');
+            if (filteredOrders.length === 0) {
+                grid.innerHTML = `<p class="text-gray-400 italic col-span-full text-center py-12">No active orders in the kitchen for this restaurant.</p>`;
+                return;
+            }
+
+            grid.innerHTML = filteredOrders.map((ord) => {
+                const isReady = ord.kitchenStatus === 'Ready';
+                const isCooking = ord.kitchenStatus === 'Cooking';
+                const safeOrderId = esc(ord.orderId);
+                return `
+                <div class="bg-gray-800 border ${isReady ? 'border-emerald-500 shadow-emerald-500/10' : 'border-gray-700'} rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-3">
+                            <span class="font-bold text-base text-amber-300">Table #${esc(ord.tableNumber)}</span>
+                            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${isReady ? 'bg-emerald-500/20 text-emerald-300' : isCooking ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'}">${esc(ord.kitchenStatus)}</span>
+                        </div>
+                        <ul class="space-y-3">
+                            ${(ord.items || []).map((i, itemIdx) => {
+                                const checks = i.checks || [false, false];
+                                return `
+                                <li class="bg-gray-700/50 border border-gray-600/60 p-3 rounded-xl flex flex-col gap-2">
+                                    <div class="flex justify-between items-center text-sm">
+                                        <span class="font-bold text-white"><span class="text-amber-400">${i.qty}x</span>${esc(i.name)}</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 pt-1">
+                                        <button data-action="toggle-item" data-order="${safeOrderId}" data-item="${itemIdx}" data-check="0" class="py-1.5 rounded-lg text-xs font-bold transition ${checks[0] ? 'bg-amber-600 text-white' : 'bg-gray-600 text-gray-300 hover:bg-gray-500'}">
+                                            ${checks[0] ? '🔥 Cooking' : 'Start Cooking'}
+                                        </button>
+                                        <button data-action="toggle-item" data-order="${safeOrderId}" data-item="${itemIdx}" data-check="1" class="py-1.5 rounded-lg text-xs font-bold transition ${checks[1] ? 'bg-emerald-600 text-white' : 'bg-gray-600 text-gray-300 hover:bg-gray-500'}">
+                                            ${checks[1] ? '✅ Ready' : 'Mark Ready'}
+                                        </button>
+                                    </div>
+                                </li>`;
+                            }).join('')}
+                        </ul>
+                    </div>
+                    <div class="space-y-2 pt-3 border-t border-gray-700">
+                        <div class="flex justify-between items-center text-xs font-bold text-gray-400">
+                            <span>Total: <span class="text-white">$${(ord.total || 0).toFixed(2)}</span></span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button data-action="set-cooking" data-order="${safeOrderId}" class="bg-amber-600 hover:bg-amber-700 py-2 rounded-xl text-xs font-bold transition text-white">Set Cooking 🍳</button>
+                            <button data-action="send-table" data-order="${safeOrderId}" class="bg-emerald-600 hover:bg-emerald-700 py-2 rounded-xl text-xs font-bold transition text-white">Send to Table 🚀</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

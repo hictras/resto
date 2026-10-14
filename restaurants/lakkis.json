@@ -1,0 +1,1372 @@
+[
+    {
+        "categoryEn": "New Items",
+        "categoryAr": "العناصر الجديدة",
+        "items": [
+            {
+                "id": "000000000000000000000577",
+                "nameEn": "Pinky Promise Smoothie",
+                "nameAr": "سموثي بينكي بروميس",
+                "price": 8.0,
+                "descEn": "A refreshing smoothie of strawberries, mixed berries, banana, creamy yogurt and milk.\nAll sales this October will be donated to the Barbara Nassar Association for Cancer Patient Support.",
+                "descAr": "سموثي منعش من الفراولة، التوت المشكل، الموز، اللبن الكريمي والحليب."
+            },
+            {
+                "id": "000000000000000000000505",
+                "nameEn": "Avocado Arisheh Bowl",
+                "nameAr": "وعاء أفوكادو عريشة",
+                "price": 13.0,
+                "descEn": "Fresh avocado blended into a rich and creamy bowl topped with granola, our farm-fresh arisheh and strawberries.",
+                "descAr": "أفوكادو طازج ممزوج في وعاء غني وكريمي مغطى بالكانولا، عريشة المزرعة الطازجة والفراولة."
+            },
+            {
+                "id": "000000000000000000000578",
+                "nameEn": "Meat and Kafta Rolls",
+                "nameAr": "رولات اللحم والكفتة",
+                "price": 21.0,
+                "descEn": "Grilled meat and kafta rolls served with grilled tomato, onion and pepper.",
+                "descAr": "رولات اللحم المشوي والكفتة تقدم مع الطماطم المشوية، البصل والفلفل."
+            },
+            {
+                "id": "000000000000000000000579",
+                "nameEn": "Meat and Lamb Fat Rolls",
+                "nameAr": "رولات اللحم وليّة الغنم",
+                "price": 21.0,
+                "descEn": "Grilled meat and lamb fat rolls, served with grilled tomato, onions and pepper.",
+                "descAr": "رولات اللحم المشوي وليّة الغنم، تقدم مع الطماطم المشوية، البصل والفلفل."
+            },
+            {
+                "id": "00000000000000000000057a",
+                "nameEn": "Meat Ras Asfour with Pesto",
+                "nameAr": "رأس عصفور لحم بالبيستو",
+                "price": 16.0,
+                "descEn": "Sautéed veal cubes tossed in a fragrant pesto sauce.",
+                "descAr": "مكعبات لحم العجل المتاحة والمطهوة بصلصة البيستو العطرية."
+            },
+            {
+                "id": "00000000000000000000057b",
+                "nameEn": "Veal Meat with Rice",
+                "nameAr": "لحم عجل مع الأرز",
+                "price": 15.0,
+                "descEn": "Slow-cooked veal meat,rice, cashews and demi-glace sauce",
+                "descAr": "لحم عجل مطهو ببطء، أرز، كاجو وصلصة ديمي جلاس."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Kids Meal",
+        "categoryAr": "وجبات الأطفال",
+        "items": [
+            {
+                "id": "000000000000000000000507",
+                "nameEn": "Crispy Chicken Tenders",
+                "nameAr": "تندرز الدجاج المقرمش",
+                "price": 9.0,
+                "descEn": "Golden crispy chicken tenders (3 pcs) served with fries, fresh coleslaw, and cocktail sauce- fun and tasty meal kids will love.",
+                "descAr": "قطع دجاج مقرمشة ذهبية (3 قطع) تقدم مع البطاطا المقلية، السلطة الطازجة، وصوص الكوكتيل."
+            },
+            {
+                "id": "000000000000000000000508",
+                "nameEn": "Beef Burger",
+                "nameAr": "برغر لحم البقر",
+                "price": 9.0,
+                "descEn": "Juicy beef burger topped with fresh tomato and lettuce, served with fries, and cocktail sauce for the perfect kids’ combo.",
+                "descAr": "برغر لحم بقري غني مغطى بالطماطم الطازجة والخس، يقدم مع البطاطا المقلية وصوص الكوكتيل."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Breakfast",
+        "categoryAr": "الإفطار",
+        "items": [
+            {
+                "id": "000000000000000000000097",
+                "nameEn": "Balila",
+                "nameAr": "قاورما / بليلة",
+                "price": 5.0,
+                "descEn": "Chickpea, lemon, and garlic served with fresh vegetables.",
+                "descAr": "حمص، ليمون، وثوم يقدم مع الخضار الطازجة."
+            },
+            {
+                "id": "000000000000000000000412",
+                "nameEn": "Breakfast Sharing Tray",
+                "nameAr": "صينية إفطار للمشاركة",
+                "price": 25.0,
+                "descEn": "Eggs Your Style with an assortment of Cow Labneh, Grilled Halloumi, Shanklish Labneh, Foul, Hummus Fatteh, Feta &amp; Fresh Vegetables",
+                "descAr": "بيض على طريقتك مع تشكيلة من لبنة البقر، حلوم مشوي، لبنة شنكليش، فول، فتة حمص، جبنة فيتا وخضار طازجة"
+            },
+            {
+                "id": "00000000000000000000008f",
+                "nameEn": "Msabaha",
+                "nameAr": "مسبحة",
+                "price": 5.5,
+                "descEn": "Chickpeas with tahini, lemon, and garlic served with fresh vegetables.",
+                "descAr": "حمص بالطحينة، ليمون، وثوم يقدم مع الخضار الطازجة."
+            },
+            {
+                "id": "00000000000000000000009c",
+                "nameEn": "Foul",
+                "nameAr": "فول",
+                "price": 6.0,
+                "descEn": "Fava beans, chickpeas and lemon served with fresh vegetables.",
+                "descAr": "فول مدمس، حمص وليمون يقدم مع الخضار الطازجة."
+            },
+            {
+                "id": "000000000000000000000094",
+                "nameEn": "Fried Eggs with Kawarma",
+                "nameAr": "بيض مقلي بالقاورما",
+                "price": 13.0,
+                "descEn": "Organic farm-fresh fried eggs with kawarma, served with fresh vegetables.",
+                "descAr": "بيض طازج من المزرعة مقلي مع القاورما، يقدم مع الخضار الطازجة."
+            },
+            {
+                "id": "000000000000000000000093",
+                "nameEn": "Fried Eggs with Sujuk",
+                "nameAr": "بيض مقلي بالسجق",
+                "price": 9.0,
+                "descEn": "Organic farm-fresh fried eggs with sujuk, served with fresh vegetables.",
+                "descAr": "بيض طازج من المزرعة مقلي مع السجق، يقدم مع الخضار الطازجة."
+            },
+            {
+                "id": "00000000000000000000008e",
+                "nameEn": "Eggs Your Style",
+                "nameAr": "بيض على طريقتك",
+                "price": 4.5,
+                "descEn": "Organic farm-fresh eggs — scrambled, sunny side up, served with fresh&nbsp;vegetables.",
+                "descAr": "بيض عضوي طازج من المزرعة — مقفل أو عيون، يقدم مع الخضار الطازجة."
+            },
+            {
+                "id": "00000000000000000000008a",
+                "nameEn": "Cow Labneh Plate",
+                "nameAr": "صحن لبنة بقر",
+                "price": 5.5,
+                "descEn": "Creamy cow labneh made with our fresh farm milk.",
+                "descAr": "لبنة بقر كريمية محضرة من حليب المزرعة الطازج."
+            },
+            {
+                "id": "000000000000000000000091",
+                "nameEn": "Labneh with Kawarma",
+                "nameAr": "لبنة بالقاورما",
+                "price": 12.0,
+                "descEn": "Creamy cow or goat labneh topped with our signature Kawarma.",
+                "descAr": "لبنة طازجة مع القاورما المميزة داخل التنور الطازج."
+            },
+            {
+                "id": "000000000000000000000088",
+                "nameEn": "Cow Labneh Balls",
+                "nameAr": "كرات لبنة بقر",
+                "price": 5.0,
+                "descEn": "Farm-fresh cow labneh balls with olives.",
+                "descAr": "كرات لبنة بقر طازجة من المزرعة مع الزيتون."
+            },
+            {
+                "id": "000000000000000000000225",
+                "nameEn": "Goat Labneh Balls",
+                "nameAr": "كرات لبنة غنم",
+                "price": 9.0,
+                "descEn": "Farm-fresh goat labneh balls with olives.",
+                "descAr": "كرات لبنة غنم طازجة من المزرعة مع الزيتون."
+            },
+            {
+                "id": "000000000000000000000087",
+                "nameEn": "Mixed Cheese Platter",
+                "nameAr": "صحن أجبان مشكلة",
+                "price": 12.0,
+                "descEn": "A selection of our farm-fresh cheeses: nabulsi, akkawi, baladiye, halloum, feta, and meshalale, served with fresh vegetables.",
+                "descAr": "تشكيلة من أجبان المزرعة الطازجة: نابلسي، عكاوي، بلدية، حلوم، فيتا، ومشالل، تقدم مع الخضار الطازجة."
+            },
+            {
+                "id": "000000000000000000000098",
+                "nameEn": "Ambaris Spread Plate",
+                "nameAr": "صحن عُمبريس",
+                "price": 9.0,
+                "descEn": "Our signature Aged fermented goat labneh — a Baalbek tradition.",
+                "descAr": "لبنة غنم مخمرة ومعتقة على طريقة أهل بعلبك."
+            },
+            {
+                "id": "00000000000000000000009a",
+                "nameEn": "Shanklish Labneh Plate",
+                "nameAr": "صحن لبنة شنكليش",
+                "price": 5.0,
+                "descEn": "Shanklish labneh balls with our signature spices, tomato, onion and parsley.",
+                "descAr": "كرات لبنة شنكليش مع البهارات الخاصة، الطماطم، البصل والبقدونس."
+            },
+            {
+                "id": "00000000000000000000009e",
+                "nameEn": "Karishe and Honey",
+                "nameAr": "عريشة بالعسل",
+                "price": 8.0,
+                "descEn": "Our special Karishe served with mini honey jars.",
+                "descAr": "عريشة تقليدية مع رشة عسل في خبز الصاج."
+            },
+            {
+                "id": "00000000000000000000008b",
+                "nameEn": "Shanklish Cheese Plate",
+                "nameAr": "صحن جبنة شنكليش",
+                "price": 7.0,
+                "descEn": "Shanklish cheese mixed with tomato, onion, parsley and our signature spices.",
+                "descAr": "جبنة شنكليش ممزوجة مع الطماطم، البصل، البقدونس والبهارات الخاصة."
+            },
+            {
+                "id": "00000000000000000000009b",
+                "nameEn": "Goat Labneh Plate",
+                "nameAr": "صحن لبنة غنم",
+                "price": 9.0,
+                "descEn": "Creamy goat labneh made with our fresh farm milk.",
+                "descAr": "لبنة غنم كريمية محضرة من حليب المزرعة الطازج."
+            },
+            {
+                "id": "00000000000000000000008c",
+                "nameEn": "Labneh with vegetables",
+                "nameAr": "لبنة بالخضار",
+                "price": 5.5,
+                "descEn": "Creamy cow or goat labneh mixed with vegetables.",
+                "descAr": "لبنة بقر أو غنم كريمية ممزوجة مع الخضار."
+            },
+            {
+                "id": "0000000000000000000003f0",
+                "nameEn": "Choose Your Cheese Plate",
+                "nameAr": "اختر طبق الجبن الخاص بك",
+                "price": 7.0,
+                "descEn": "Your choice of our farm-fresh cheese plates: Halloum, Feta, Baladiyeh, Nabulsi, Akkawi, Meshalale, double cream.",
+                "descAr": "اختيارك من أطباق أجبان المزرعة الطازجة: حلوم، فيتا، بلدية، نابلسي، عكاوي، مشلل، دابل كريم."
+            },
+            {
+                "id": "000000000000000000000095",
+                "nameEn": "Olives Plate",
+                "nameAr": "صحن زيتون",
+                "price": 2.0,
+                "descEn": "",
+                "descAr": "زيتون منوع طازج."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Authentic Woodfire Tannour Manakish",
+        "categoryAr": "مناقيش تنور على الحطب الأصلية",
+        "items": [
+            {
+                "id": "0000000000000000000000d4",
+                "nameEn": "Zaatar",
+                "nameAr": "زعتر",
+                "price": 3.0,
+                "descEn": "Traditional za’atar spread with extra virgin olive oil on our freshly baked tannour.",
+                "descAr": "زعتر تقليدي مع زيت الزيتون البكرا على تنورنا الطازج."
+            },
+            {
+                "id": "0000000000000000000000ec",
+                "nameEn": "Cheese",
+                "nameAr": "جبنة",
+                "price": 5.0,
+                "descEn": "Our special cheese mix wrapped inside our freshly baked tannour.",
+                "descAr": "خلطة أجبان خاصة داخل التنور المخبوز طازجاً."
+            },
+            {
+                "id": "0000000000000000000000e2",
+                "nameEn": "Cocktail",
+                "nameAr": "كوكتيل",
+                "price": 4.5,
+                "descEn": "A savory mix of za’atar and cheese wrapped inside our freshly baked tannour.",
+                "descAr": "مزيج لذيذ من الزعتر والجبنة داخل التنور الطازج."
+            },
+            {
+                "id": "000000000000000000000227",
+                "nameEn": "Labneh",
+                "nameAr": "لبنة",
+                "price": 3.5,
+                "descEn": "Creamy, farm-fresh labneh wrapped inside our freshly baked tannour.",
+                "descAr": "لبنة كريمية طازجة داخل التنور الطازج."
+            },
+            {
+                "id": "0000000000000000000000de",
+                "nameEn": "Keshek",
+                "nameAr": "كشك",
+                "price": 6.0,
+                "descEn": "Our bold, homemade keshek spread wrapped inside our freshly baked tannour for a traditional bite.",
+                "descAr": "كشك بيتي جريء ومميز داخل التنور الطازج."
+            },
+            {
+                "id": "0000000000000000000000ea",
+                "nameEn": "Muhammara &amp; Cheese",
+                "nameAr": "محمرة وجبنة",
+                "price": 4.5,
+                "descEn": "A rich combination of our muhammara spread and melted cheese wrapped inside our freshly baked tannour.",
+                "descAr": "مزيج غني من محمرة الفليفلة والجبنة المذابة داخل التنور."
+            },
+            {
+                "id": "0000000000000000000000d8",
+                "nameEn": "Turkey &amp; Cheese",
+                "nameAr": "ديك رومي وجبنة",
+                "price": 8.0,
+                "descEn": "Slices of turkey breast and melted cheese wrapped inside our freshly baked tannour.",
+                "descAr": "شرائح الديك الرومي والجبنة المذابة داخل التنور الطازج."
+            },
+            {
+                "id": "0000000000000000000000dc",
+                "nameEn": "Labneh with Kawarma",
+                "nameAr": "لبنة بالقاورما",
+                "price": 6.0,
+                "descEn": "Creamy, farm-fresh labneh paired with our signature kawarma, wrapped inside our freshly baked tannour.",
+                "descAr": "لبنة طازجة مع القاورما المميزة داخل التنور الطازج."
+            },
+            {
+                "id": "0000000000000000000000da",
+                "nameEn": "Spinach",
+                "nameAr": "سبانخ",
+                "price": 4.0,
+                "descEn": "A zesty mix of spinach, tomato, onion, and sumac filled inside our freshly baked tannour.",
+                "descAr": "مزيج منعش من السبانخ، الطماطم، البصل والسماق داخل التنور."
+            },
+            {
+                "id": "0000000000000000000000e6",
+                "nameEn": "Bakleh Tannour",
+                "nameAr": "تنور بقلة",
+                "price": 4.5,
+                "descEn": "Purslane mixed with tomato, onion, and sumac wrapped inside our freshly baked tannour.",
+                "descAr": "بقلة ممزوجة مع الطماطم، البصل والسماق داخل التنور الطازج."
+            },
+            {
+                "id": "0000000000000000000000e0",
+                "nameEn": "Kafta Tannour",
+                "nameAr": "تنور كفتة",
+                "price": 7.0,
+                "descEn": "Juicy, seasoned kafta wrapped inside our freshly baked tannour for a hearty flavor.",
+                "descAr": "كفتة غنية ومتبلة داخل التنور الطازج بنكهة رائعة."
+            },
+            {
+                "id": "0000000000000000000000e8",
+                "nameEn": "Kafta &amp; Cheese Tannour",
+                "nameAr": "تنور كفتة وجبنة",
+                "price": 8.0,
+                "descEn": "A flavorful pairing of kafta and melted cheese wrapped inside our freshly baked tannour.",
+                "descAr": "مزيج رائع من الكفتة والجبنة المذابة داخل التنور."
+            },
+            {
+                "id": "0000000000000000000000ee",
+                "nameEn": "Sujuk &amp; Cheese",
+                "nameAr": "سجق وجبنة",
+                "price": 7.0,
+                "descEn": "Lebanese sujuk sausage and melted cheese wrapped inside our freshly baked tannour.",
+                "descAr": "سجق لبناني مع جبنة مذابة داخل التنور الطازج."
+            },
+            {
+                "id": "0000000000000000000004b7",
+                "nameEn": "Nutella &amp; Cheese Tannour",
+                "nameAr": "تنور نوتيلا وجبنة",
+                "price": 8.0,
+                "descEn": "Melted Nutella chocolate spread paired with melted cheese, wrapped inside our freshly baked tannour.",
+                "descAr": "شوكولاتة نوتيلا المذابة مع الجبنة داخل التنور الطازج."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Fatteh",
+        "categoryAr": "فتات",
+        "items": [
+            {
+                "id": "000000000000000000000089",
+                "nameEn": "Sfiha Fatteh",
+                "nameAr": "فتة صفيحة",
+                "price": 10.0,
+                "descEn": "Mini Sfiha, chickpea, our farm fresh yogurt, toasted pine nut, fresh pomegranate and crispy Arabic bread.",
+                "descAr": "صفيحة صغيرة، حمص، لبنة المزرعة الطازجة، صنوبر محمص، رمان طازج وخبر عربي مقرمش."
+            },
+            {
+                "id": "000000000000000000000096",
+                "nameEn": "Hummus Fatteh",
+                "nameAr": "فتة حمص",
+                "price": 8.0,
+                "descEn": "Chickpea, our farm fresh yogurt, toasted pine nut, fresh pomegranate and crispy Arabic bread.",
+                "descAr": "حمص، لبن المزرعة الطازج، صنوبر محمص، رمان طازج وخبز عربي مقرمش."
+            },
+            {
+                "id": "000000000000000000000085",
+                "nameEn": "Eggplant Fatteh",
+                "nameAr": "فتة باذنجان",
+                "price": 10.0,
+                "descEn": "Fried eggplant marinated in tomato sauce, chickpea, our farm fresh yogurt, toasted pine nut, fresh pomegranate, and crispy Arabic bread.",
+                "descAr": "باذنجان مقلي بصلصة الطماطم، حمص، لبن المزرعة الطازج، صنوبر محمص، رمان طازج وخبز مقرمش."
+            },
+            {
+                "id": "000000000000000000000090",
+                "nameEn": "Lsanat Fatteh",
+                "nameAr": "فتة لسانات",
+                "price": 13.0,
+                "descEn": "Fried tongue, chickpea, our farm fresh yogurt, toasted pine nut, fresh pomegranate, and crispy Arabic bread.",
+                "descAr": "لسانات مقلية، حمص، لبن المزرعة، صنوبر محمص، رمان طازج وخبز مقرمش."
+            },
+            {
+                "id": "000000000000000000000084",
+                "nameEn": "Makadem Fatteh",
+                "nameAr": "فتة مقادم",
+                "price": 14.0,
+                "descEn": "Boiled makadem, chickpea, our farm fresh yogurt, toasted pine nut, fresh pomegranate, and crispy Arabic bread.",
+                "descAr": "مقايم مسلوقة، حمص، لبن المزرعة، صنوبر محمص، رمان طازج وخبز مقرمش."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Salads",
+        "categoryAr": "السلطات",
+        "items": [
+            {
+                "id": "000000000000000000000119",
+                "nameEn": "Tabbouleh",
+                "nameAr": "تبولة",
+                "price": 7.0,
+                "descEn": "Chopped parsley, tomato, onions, burgul, lemon, and extra virgin olive oil dressing.",
+                "descAr": "بقدونس مفروم، طماطم، بصل، برغل، ليمون وزيت زيتون بكر."
+            },
+            {
+                "id": "000000000000000000000116",
+                "nameEn": "Fattoush",
+                "nameAr": "فتوش",
+                "price": 7.0,
+                "descEn": "Fresh mixed greens, tomato, cucumber, radish, fresh pomegranate, fried Arabic bread, and a pomegranate molasses dressing.",
+                "descAr": "خضار مشكلة طازجة، طماطم، خيار، فجل، رمان طازج، خبز مقرمش ودبس الرمان."
+            },
+            {
+                "id": "000000000000000000000118",
+                "nameEn": "Greek Salad",
+                "nameAr": "سلطة يونانية",
+                "price": 9.0,
+                "descEn": "Feta cheese, tomato, pepper, cucumber, olives, onion and extra virgin olive oil dressing.",
+                "descAr": "جبنة فيتا، طماطم، فلفل، خيار، زيتون، بصل وزيت زيتون بكر."
+            },
+            {
+                "id": "00000000000000000000011b",
+                "nameEn": "Rocca &amp; Beetroot Salad",
+                "nameAr": "سلطة الجرجير والشمندر",
+                "price": 7.0,
+                "descEn": "Rocca, purslane, beetroot, onion, and extra virgin olive oil dressing.",
+                "descAr": "جرير، بقلة، شمندر، بصل وتتبيلة زيت الزيتون البكر."
+            },
+            {
+                "id": "00000000000000000000011c",
+                "nameEn": "Rocca, Thyme &amp; Bakleh",
+                "nameAr": "سلطة جرجير وزعتر وبقلة",
+                "price": 6.0,
+                "descEn": "Rocca, thyme, purslane, tomato, onion, and extra virgin olive oil dressing.",
+                "descAr": "جرير، زعتر، بقلة، طماطم، بصل وتتبيلة زيت الزيتون."
+            },
+            {
+                "id": "00000000000000000000035f",
+                "nameEn": "Goat Labneh Salad",
+                "nameAr": "سلطة لبنة الغنم",
+                "price": 10.0,
+                "descEn": "Goat labneh balls coated with cranberries, green apples, walnuts, lollo rosso verde with balsamic dressing",
+                "descAr": "كرات لبنة الغنم مغطاة بالتوت البري، التفاح الأخضر، الجوز وخس لولو روسو مع صوص البلساميك."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Cold Mezza",
+        "categoryAr": "المقبلات الباردة",
+        "items": [
+            {
+                "id": "00000000000000000000004f",
+                "nameEn": "Hindbeh Bil Zeit",
+                "nameAr": "هندبة بالزيت",
+                "price": 6.5,
+                "descEn": "Dandelion greens cooked in olive oil with crispy onions, served with a lemon slice.",
+                "descAr": "هندبة مطهوة بالزيت مع بصل مقرمش وشرائح الليمون."
+            },
+            {
+                "id": "0000000000000000000001eb",
+                "nameEn": "Grape Leaves with Oil",
+                "nameAr": "ورق عنب بالزيت",
+                "price": 7.0,
+                "descEn": "Stuffed grape leaves with rice, tomato, parsley and mint.",
+                "descAr": "ورق عنب محشو بالأرز، الطماطم، البقدونس والنعناع."
+            },
+            {
+                "id": "0000000000000000000000f2",
+                "nameEn": "Labneh with Garlic",
+                "nameAr": "لبنة بالثوم",
+                "price": 5.5,
+                "descEn": "Labneh with garlic and dried mint.",
+                "descAr": "لبنة مع الثوم والنعناع الجاف."
+            },
+            {
+                "id": "0000000000000000000000f8",
+                "nameEn": "Hummus Har",
+                "nameAr": "حمص حار",
+                "price": 5.5,
+                "descEn": "Chickpea and chili pepper blend with tahini and lemon.",
+                "descAr": "مزيج الحمص والفلفل الحار مع الطحينة والليمون."
+            },
+            {
+                "id": "0000000000000000000000f3",
+                "nameEn": "Hummus Beiruti",
+                "nameAr": "حمص بيروتي",
+                "price": 5.5,
+                "descEn": "Chickpea dip with tahini, garlic, parsley and lemon topped with fava bean and tomato.",
+                "descAr": "حمص بالطحينة، ثوم، بقدونس وليمون مع الفول والطماطم."
+            },
+            {
+                "id": "0000000000000000000000fe",
+                "nameEn": "Hummus",
+                "nameAr": "حمص",
+                "price": 5.5,
+                "descEn": "Chickpea dip with tahini and lemon.",
+                "descAr": "طبق الحمص الشهير بالطحينة والليمون."
+            },
+            {
+                "id": "0000000000000000000000f6",
+                "nameEn": "Hummus Lahme",
+                "nameAr": "حمص باللحمة",
+                "price": 14.0,
+                "descEn": "Chickpea dip with tahini, lemon, meat cubes and toasted pine nuts.",
+                "descAr": "حمص بالطحينة والليمون مع مكعبات اللحم والصنوبر المحمص."
+            },
+            {
+                "id": "00000000000000000000023e",
+                "nameEn": "Hummus With Awarma",
+                "nameAr": "حمص بالقاورما",
+                "price": 12.0,
+                "descEn": "",
+                "descAr": "حمص بالطحينة والليمون مع قطع القاورما الغنية."
+            },
+            {
+                "id": "0000000000000000000000fa",
+                "nameEn": "Mutabbal",
+                "nameAr": "متبل",
+                "price": 5.5,
+                "descEn": "Flame-grilled eggplant with tahini, lemon and fresh pomegranate.",
+                "descAr": "باذنجان مشوي على الفحم مع الطحينة، الليمون والرمان الطازج."
+            },
+            {
+                "id": "0000000000000000000000f9",
+                "nameEn": "Mutabbal Ajami",
+                "nameAr": "متبل عجمي",
+                "price": 6.0,
+                "descEn": "Flamed- grilled eggplant with tahini and lemon topped with tomato sauce and toasted almonds.",
+                "descAr": "باذنجان مشوي مع الطحينة والليمون مغطى بصلصة الطماطم واللوز المحمص."
+            },
+            {
+                "id": "0000000000000000000000f4",
+                "nameEn": "Muhammara",
+                "nameAr": "محمرة",
+                "price": 5.5,
+                "descEn": "Roasted sweet pepper and walnut dip, topped with shaved walnut and fresh pomegranate.",
+                "descAr": "مقبلات الفلفل الأحمر الحلو والجوز المزينة بالجوز والرمان الطازج."
+            },
+            {
+                "id": "0000000000000000000000fb",
+                "nameEn": "Raheb",
+                "nameAr": "راهب",
+                "price": 5.0,
+                "descEn": "Flame-grilled eggplant with tomato, onion, garlic, green pepper and lemon topped with fresh pomegranate and extra virgin olive oil.",
+                "descAr": "باذنجان مشوي مع الطماطم، البصل، الثوم، الفلفل الأخضر والليمون مع الرمان وزيت الزيتون."
+            },
+            {
+                "id": "0000000000000000000000fc",
+                "nameEn": "Vegetables Plate",
+                "nameAr": "صحن خضار",
+                "price": 4.0,
+                "descEn": "Tomato, cucumber, radish, onion, chili pepper, olive, and mint.",
+                "descAr": "طماطم، خيار، فجل، بصل، فلفل حار، زيتون ونعناع."
+            },
+            {
+                "id": "0000000000000000000000f1",
+                "nameEn": "Goat Yogurt",
+                "nameAr": "لبن غنم",
+                "price": 3.0,
+                "descEn": "",
+                "descAr": "لبن غنم طازج."
+            },
+            {
+                "id": "0000000000000000000000f7",
+                "nameEn": "Sheep Yogurt",
+                "nameAr": "لبن نعاج",
+                "price": 3.0,
+                "descEn": "",
+                "descAr": "لبن نعاج طازج غني."
+            },
+            {
+                "id": "0000000000000000000000fd",
+                "nameEn": "Cow Yogurt",
+                "nameAr": "لبن بقر",
+                "price": 2.5,
+                "descEn": "",
+                "descAr": "لبن بقر طازج."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Hot Mezza",
+        "categoryAr": "المقبلات الساخنة",
+        "items": [
+            {
+                "id": "0000000000000000000003fa",
+                "nameEn": "Mix Pastries",
+                "nameAr": "مشكل معجنات",
+                "price": 7.0,
+                "descEn": "Pizza, spinach, backleh, keshek",
+                "descAr": "فطاير بيتزا، سبانخ، بقلة، وكشك."
+            },
+            {
+                "id": "0000000000000000000001d1",
+                "nameEn": "Pumpkin Kebbe",
+                "nameAr": "كبة يقطين",
+                "price": 6.0,
+                "descEn": "Pumpkin kebbe filled with spinach and chickpeas.",
+                "descAr": "كبة اليقطين المحشية بالسبانخ والحمص."
+            },
+            {
+                "id": "00000000000000000000023c",
+                "nameEn": "Mixed Mouajanet",
+                "nameAr": "معجنات مشكلة",
+                "price": 9.0,
+                "descEn": "Assortment of cheese rolls, sambsousik and kebbe.",
+                "descAr": "تشكيلة من رولات الجبن، السمبوسك والكبة."
+            },
+            {
+                "id": "000000000000000000000104",
+                "nameEn": "Batata Harra",
+                "nameAr": "بطاطا حرة",
+                "price": 7.0,
+                "descEn": "Spicy potatoes with garlic and coriander.",
+                "descAr": "بطاطا مقلية حارة مع الثوم والكزبرة."
+            },
+            {
+                "id": "000000000000000000000108",
+                "nameEn": "French Fries",
+                "nameAr": "بطاطا مقلية",
+                "price": 5.0,
+                "descEn": "Crispy golden fries.",
+                "descAr": "بطاطا مقلية ذهبية ومقرمشة."
+            },
+            {
+                "id": "000000000000000000000105",
+                "nameEn": "Grilled Potato",
+                "nameAr": "بطاطا مشوية",
+                "price": 4.5,
+                "descEn": "Grilled potato slices served with garlic cream.",
+                "descAr": "شرائح بطاطا مشوية تقدم مع كريمة الثوم."
+            },
+            {
+                "id": "000000000000000000000240",
+                "nameEn": "Grilled Rakakat Cheese",
+                "nameAr": "رقاقات جبن مشوية",
+                "price": 8.0,
+                "descEn": "Grilled cheese-filled pastries",
+                "descAr": "رقاقات محشية بالجبن ومشوية."
+            },
+            {
+                "id": "000000000000000000000106",
+                "nameEn": "Chicken Wings Provencal",
+                "nameAr": "جوانح دجاج بروفنسال",
+                "price": 9.0,
+                "descEn": "Marinated chicken wings with garlic, parsley, and lemon.",
+                "descAr": "جوانح دجاج مարنة بالثوم، البقدونس والليمون."
+            },
+            {
+                "id": "000000000000000000000101",
+                "nameEn": "Makanek",
+                "nameAr": "نقانق",
+                "price": 13.0,
+                "descEn": "Fried Lebanese sausage in pomegranate molasses.",
+                "descAr": "نقانق لبنانية مقلية بدبس الرمان."
+            },
+            {
+                "id": "0000000000000000000000ff",
+                "nameEn": "Sujuk",
+                "nameAr": "سجق",
+                "price": 13.0,
+                "descEn": "Fried Lebanese sausage with tomato, onion and green pepper.",
+                "descAr": "سجق لبناني مقلي مع الطماطم، البصل والفلفل الأخضر."
+            },
+            {
+                "id": "000000000000000000000100",
+                "nameEn": "Meat Ras Asfour",
+                "nameAr": "رأس عصفور لحم",
+                "price": 17.0,
+                "descEn": "Sautéed veal cubes with pomegranate molasses.",
+                "descAr": "مكعبات لحم عجل مقلية بدبس الرمان."
+            },
+            {
+                "id": "00000000000000000000010c",
+                "nameEn": "Kabab Karaz",
+                "nameAr": "كباب كرز",
+                "price": 21.0,
+                "descEn": "Kabab balls with cherry jam topped with almonds and fresh pomegranate.",
+                "descAr": "كرات الكباب مع مربى الكرز مزينة باللوز والرمان الطازج."
+            },
+            {
+                "id": "000000000000000000000103",
+                "nameEn": "Cheese Rolls",
+                "nameAr": "رولات الجبن",
+                "price": 8.0,
+                "descEn": "Fried cheese-filled pastries.",
+                "descAr": "معجنات مقلية محشية بالجبن."
+            },
+            {
+                "id": "00000000000000000000010a",
+                "nameEn": "Meat Sambousek",
+                "nameAr": "سمبوسك لحم",
+                "price": 8.0,
+                "descEn": "Meat-filled pastries.",
+                "descAr": "فطاير مقلية محشية باللحم."
+            },
+            {
+                "id": "00000000000000000000008d",
+                "nameEn": "Grilled Halloumi Plate",
+                "nameAr": "صحن حلوم مشوي",
+                "price": 8.0,
+                "descEn": "Perfectly grilled, farm-fresh halloumi cheese.",
+                "descAr": "جبنة حلوم طازجة ومشوية بإتقان."
+            },
+            {
+                "id": "000000000000000000000109",
+                "nameEn": "Fried Kebbe",
+                "nameAr": "كبة مقلية",
+                "price": 9.0,
+                "descEn": "Filled with spiced meat and onion.",
+                "descAr": "كبة مقلية محشية باللحم المتبل والبصل."
+            },
+            {
+                "id": "000000000000000000000102",
+                "nameEn": "Kebbe Sajiyeh",
+                "nameAr": "كبة صاجية",
+                "price": 11.0,
+                "descEn": "Our special grilled kebbe filled with spiced meat and onion.",
+                "descAr": "كبة صاجية مشوية محشية باللحم والبصل المتبل."
+            },
+            {
+                "id": "000000000000000000000107",
+                "nameEn": "Fried Lamb Liver",
+                "nameAr": "سودا غنم مقلية",
+                "price": 13.0,
+                "descEn": "Sautéed lamb liver with lemon and pomegranate molasses.",
+                "descAr": "كبدة غنم مقلية مع الليمون ودبس الرمان."
+            },
+            {
+                "id": "00000000000000000000023d",
+                "nameEn": "Nkhaat Plate",
+                "nameAr": "نخاعات",
+                "price": 11.0,
+                "descEn": "",
+                "descAr": "نخاعات طازجة ومحضرة بعناية."
+            },
+            {
+                "id": "000000000000000000000185",
+                "nameEn": "Sheep Eggs",
+                "nameAr": "بيض غنم",
+                "price": 12.0,
+                "descEn": "Sautéed sheep eggs with lemon and butter.",
+                "descAr": "بيض غنم مقلي مع الليمون والزبدة."
+            },
+            {
+                "id": "0000000000000000000003a0",
+                "nameEn": "Oven Baked Fetta",
+                "nameAr": "فيتا مخبوزة في الفرن",
+                "price": 10.0,
+                "descEn": "Fresh Lakkis Farm feta cheese baked in the oven with cherry tomatoes, allowing the flavors to blend into a rich, warm, and savory dish.\nServed with fresh tannour bread on the side.",
+                "descAr": "جبنة فيتا لويس فارم مخبوزة في الفرن مع طماطم كرزية، تقدم مع خبز التنور الطازج."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Cold Sandwiches",
+        "categoryAr": "السندويشات الباردة",
+        "items": [
+            {
+                "id": "000000000000000000000132",
+                "nameEn": "Cow Labneh Sandwich",
+                "nameAr": "سندويش لبنة بقر",
+                "price": 3.0,
+                "descEn": "Labneh, cucumber, olives, and mint served in saj bread with extra virgin olive oil.",
+                "descAr": "لبنة، خيار، زيتون ونعناع في خبز الصاج مع زيت الزيتون البكر."
+            },
+            {
+                "id": "000000000000000000000135",
+                "nameEn": "Goat Labneh Sandwich",
+                "nameAr": "سندويش لبنة غنم",
+                "price": 5.0,
+                "descEn": "Labneh, cucumber, olives, and mint served in saj bread with extra virgin olive oil.",
+                "descAr": "لبنة غنم، خيار، زيتون ونعناع في خبز الصاج مع زيت الزيتون."
+            },
+            {
+                "id": "0000000000000000000000ed",
+                "nameEn": "Ambaris Sandwich",
+                "nameAr": "سندويش عُمبريس",
+                "price": 5.5,
+                "descEn": "Traditional ambaris spread, cucumber, olives, and mint served in saj bread with extra virgin olive oil.",
+                "descAr": "عنبريس تقليدي، خيار، زيتون ونعناع في خبز الصاج."
+            },
+            {
+                "id": "000000000000000000000133",
+                "nameEn": "Karishe and Honey",
+                "nameAr": "عريشة بالعسل",
+                "price": 7.0,
+                "descEn": "Traditional karishe spread with a drizzle of honey served in saj bread.",
+                "descAr": "عريشة تقليدية مع رشة عسل في خبز الصاج."
+            },
+            {
+                "id": "0000000000000000000003ef",
+                "nameEn": "Make Your Own Cheese Sandwich",
+                "nameAr": "اصنع سندويش الجبن الخاص بك",
+                "price": 4.5,
+                "descEn": "Personalize your sandwich (Halloum, Baladiyeh, Double Cream, Feta, Akkawi, Meshalale)",
+                "descAr": "حلوم، بلدية، دابل كريم، فيتا، عكاوي أو مشلل."
+            },
+            {
+                "id": "00000000000000000000020f",
+                "nameEn": "Malseh Sandwich",
+                "nameAr": "سندويش ملَسْة",
+                "price": 7.0,
+                "descEn": "Creamy raw meat, onions, garlic, and mint served in tannour bread with extra virgin olive oil.",
+                "descAr": "لحم ناعم نيء، بصل، ثوم ونعناع في خبز التنور."
+            },
+            {
+                "id": "000000000000000000000131",
+                "nameEn": "Raw Kafta Sandwich",
+                "nameAr": "سندويش كفتة نية",
+                "price": 7.0,
+                "descEn": "Finely minced raw meat, black pepper, onions, and mint served in tannour bread.",
+                "descAr": "لحم نيء مفروم، فلفل أسود، بصل ونعناع في خبز التنور."
+            },
+            {
+                "id": "000000000000000000000151",
+                "nameEn": "Mujarmashe Sandwich",
+                "nameAr": "سندويش مجرمشة",
+                "price": 7.0,
+                "descEn": "Finely chopped raw meat with black pepper, onions, and mint served in tannour bread.",
+                "descAr": "لحم نيء مفروم ناعماً مع الفلفل الأسود والبصل والنعناع."
+            },
+            {
+                "id": "0000000000000000000000db",
+                "nameEn": "Nayyeh Liver Sandwich",
+                "nameAr": "سندويش سودا نية",
+                "price": 8.0,
+                "descEn": "Raw lamb liver and fat, mint, and raw onions served in saj bread.",
+                "descAr": "كبدة غنم نية، دهن، نعناع وبصل نيء في خبز الصاج."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Hot Sandwiches",
+        "categoryAr": "السندويشات الساخنة",
+        "items": [
+            {
+                "id": "000000000000000000000161",
+                "nameEn": "Taouk Sandwich",
+                "nameAr": "سندويش طاووق",
+                "price": 6.5,
+                "descEn": "Grilled marinated chicken skewer, garlic cream, pickled cucumber, and fries served in saj bread (white or red taouk).",
+                "descAr": "شيش طاووق متبل، ثوم، مخلل خيار وبطاطا مقلية في خبز الصاج."
+            },
+            {
+                "id": "00000000000000000000015b",
+                "nameEn": "Grilled Chicken Sandwich",
+                "nameAr": "سندويش دجاج مشوي",
+                "price": 7.5,
+                "descEn": "Grilled marinated chicken, garlic cream, pickled cucumber, and fries served in saj bread.",
+                "descAr": "دجاج مشوي متبل، ثوم، مخلل وبطاطا في خبز الصاج."
+            },
+            {
+                "id": "000000000000000000000159",
+                "nameEn": "Lamb Meat Sandwich",
+                "nameAr": "سندويش لحم غنم",
+                "price": 10.0,
+                "descEn": "Grilled fresh lamb skewers, hummus, tomato, onions, and parsley served in saj bread.",
+                "descAr": "أسياخ لحم غنم مشوية، حمص، طماطم، بصل وبقدونس في خبز الصاج."
+            },
+            {
+                "id": "0000000000000000000004e1",
+                "nameEn": "Veal Meat Sandwich",
+                "nameAr": "سندويش لحم عجل",
+                "price": 10.0,
+                "descEn": "Grilled fresh veal skewers, hummus, tomato, onions, and parsley served in saj bread.",
+                "descAr": "أسياخ لحم عجل مشوية، حمص، طماطم، بصل وبقدونس في الصاج."
+            },
+            {
+                "id": "000000000000000000000203",
+                "nameEn": "Kafta Sandwich",
+                "nameAr": "سندويش كفتة",
+                "price": 7.0,
+                "descEn": "Grilled kafta skewers, hummus, tomato, onions, and parsley served in saj bread.",
+                "descAr": "أسياخ كفتة مشوية، حمص، طماطم، بصل وبقدونس في خبز الصاج."
+            },
+            {
+                "id": "000000000000000000000205",
+                "nameEn": "Kabab Sandwich",
+                "nameAr": "سندويش كباب",
+                "price": 6.5,
+                "descEn": "Grilled kabab skewers, hummus, tomato, onions, and parsley served in saj bread.",
+                "descAr": "أسياخ كباب مشوية، حمص، طماطم، بصل وبقدونس في خبز الصاج."
+            },
+            {
+                "id": "00000000000000000000015c",
+                "nameEn": "Orfali Kabab Sandwich",
+                "nameAr": "سندويش كباب أورفلي",
+                "price": 7.0,
+                "descEn": "Grilled kabab skewer, hummus, parsley, grilled eggplant, tomato, and onion served in saj bread.",
+                "descAr": "سيخ كباب مشوي، حمص، بقدونس، باذنجان مشوي، طماطم وبصل في الصاج."
+            },
+            {
+                "id": "00000000000000000000015a",
+                "nameEn": "Keshkash Kabab Sandwich",
+                "nameAr": "سندويش كباب خشخاش",
+                "price": 7.0,
+                "descEn": "Grilled kabab skewer with a spicy tomato and green pepper sauce served in saj bread.",
+                "descAr": "سيخ كباب مشوي مع صلصة طماطم وفلفل حار في خبز الصاج."
+            },
+            {
+                "id": "00000000000000000000015d",
+                "nameEn": "Sujuk Sandwich",
+                "nameAr": "سندويش سجق",
+                "price": 7.0,
+                "descEn": "Lebanese spicy sausage skewer, garlic cream, tomato, and pickled cucumber served in saj bread.",
+                "descAr": "سجق لبناني، ثوم، طماطم ومخلل في خبز الصاج."
+            },
+            {
+                "id": "00000000000000000000015f",
+                "nameEn": "Makanek Sandwich",
+                "nameAr": "سندويش نقانق",
+                "price": 7.0,
+                "descEn": "Lebanese sausage skewer, hummus, tomato, pickled cucumber, and pomegranate molasses served in saj bread.",
+                "descAr": "نقانق لبنانية، حمص، طماطم، مخلل ودبس الرمان في خبز الصاج."
+            },
+            {
+                "id": "000000000000000000000136",
+                "nameEn": "Fried Lamb Liver Sandwich",
+                "nameAr": "سندويش سودا مقلية",
+                "price": 8.5,
+                "descEn": "Sautéed fried lamb liver, garlic cream, mint, and tomato served in saj bread.",
+                "descAr": "كبدة غنم مقلية، ثوم، نعناع وطماطم في خبز الصاج."
+            },
+            {
+                "id": "00000000000000000000023b",
+                "nameEn": "Grilled Halloumi Sandwich",
+                "nameAr": "سندويش حلوم مشوي",
+                "price": 5.0,
+                "descEn": "Grilled halloum, cucumber, olives, and mint served in saj bread.",
+                "descAr": "حلوم مشوي، خيار، زيتون ونعناع في خبز الصاج."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Fresh Raw Meat",
+        "categoryAr": "لحوم نادمة / لحم ناي",
+        "items": [
+            {
+                "id": "00000000000000000000014e",
+                "nameEn": "Frakeh",
+                "nameAr": "فركة",
+                "price": 13.5,
+                "descEn": "Finely ground raw meat, bulgur, and Lebanese kamouneh served with fresh vegetables.",
+                "descAr": "لحم نيء مفروم، برغل وكمونة لبنانية تقدم مع الخضار الطازجة."
+            },
+            {
+                "id": "000000000000000000000158",
+                "nameEn": "Malseh",
+                "nameAr": "ملَسْة",
+                "price": 16.0,
+                "descEn": "Creamy raw meat served with garlic cream and fresh vegetables.",
+                "descAr": "لحم نيء كريمي يقدم مع كريمة الثوم والخضار الطازجة."
+            },
+            {
+                "id": "000000000000000000000153",
+                "nameEn": "Kebbe",
+                "nameAr": "كبة نية",
+                "price": 13.5,
+                "descEn": "Finely minced raw meat, bulgur, and Lebanese spices served with fresh vegetables.",
+                "descAr": "لحم نيء مفروم ناعماً، برغل وبهارات لبنانية مع خضار طازجة."
+            },
+            {
+                "id": "000000000000000000000157",
+                "nameEn": "Kafta Plate",
+                "nameAr": "صحن كفتة نية",
+                "price": 16.0,
+                "descEn": "Finely minced raw meat, parsley, onions, and black pepper served with fresh vegetables.",
+                "descAr": "لحم نيء مفروم، بقدونس، بصل وفلفل أسود مع الخضار الطازجة."
+            },
+            {
+                "id": "000000000000000000000154",
+                "nameEn": "Mujarmashe Plate",
+                "nameAr": "صحن مجرمشة",
+                "price": 17.0,
+                "descEn": "Finely chopped raw lamb and black pepper served with fresh vegetables.",
+                "descAr": "لحم غنم نيء مفروم خشن مع الفلفل الأسود والخضار الطازجة."
+            },
+            {
+                "id": "000000000000000000000155",
+                "nameEn": "Raw Ftileh Plate",
+                "nameAr": "صحن فتيلة نية",
+                "price": 18.0,
+                "descEn": "Premium raw veal fillet, sliced thin served with black pepper and fresh vegetables.",
+                "descAr": "فيليه عجل نيء طازج ومقطع شرائح رقيقة مع الفلفل الأسود والخضار."
+            },
+            {
+                "id": "000000000000000000000150",
+                "nameEn": "Lamb Liver Plate",
+                "nameAr": "صحن سودا نية",
+                "price": 15.0,
+                "descEn": "Chopped raw lamb liver, lamb fat and black pepper served with fresh vegetables.",
+                "descAr": "كبدة غنم نية مفرومة مع الدهن والفلفل الأسود والخضار."
+            },
+            {
+                "id": "000000000000000000000152",
+                "nameEn": "Mixed Raw Meat Plate",
+                "nameAr": "صحن لحم نيء مشكل",
+                "price": 30.0,
+                "descEn": "A curated selection of our signature raw meat plates for sharing (Malseh, Mujarmashe, Kafta, and Lamb Liver).",
+                "descAr": "تشكيلة مختارة من أطباق اللحم النيء للمشاركة (ملسة، مجرمشة، كفتة، وسودا)."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Sfiha Experts",
+        "categoryAr": "خبراء الصفيحة",
+        "items": [
+            {
+                "id": "0000000000000000000000c2",
+                "nameEn": "Signature Sfiha Dozen",
+                "nameAr": "درزن صفيحة مميزة",
+                "price": 8.5,
+                "descEn": "A mix of veal and lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "مزيج من لحم العجل والغنم، الطماطم، البصل والفلفل مع خلطة البهارات الخاصة."
+            },
+            {
+                "id": "0000000000000000000000b7",
+                "nameEn": "Signature Sfiha 0.5 KG",
+                "nameAr": "نصف كيلو صفيحة مميزة",
+                "price": 19.0,
+                "descEn": "A mix of veal and lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "مزيج من لحم العجل والغنم، الطماطم، البصل والفلفل مع خلطة البهارات الخاصة."
+            },
+            {
+                "id": "0000000000000000000003af",
+                "nameEn": "Signature Sfiha 1 KG",
+                "nameAr": "كيلو صفيحة مميزة",
+                "price": 36.0,
+                "descEn": "A mix of veal and lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "مزيج من لحم العجل والغنم، الطماطم، البصل والفلفل مع خلطة البهارات الخاصة."
+            },
+            {
+                "id": "0000000000000000000000b3",
+                "nameEn": "Lamb Sfiha Dozen",
+                "nameAr": "درزن صفيحة غنم",
+                "price": 10.0,
+                "descEn": "Lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "لحم غنم، طماطم، بصل وفلفل مع خلطة البهارات الخاصة."
+            },
+            {
+                "id": "0000000000000000000000a8",
+                "nameEn": "Lamb Sfiha 0.5 KG",
+                "nameAr": "نصف كيلو صفيحة غنم",
+                "price": 21.0,
+                "descEn": "Lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "لحم غنم، طماطم، بصل وفلفل مع خلطة البهارات الخاصة."
+            },
+            {
+                "id": "0000000000000000000000aa",
+                "nameEn": "Lamb Sfiha 1 KG",
+                "nameAr": "كيلو صفيحة غنم",
+                "price": 38.0,
+                "descEn": "Lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "لحم غنم، طماطم، بصل وفلفل مع خلطة البهارات الخاصة."
+            },
+            {
+                "id": "000000000000000000000234",
+                "nameEn": "Signature Round Sfiha Dozen",
+                "nameAr": "درزن صفيحة دائرية مميزة",
+                "price": 12.0,
+                "descEn": "A mix of veal and lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "مزيج من لحم العجل والغنم، طماطم، بصل وفلفل مع التوابل الخاصة."
+            },
+            {
+                "id": "0000000000000000000000af",
+                "nameEn": "Signature Round Sfiha 0.5 KG",
+                "nameAr": "نصف كيلو صفيحة دائرية مميزة",
+                "price": 20.0,
+                "descEn": "A blend of veal and lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "مزيج من لحم العجل والغنم، طماطم، بصل وفلفل مع التوابل الخاصة."
+            },
+            {
+                "id": "0000000000000000000000c0",
+                "nameEn": "Lamb Round Sfiha Dozen",
+                "nameAr": "درزن صفيحة غنم دائرية",
+                "price": 13.0,
+                "descEn": "Lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "لحم غنم، طماطم، بصل وفلفل مع خلطة التوابل الخاصة."
+            },
+            {
+                "id": "0000000000000000000000b5",
+                "nameEn": "Veal Sfiha Dozen",
+                "nameAr": "درزن صفيحة عجل",
+                "price": 7.5,
+                "descEn": "Veal meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "لحم عجل، طماطم، بصل وفلفل مع التوابل الخاصة."
+            },
+            {
+                "id": "0000000000000000000000a6",
+                "nameEn": "Veal Round Sfiha Dozen",
+                "nameAr": "درزن صفيحة عجل دائرية",
+                "price": 11.0,
+                "descEn": "Veal meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "لحم عجل، طماطم، بصل وفلفل مع خلطة التوابل الخاصة."
+            },
+            {
+                "id": "000000000000000000000232",
+                "nameEn": "Signature Round Sfiha 1KG",
+                "nameAr": "كيلو صفيحة دائرية مميزة",
+                "price": 38.0,
+                "descEn": "A blend of veal and lamb meat, tomato, onion, and pepper with our signature blend of spices.",
+                "descAr": "مزيج من لحم العجل والغنم، طماطم، بصل وفلفل مع التوابل الخاصة."
+            },
+            {
+                "id": "0000000000000000000000b9",
+                "nameEn": "Pickles &amp; Lemon",
+                "nameAr": "مخللات وليمون",
+                "price": 1.5,
+                "descEn": "",
+                "descAr": "تشكيلة من المخللات وشرائح الليمون الحامض."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Grills",
+        "categoryAr": "المشاوي",
+        "items": [
+            {
+                "id": "000000000000000000000145",
+                "nameEn": "Tawouk Plate",
+                "nameAr": "صحن طاووق",
+                "price": 14.5,
+                "descEn": "Grilled marinated chicken skewers (2 skewers), served your choice of grilled potato or french fries, pickles, and garlic cream.",
+                "descAr": "أسياخ دجاج مشوية متبلة (سيخين)، تقدم مع بطاطا مقلية أو مشوية، مخلل وثوم."
+            },
+            {
+                "id": "000000000000000000000140",
+                "nameEn": "Grilled Lamb Meat Plate",
+                "nameAr": "صحن لحم غنم مشوي",
+                "price": 21.0,
+                "descEn": "Grilled lamb skewers (2 skewers) with grilled tomato, grilled onion, hummus, and biwaz.",
+                "descAr": "أسياخ لحم غنم مشوية (سيخين) مع طماطم وبصل مشوي، حمص وبيواز."
+            },
+            {
+                "id": "00000000000000000000014b",
+                "nameEn": "Grilled Kafta Plate",
+                "nameAr": "صحن كفتة مشوية",
+                "price": 16.0,
+                "descEn": "Minced meat skewers (4 skewers), served with grilled tomato, grilled onion, hummus, and biwaz.",
+                "descAr": "أسياخ كفتة مفرومة (4 أسياخ)، تقدم مع طماطم وبصل مشوي، حمص وبيواز."
+            },
+            {
+                "id": "0000000000000000000001f4",
+                "nameEn": "Grilled Veal Meat Plate",
+                "nameAr": "صحن لحم عجل مشوي",
+                "price": 21.0,
+                "descEn": "Grilled veal skewers (2 skewers) with grilled tomato, grilled onion, hummus, and biwaz.",
+                "descAr": "أسياخ لحم عجل مشوية (سيخين) مع طماطم وبصل مشوي، حمص وبيواز."
+            },
+            {
+                "id": "000000000000000000000143",
+                "nameEn": "Kabab Plate",
+                "nameAr": "صحن كباب",
+                "price": 17.0,
+                "descEn": "Minced meat skewers (4 skewers), served with grilled tomato, grilled onion, hummus, and biwaz.",
+                "descAr": "أسياخ كباب مفرومة (4 أسياخ)، تقدم مع طماطم وبصل مشوي، حمص وبيواز."
+            },
+            {
+                "id": "000000000000000000000147",
+                "nameEn": "Kabab Orfali Plate",
+                "nameAr": "صحن كباب أورفلي",
+                "price": 16.0,
+                "descEn": "Minced meat skewers (2 skewers) with grilled eggplant, grilled tomato, grilled onion, hummus, and biwaz.",
+                "descAr": "أسياخ كباب مفرومة (سيخين) مع باذنجان وطماطم وبصل مشوي، حمص وبيواز."
+            },
+            {
+                "id": "00000000000000000000013f",
+                "nameEn": "Kabab Keshkhash Plate",
+                "nameAr": "صحن كباب خشخاش",
+                "price": 16.0,
+                "descEn": "Minced meat skewers (4 skewers) served over a spicy tomato and green pepper sauce.",
+                "descAr": "أسياخ كباب مفرومة (4 أسياخ) تقدم فوق صلصة الطماطم والفلفل الحار."
+            },
+            {
+                "id": "000000000000000000000146",
+                "nameEn": "Mixed Grill Plate",
+                "nameAr": "صحن مشاوي مشكلة",
+                "price": 26.0,
+                "descEn": "A mix of 2 kabab skewers, 1 taouk skewer, and 1 grilled meat skewer, served with grilled tomato, grilled onion, hummus, garlic cream, and biwaz.",
+                "descAr": "تشكيلة من سيخين كباب، سيخ طاووق، وسيخ لحم مشوي مع خضار مشوية وحمص وثوم وبيواز."
+            },
+            {
+                "id": "00000000000000000000014c",
+                "nameEn": "Grilled Kafta 0.5 KG",
+                "nameAr": "نصف كيلو كفتة مشوية",
+                "price": 32.0,
+                "descEn": "10 minced meat skewers served with grilled tomato, grilled onion, and biwaz.",
+                "descAr": "10 أسياخ كفتة مفرومة تقدم مع طماطم وبصل مشوي وبيواز."
+            },
+            {
+                "id": "00000000000000000000013d",
+                "nameEn": "Tawouk 0.5 KG",
+                "nameAr": "نصف كيلو طاووق",
+                "price": 27.5,
+                "descEn": "5 grilled marinated chicken skewers served with your choice of grilled potato or french fries, served with pickles and garlic cream.",
+                "descAr": "5 أسياخ طاووق متبلة مع بطاطا مقلية أو مشوية، مخلل وثوم."
+            },
+            {
+                "id": "00000000000000000000013b",
+                "nameEn": "Kabab 0.5 KG",
+                "nameAr": "نصف كيلو كباب",
+                "price": 32.0,
+                "descEn": "10 minced meat skewers served with grilled tomato, grilled onion, and biwaz.",
+                "descAr": "10 أسياخ كباب مفرومة تقدم مع طماطم وبصل مشوي وبيواز."
+            },
+            {
+                "id": "000000000000000000000141",
+                "nameEn": "Grilled Meat 0.5 KG",
+                "nameAr": "نصف كيلو لحم غنم مشوي",
+                "price": 38.0,
+                "descEn": "5 grilled lamb skewers served with grilled tomato, grilled onion, and biwaz.",
+                "descAr": "5 أسياخ لحم غنم مشوية مع طماطم وبصل مشوي وبيواز."
+            },
+            {
+                "id": "000000000000000000000144",
+                "nameEn": "Mixed Grill 0.5 KG",
+                "nameAr": "نصف كيلو مشاوي مشكلة",
+                "price": 31.0,
+                "descEn": "2 Skewers of Shekaf,2 Skewers of Tawouk,2 Skewers of Kabab,Onion,Tomato,Biwaz",
+                "descAr": "سيخين شقف، سيخين طاووق، سيخين كباب، مع بصل، طماطم وبيواز."
+            },
+            {
+                "id": "00000000000000000000014a",
+                "nameEn": "Riyash 0.5 KG",
+                "nameAr": "نصف كيلو ريش",
+                "price": 38.0,
+                "descEn": "Riyash,Tomato,Onion,Biwaz",
+                "descAr": "ريش غنم مشوية مع طماطم، بصل وبيواز."
+            },
+            {
+                "id": "00000000000000000000013c",
+                "nameEn": "Arayes Kafta",
+                "nameAr": "عرايس كفتة",
+                "price": 16.0,
+                "descEn": "Saj bread filled with seasoned kafta and grilled until crisp and golden.",
+                "descAr": "خبز صاج محشو بالكفتة المتبلة ومشوي حتى يقرمش."
+            },
+            {
+                "id": "00000000000000000000013a",
+                "nameEn": "Half Grilled Chicken",
+                "nameAr": "نصف دجاجة مشوية",
+                "price": 15.0,
+                "descEn": "Half grilled marinated chicken served with your choice of grilled potato or french fries, with pickles and garlic cream.",
+                "descAr": "نصف دجاجة مشوية متبلة مع بطاطا، مخلل وثوم."
+            },
+            {
+                "id": "000000000000000000000149",
+                "nameEn": "Chicken Wings",
+                "nameAr": "جوانح دجاج",
+                "price": 10.0,
+                "descEn": "Grilled marinated chicken wings (12 pcs), grilled potato, served with pickles and garlic cream.",
+                "descAr": "جوانح دجاج مشوية متبلة (12 قطعة)، بطاطا مشوية، مخلل وثوم."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Main Course",
+        "categoryAr": "الأطباق الرئيسية",
+        "items": [
+            {
+                "id": "00000000000000000000010b",
+                "nameEn": "Chicken Escalope",
+                "nameAr": "إسكالوب دجاج",
+                "price": 17.0,
+                "descEn": "Breaded fried chicken, fries, coleslaw and smoky mayo sauce.",
+                "descAr": "دجاج مقلي مقرمش، بطاطا، كولسلو وصوص سموكي مايونيز."
+            },
+            {
+                "id": "00000000000000000000010d",
+                "nameEn": "Kafta in Oven",
+                "nameAr": "صينية كفتة بالفرن",
+                "price": 30.0,
+                "descEn": "Oven-baked kafta with tomato, green pepper, and onion.",
+                "descAr": "كفتة مخبوزة بالفرن مع الطماطم، الفلفل الأخضر والبصل."
+            },
+            {
+                "id": "000000000000000000000113",
+                "nameEn": "Meat in Oven",
+                "nameAr": "صينية لحم بالفرن",
+                "price": 30.0,
+                "descEn": "Oven-baked meat with tomato, green pepper, and onion.",
+                "descAr": "لحم مخبوز بالفرن مع الطماطم، الفلفل الأخضر والبصل."
+            },
+            {
+                "id": "00000000000000000000010e",
+                "nameEn": "Chicken with Rice",
+                "nameAr": "دجاج مع الأرز",
+                "price": 18.0,
+                "descEn": "Grilled marinated chicken cooked with rice, cashews, and demi-glace sauce.",
+                "descAr": "دجاج مشوي متبل مطهو مع الأرز، الكاجو وصلصة ديمي جلاس."
+            },
+            {
+                "id": "00000000000000000000021a",
+                "nameEn": "Chicken with Frikeh",
+                "nameAr": "دجاج مع فريكة",
+                "price": 18.0,
+                "descEn": "Grilled marinated chicken, frikeh, cashews, and demi-glace sauce.",
+                "descAr": "دجاج مشوي متبل، فريكة، كاجو وصلصة ديمي جلاس."
+            },
+            {
+                "id": "000000000000000000000114",
+                "nameEn": "Lamb Meat with Rice",
+                "nameAr": "لحم غنم مع الأرز",
+                "price": 28.0,
+                "descEn": "Slow-cooked lamb meat, rice, cashews and demi-glace sauce.",
+                "descAr": "لحم غنم مطهو ببطء، أرز، كاجو وصلصة ديمي جلاس."
+            },
+            {
+                "id": "000000000000000000000111",
+                "nameEn": "Lamb Meat with Frikeh",
+                "nameAr": "لحم غنم مع فريكة",
+                "price": 28.0,
+                "descEn": "Slow-cooked lamb meat, frikeh, cashews and demi-glace sauce.",
+                "descAr": "لحم غنم مطهو ببطء، فريكة، كاجو وصلصة ديمي جلاس."
+            },
+            {
+                "id": "000000000000000000000110",
+                "nameEn": "Kebbe and Shish Barak",
+                "nameAr": "كبة وشيش برك",
+                "price": 14.0,
+                "descEn": "Kebbe (3 pcs), shish barak (5 pcs), yogurt, garlic, and coriander served with rice.",
+                "descAr": "كبة (3 قطع)، شيش برك (5 قطع)، لبن، ثوم وكزبرة يقدم مع الأرز."
+            },
+            {
+                "id": "000000000000000000000112",
+                "nameEn": "Vine Leaves and Lamb Cutlets",
+                "nameAr": "ورق عنب وكوستليتا لحم",
+                "price": 22.0,
+                "descEn": "Meat-stuffed vine leaves (18 pcs) and baby marrow (2 pcs), served with lamb cutlets (2 pcs).",
+                "descAr": "ورق عنب محشو باللحم (18 قطعة) كوسا محشي (قطعتين)، مع ريش لحم غنم (قطعتين)."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Burgers",
+        "categoryAr": "البرغر",
+        "items": [
+            {
+                "id": "000000000000000000000163",
+                "nameEn": "Lebanese Burger",
+                "nameAr": "برغر لبناني",
+                "price": 10.0,
+                "descEn": "Minced meat burger, coleslaw, fries and ketchup.",
+                "descAr": "برغر لحم مفروم، كولسلو، بطاطا مقلية كاتشب."
+            },
+            {
+                "id": "00000000000000000000010f",
+                "nameEn": "Lebanese Burger Plate",
+                "nameAr": "صحن برغر لبناني",
+                "price": 14.0,
+                "descEn": "",
+                "descAr": "برغر لبناني يقدم مع البطاطا المقلية والسلطة."
+            }
+        ]
+    }
+]

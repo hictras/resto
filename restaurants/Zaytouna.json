@@ -1,0 +1,1038 @@
+[
+    {
+        "categoryEn": "Breakfast & Morning",
+        "categoryAr": "ترويقة",
+        "items": [
+            {
+                "id": "sallat_zeitouna",
+                "nameEn": "Zeitouna Basket",
+                "nameAr": "سلة زيتونا",
+                "price": 24.00,
+                "descEn": "A selection of various mezza items in one basket: Halloumi, eggs, labneh, foul, hummus with falafel, green salad, kaskh, zaatar saj, cheese saj, and fig jam.",
+                "descAr": "مجموعة مختارة من أصناف المازة المختلفة في سلّة واحدة: حلوم - بيض - لبنة - فول - حمص مع فلافل - صحن خضرة - صاج كشك - صاج زعتر - صاج جبنة - مربى التين"
+            },
+            {
+                "id": "eggs_variety",
+                "nameEn": "Eggs Selection",
+                "nameAr": "بيض",
+                "price": null,
+                "descEn": "Fried eggs (5.50), Omelette (cheese, mushroom, veggies - 8.50), Eggs with fennel (5.50), Eggs with meat (7.50), Eggs with potatoes (5.50), Eggs with feta & tomatoes (9.00), Eggs with sujuk (8.00).",
+                "descAr": "بيض مقلي (5.50) - أومليت (جبنة، فطر، خضار - 8.50) - بيض مع شومر (5.50) - بيض باللحمة (7.50) - بيض بالبطاطا (5.50) - بيض بالفيتا والبندورة (9.00) - بيض بالسجق (8.00)"
+            }
+        ]
+    },
+    {
+        "categoryEn": "Salads",
+        "categoryAr": "سلطة",
+        "items": [
+            {
+                "id": "tabbouleh",
+                "nameEn": "Tabbouleh",
+                "nameAr": "تبّولة",
+                "price": 8.50,
+                "descEn": "Traditional Lebanese parsley and bulgur salad.",
+                "descAr": "تبّولة تقليدية."
+            },
+            {
+                "id": "fattoush",
+                "nameEn": "Fattouch",
+                "nameAr": "فتّوش",
+                "price": 8.50,
+                "descEn": "Traditional green salad with toasted bread.",
+                "descAr": "فتّوش تقليدي مع الخبز المحمص."
+            },
+            {
+                "id": "jabalieh_salad",
+                "nameEn": "Jabalieh Salad",
+                "nameAr": "سلطة جبلية",
+                "price": 14.00,
+                "descEn": "Mountain style green salad.",
+                "descAr": "سلطة جبلية."
+            },
+            {
+                "id": "kale_halloumi_salad",
+                "nameEn": "Kale & Halloumi Salad",
+                "nameAr": "سلطة الكايل و الحلوم",
+                "price": 12.00,
+                "descEn": "Fresh kale with grilled halloumi cheese.",
+                "descAr": "سلطة الكايل مع جبنة الحلوم المشوية."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Cold & Hot Mezza",
+        "categoryAr": "مازة باردة وساخنة",
+        "items": [
+            {
+                "id": "hummus",
+                "nameEn": "Hummus",
+                "nameAr": "حمص",
+                "price": 5.75,
+                "descEn": "Classic blended chickpeas with tahini.",
+                "descAr": "حمص بالطحينة."
+            },
+            {
+                "id": "hummus_beiruti",
+                "nameEn": "Beiruti Hummus",
+                "nameAr": "حمص بيروتي",
+                "price": 5.75,
+                "descEn": "Hummus with parsley, garlic, and cumin.",
+                "descAr": "حمص بيروتي."
+            },
+            {
+                "id": "mabtabal",
+                "nameEn": "Moutabal",
+                "nameAr": "متبل",
+                "price": 5.75,
+                "descEn": "Smoked eggplant dip with tahini.",
+                "descAr": "متبل باذنجان مشوي."
+            },
+            {
+                "id": "baba_ghannouj",
+                "nameEn": "Baba Ghannouj",
+                "nameAr": "بابا غنوج",
+                "price": 5.75,
+                "descEn": "Smoked eggplant with diced vegetables and pomegranate.",
+                "descAr": "باذنجان مشوي مع الخضار."
+            },
+            {
+                "id": "eggplant_pomegranate",
+                "nameEn": "Eggplant with Pomegranate Molasses",
+                "nameAr": "باذنجان مع دبس الرمان",
+                "price": 5.75,
+                "descEn": "Fried eggplant chunks topped with pomegranate molasses.",
+                "descAr": "باذنجان مع دبس الرمان."
+            },
+            {
+                "id": "loubieh_zeit",
+                "nameEn": "Green Beans in Olive Oil",
+                "nameAr": "لوبية بالزيت",
+                "price": 5.75,
+                "descEn": "Tender green beans simmered in olive oil and tomatoes.",
+                "descAr": "لوبية بالزيت."
+            },
+            {
+                "id": "muhammara",
+                "nameEn": "Muhammara",
+                "nameAr": "محمرة",
+                "price": 7.00,
+                "descEn": "Spicy red pepper and walnut dip.",
+                "descAr": "مزيج الفلفل الجوز والمحمرة."
+            },
+            {
+                "id": "labneh",
+                "nameEn": "Labneh",
+                "nameAr": "لبنة",
+                "price": 5.75,
+                "descEn": "Strained strained yogurt spread.",
+                "descAr": "لبنة طازجة."
+            },
+            {
+                "id": "labneh_mix",
+                "nameEn": "Labneh Mix",
+                "nameAr": "لبنة ميكس",
+                "price": 5.75,
+                "descEn": "Assorted labneh blend.",
+                "descAr": "تشكيلة لبنة."
+            },
+            {
+                "id": "beetroot_kashk",
+                "nameEn": "Beetroot with Kashk",
+                "nameAr": "شمندر مع كشك",
+                "price": 6.00,
+                "descEn": "Beetroot mixed with traditional fermented kashk.",
+                "descAr": "شمندر مع كشك."
+            },
+            {
+                "id": "vine_leaves",
+                "nameEn": "Stuffed Vine Leaves",
+                "nameAr": "ورق عنب",
+                "price": 8.00,
+                "descEn": "Rice-stuffed vine leaves cooked in olive oil.",
+                "descAr": "ورق عنب محشي بالرز."
+            },
+            {
+                "id": "pickles",
+                "nameEn": "Assorted Pickles",
+                "nameAr": "كبيس",
+                "price": 3.50,
+                "descEn": "House-pickled vegetables.",
+                "descAr": "تشكيلة كبيس."
+            },
+            {
+                "id": "small_veg_plate",
+                "nameEn": "Small Vegetable Plate",
+                "nameAr": "صحن خضار صغير",
+                "price": 1.50,
+                "descEn": "Fresh seasonal raw vegetables.",
+                "descAr": "صحن خضار طازجة."
+            },
+            {
+                "id": "makanek",
+                "nameEn": "Makanek",
+                "nameAr": "مقانق",
+                "price": 13.00,
+                "descEn": "Lebanese mini sausages sautéed with lemon and pomegranate.",
+                "descAr": "مقانق لحمة."
+            },
+            {
+                "id": "sujuk",
+                "nameEn": "Sujuk",
+                "nameAr": "سجق",
+                "price": 13.00,
+                "descEn": "Spicy Armenian sausages pan-fried.",
+                "descAr": "سجق حار."
+            },
+            {
+                "id": "chicken_livers",
+                "nameEn": "Chicken Livers",
+                "nameAr": "سودة دجاج",
+                "price": 11.00,
+                "descEn": "Pan-seared chicken livers with pomegranate molasses.",
+                "descAr": "سودة دجاج بدبس الرمان."
+            },
+            {
+                "id": "chicken_wings_provencal",
+                "nameEn": "Chicken Wings Provencal",
+                "nameAr": "جوانح دجاج بروفنسال",
+                "price": 9.00,
+                "descEn": "Crispy chicken wings tossed in garlic, coriander, and lemon.",
+                "descAr": "جوانح دجاج مع الثوم والكزبرة والحامض."
+            },
+            {
+                "id": "kebbeh_sajieh",
+                "nameEn": "Kebbeh Sajieh",
+                "nameAr": "كبة صاجيه",
+                "price": 8.75,
+                "descEn": "Spread kebbeh cooked on a saj.",
+                "descAr": "كبة صاجية."
+            },
+            {
+                "id": "cheese_rolls",
+                "nameEn": "Cheese Rolls",
+                "nameAr": "رقائق جبنة",
+                "price": 8.50,
+                "descEn": "Crispy pastry rolls filled with mixed cheeses.",
+                "descAr": "رقائق محشوة بالجبنة المقرمشة."
+            },
+            {
+                "id": "osmalieh_chicken",
+                "nameEn": "Osmalieh Chicken",
+                "nameAr": "عثملية دجاج",
+                "price": 8.75,
+                "descEn": "Shredded dough pastry with savory chicken filling.",
+                "descAr": "عثملية دجاج."
+            },
+            {
+                "id": "halloumi_figs",
+                "nameEn": "Halloumi with Figs",
+                "nameAr": "حلوم بالتين",
+                "price": 10.50,
+                "descEn": "Grilled halloumi served with sweet figs.",
+                "descAr": "حلوم مشوي مع التين."
+            },
+            {
+                "id": "grilled_halloumi",
+                "nameEn": "Grilled Halloumi",
+                "nameAr": "حلوم مشوي",
+                "price": 9.00,
+                "descEn": "Simple grilled halloumi cheese slices.",
+                "descAr": "شرائح جبنة حلوم مشوية."
+            },
+            {
+                "id": "hummus_falafel",
+                "nameEn": "Hummus with Falafel",
+                "nameAr": "حمص بالفلافل",
+                "price": 9.00,
+                "descEn": "Classic hummus topped with crunchy falafel balls.",
+                "descAr": "حمص مزين بالفلافل المقرمشة."
+            },
+            {
+                "id": "hummus_meat",
+                "nameEn": "Hummus with Meat",
+                "nameAr": "حمص باللحمة",
+                "price": 12.50,
+                "descEn": "Hummus topped with sautéed minced meat and pine nuts.",
+                "descAr": "حمص مع اللحمة المقلية والصنوبر."
+            },
+            {
+                "id": "balila",
+                "nameEn": "Balila",
+                "nameAr": "بليلة",
+                "price": 5.75,
+                "descEn": "Warm chickpeas seasoned with cumin, garlic, and olive oil.",
+                "descAr": "حبوب الحمص المسلوقة مع الكمون والزيت."
+            },
+            {
+                "id": "foul",
+                "nameEn": "Foul Mdammas",
+                "nameAr": "فول",
+                "price": 5.75,
+                "descEn": "Fava beans cooked with garlic, lemon, and olive oil.",
+                "descAr": "فول مدمس بالثوم والحامض."
+            },
+            {
+                "id": "roasted_potatoes_garlic",
+                "nameEn": "Roasted Potatoes with Garlic Sauce",
+                "nameAr": "بطاطا مشوية مع صلصة الثوم",
+                "price": 5.50,
+                "descEn": "Oven-roasted potato cubes with garlic dip.",
+                "descAr": "بطاطا مشوية مع الثوم."
+            },
+            {
+                "id": "french_fries",
+                "nameEn": "French Fries",
+                "nameAr": "بطاطا مقلية",
+                "price": 6.00,
+                "descEn": "Crispy golden french fries.",
+                "descAr": "بطاطا مقلية ذهبية."
+            },
+            {
+                "id": "batata_harra",
+                "nameEn": "Batata Harra",
+                "nameAr": "بطاطا حرة",
+                "price": 7.00,
+                "descEn": "Spicy potato cubes tossed with chili, garlic, and coriander.",
+                "descAr": "مكعبات البطاطا الحارة مع الثوم والكزبرة والحر."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Fatteh",
+        "categoryAr": "فتة",
+        "items": [
+            {
+                "id": "fatteh_hommos",
+                "nameEn": "Hummus Fatteh",
+                "nameAr": "فتة حمص",
+                "price": 9.00,
+                "descEn": "Layered crispy bread, chickpeas, garlic yogurt, and ghee with nuts.",
+                "descAr": "فتة حمص باللبن والسمنة والمكسرات."
+            },
+            {
+                "id": "fatteh_chicken",
+                "nameEn": "Chicken Fatteh",
+                "nameAr": "فتة دجاج",
+                "price": 14.00,
+                "descEn": "Shredded chicken over layered crispy bread and garlic yogurt.",
+                "descAr": "فتة دجاج مع اللبن والثوم والمكسرات."
+            },
+            {
+                "id": "fatteh_kebbeh_labanieh",
+                "nameEn": "Kebbeh Labanieh Fatteh",
+                "nameAr": "فتة كبة لبنية",
+                "price": 14.00,
+                "descEn": "Fried kebbeh balls served in warm yogurt sauce with bread.",
+                "descAr": "كبة مقلية باللبن مع الخبز المحمص."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Saj",
+        "categoryAr": "صاج",
+        "items": [
+            {
+                "id": "saj_zaatar",
+                "nameEn": "Zaatar Saj",
+                "nameAr": "زعتر",
+                "price": 4.50,
+                "descEn": "Traditional saj bread baked with wild thyme and olive oil.",
+                "descAr": "منقوشة زعتر على الصاج."
+            },
+            {
+                "id": "saj_zaatar_labneh",
+                "nameEn": "Zaatar & Labneh Saj",
+                "nameAr": "زعتر و لبنة",
+                "price": 4.50,
+                "descEn": "Half zaatar and half labneh saj wrap.",
+                "descAr": "صاج زعتر ولبنة."
+            },
+            {
+                "id": "saj_labneh",
+                "nameEn": "Labneh Saj",
+                "nameAr": "لبنة",
+                "price": 4.50,
+                "descEn": "Saj bread spread with fresh labneh.",
+                "descAr": "صاج لبنة."
+            },
+            {
+                "id": "saj_cheese",
+                "nameEn": "Cheese Saj",
+                "nameAr": "جبنة",
+                "price": 7.50,
+                "descEn": "Melted local cheese on warm saj bread.",
+                "descAr": "صاج جبنة."
+            },
+            {
+                "id": "saj_kaskh",
+                "nameEn": "Kashk Saj",
+                "nameAr": "كشك",
+                "price": 6.50,
+                "descEn": "Fermented wheat and yogurt mix baked on saj.",
+                "descAr": "صاج كشك."
+            },
+            {
+                "id": "saj_cheese_zaatar",
+                "nameEn": "Cheese & Zaatar Saj",
+                "nameAr": "جبنة و زعتر",
+                "price": 7.50,
+                "descEn": "Combination of cheese and zaatar on saj.",
+                "descAr": "صاج جبنة وزعتر."
+            },
+            {
+                "id": "saj_taouk",
+                "nameEn": "Taouk Saj",
+                "nameAr": "طاووق",
+                "price": 13.00,
+                "descEn": "Grilled chicken taouk wrapped in saj bread.",
+                "descAr": "صاج طاووق."
+            },
+            {
+                "id": "saj_sujuk_cheese",
+                "nameEn": "Sujuk & Cheese Saj",
+                "nameAr": "سجق و جبنة",
+                "price": 13.00,
+                "descEn": "Spicy sujuk slices with melted cheese on saj.",
+                "descAr": "صاج سجق وجبنة."
+            },
+            {
+                "id": "saj_kafta_cheese",
+                "nameEn": "Kafta & Cheese Saj",
+                "nameAr": "كفتة و جبنة",
+                "price": 13.00,
+                "descEn": "Seasoned ground meat spread with cheese on saj.",
+                "descAr": "صاج كفتة وجبنة."
+            },
+            {
+                "id": "saj_chicken_cheese",
+                "nameEn": "Chicken & Cheese Saj",
+                "nameAr": "دجاج و جبنة",
+                "price": 13.00,
+                "descEn": "Chicken chunks and melted cheese on saj.",
+                "descAr": "صاج دجاج وجبنة."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Grills & Platters",
+        "categoryAr": "مشاوي وأطباق",
+        "items": [
+            {
+                "id": "shish_taouk",
+                "nameEn": "Shish Taouk Platter",
+                "nameAr": "شيش طاووق",
+                "price": 16.00,
+                "descEn": "Marinated chicken skewers served with garlic paste and fries.",
+                "descAr": "سيش طاووق مع الثوم والبطاطا."
+            },
+            {
+                "id": "kebab",
+                "nameEn": "Kebab Platter",
+                "nameAr": "كباب",
+                "price": 18.00,
+                "descEn": "Charcoal-grilled minced meat skewers with parsley and onions.",
+                "descAr": "أسياخ كباب مشوية عالفحم."
+            },
+            {
+                "id": "chicken_kebab",
+                "nameEn": "Chicken Kebab Platter",
+                "nameAr": "كباب دجاج",
+                "price": 12.50,
+                "descEn": "Minced chicken skewers seasoned with special spices.",
+                "descAr": "كباب دجاج مشوي."
+            },
+            {
+                "id": "deboned_chicken",
+                "nameEn": "Deboned Chicken",
+                "nameAr": "دجاج مسحب",
+                "price": 22.00,
+                "descEn": "Whole grilled deboned chicken with garlic sauce.",
+                "descAr": "دجاج مسحب مشوي."
+            },
+            {
+                "id": "mixed_grills",
+                "nameEn": "Mixed Grills",
+                "nameAr": "مشاوي مشكلة",
+                "price": 29.00,
+                "descEn": "Selection of shish taouk, meat skewers, and kebab.",
+                "descAr": "تشكيلة مشاوي مشكلة عالفحم."
+            },
+            {
+                "id": "grilled_meat",
+                "nameEn": "Grilled Meat Platter",
+                "nameAr": "لحمة مشوية",
+                "price": 27.00,
+                "descEn": "Tender grilled meat cubes.",
+                "descAr": "لحمة مشوية طرية."
+            },
+            {
+                "id": "chicken_potatoes",
+                "nameEn": "Chicken & Potatoes",
+                "nameAr": "دجاج و بطاطا",
+                "price": 14.50,
+                "descEn": "Oven-baked chicken and potatoes dish.",
+                "descAr": "صينية دجاج وبطاطا."
+            },
+            {
+                "id": "lebanese_burger",
+                "nameEn": "Lebanese Burger",
+                "nameAr": "ليبانيز برغر",
+                "price": 16.50,
+                "descEn": "Specialty Lebanese spiced burger with fries.",
+                "descAr": "برغر على الطريقة اللبنانية مع البطاطا."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Sweets",
+        "categoryAr": "حلويات",
+        "items": [
+            {
+                "id": "maamoul_cheese",
+                "nameEn": "Maamoul with Cheese",
+                "nameAr": "معمول بالجبنة",
+                "price": 12.50,
+                "descEn": "Traditional semolina pastry stuffed with sweet cheese.",
+                "descAr": "معمول محشي بالجبنة الحلوة."
+            },
+            {
+                "id": "chocolate_pudding",
+                "nameEn": "Chocolate Pudding",
+                "nameAr": "شوكولا بودنغ",
+                "price": 12.50,
+                "descEn": "Rich and creamy chocolate pudding dessert.",
+                "descAr": "بودنغ الشوكولا الغني."
+            },
+            {
+                "id": "soft_cream",
+                "nameEn": "Soft Cream",
+                "nameAr": "سوفت كريم",
+                "price": 5.50,
+                "descEn": "Smooth soft serve ice cream.",
+                "descAr": "بوظة سوفت كريم."
+            },
+            {
+                "id": "mouhalabiya_saraya",
+                "nameEn": "Eish El Saraya",
+                "nameAr": "عيش السرايا",
+                "price": 9.00,
+                "descEn": "Caramelized toast dessert topped with cream and pistachios.",
+                "descAr": "عيش السرايا بالقشطة والفستق."
+            },
+            {
+                "id": "saj_chocolate_banana",
+                "nameEn": "Chocolate & Banana Saj",
+                "nameAr": "صاج شوكولا و موز",
+                "price": 9.00,
+                "descEn": "Saj bread spread with chocolate spread and sliced bananas.",
+                "descAr": "صاج محشي بالشوكولا والموز."
+            },
+            {
+                "id": "pain_perdu",
+                "nameEn": "Pain Perdu",
+                "nameAr": "بان بيردو",
+                "price": 14.00,
+                "descEn": "Sweet French toast dessert served warm.",
+                "descAr": "بان بيردو الفرنسي."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Cold Beverages",
+        "categoryAr": "المشروبات الباردة",
+        "items": [
+            {
+                "id": "large_mineral_water",
+                "nameEn": "Large Mineral Water",
+                "nameAr": "مياه معدنية كبيرة",
+                "price": 4.50,
+                "descEn": "Large bottled water.",
+                "descAr": "مياه معدنية كبيرة."
+            },
+            {
+                "id": "small_mineral_water",
+                "nameEn": "Small Mineral Water",
+                "nameAr": "مياه معدنية صغيرة",
+                "price": 2.50,
+                "descEn": "Small bottled water.",
+                "descAr": "مياه معدنية صغيرة."
+            },
+            {
+                "id": "large_sparkling_water",
+                "nameEn": "Large Sparkling Water",
+                "nameAr": "مياه غازية كبيرة",
+                "price": 5.00,
+                "descEn": "Large carbonated water.",
+                "descAr": "مياه غازية كبيرة."
+            },
+            {
+                "id": "small_sparkling_water",
+                "nameEn": "Small Sparkling Water",
+                "nameAr": "مياه غازية صغيرة",
+                "price": 3.50,
+                "descEn": "Small carbonated water.",
+                "descAr": "مياه غازية صغيرة."
+            },
+            {
+                "id": "local_beer",
+                "nameEn": "Local Beer",
+                "nameAr": "بيرة محلية",
+                "price": 4.25,
+                "descEn": "Cold local beer bottle.",
+                "descAr": "بيرة محلية باردة."
+            },
+            {
+                "id": "imported_beer",
+                "nameEn": "Imported Beer",
+                "nameAr": "بيرة مستوردة",
+                "price": 5.00,
+                "descEn": "Cold imported beer bottle.",
+                "descAr": "بيرة مستوردة باردة."
+            },
+            {
+                "id": "iced_tea",
+                "nameEn": "Iced Tea (Peach or Lemon)",
+                "nameAr": "شاي مثلج ( دراق او حامض)",
+                "price": 3.50,
+                "descEn": "Refreshing iced tea.",
+                "descAr": "شاي مثلج بنكهة الدراق أو الحامض."
+            },
+            {
+                "id": "ayran",
+                "nameEn": "Laban Ayran",
+                "nameAr": "لبن عيران",
+                "price": 3.50,
+                "descEn": "Traditional cold yogurt drink.",
+                "descAr": "لبن عيران مثلج."
+            },
+            {
+                "id": "soda",
+                "nameEn": "Soda",
+                "nameAr": "صودا",
+                "price": 3.50,
+                "descEn": "Club soda.",
+                "descAr": "مياه صودا."
+            },
+            {
+                "id": "tonic",
+                "nameEn": "Tonic",
+                "nameAr": "تونيك",
+                "price": 3.50,
+                "descEn": "Tonic water.",
+                "descAr": "ماء التونيك."
+            },
+            {
+                "id": "energy_drink",
+                "nameEn": "Energy Drink",
+                "nameAr": "مشروب طاقة",
+                "price": 6.50,
+                "descEn": "Energizing beverage.",
+                "descAr": "مشروب طاقة."
+            },
+            {
+                "id": "soft_drinks",
+                "nameEn": "Soft Drinks",
+                "nameAr": "مشروبات غازية",
+                "price": 3.50,
+                "descEn": "Assorted sodas.",
+                "descAr": "مشروبات غازية متنوعة."
+            },
+            {
+                "id": "non_alcoholic_beer",
+                "nameEn": "Non-Alcoholic Beer",
+                "nameAr": "بيرة خالية من الكحول",
+                "price": 3.50,
+                "descEn": "Malt beverage without alcohol.",
+                "descAr": "بيرة خالية من الكحول."
+            },
+            {
+                "id": "fresh_orange",
+                "nameEn": "Fresh Orange Juice",
+                "nameAr": "برتقال طازج",
+                "price": 4.75,
+                "descEn": "Squeezed fresh orange juice.",
+                "descAr": "عصير برتقال طازج."
+            },
+            {
+                "id": "lemonade",
+                "nameEn": "Lemonade",
+                "nameAr": "ليموناضة",
+                "price": 4.75,
+                "descEn": "House-made fresh lemonade.",
+                "descAr": "ليموناضة طازجة."
+            },
+            {
+                "id": "minted_lemonade",
+                "nameEn": "Minted Lemonade",
+                "nameAr": "ليموناضة بالنعنع",
+                "price": 4.75,
+                "descEn": "Fresh lemonade blended with mint leaves.",
+                "descAr": "ليموناضة منعشة مع النعناع."
+            },
+            {
+                "id": "jallab",
+                "nameEn": "Jallab",
+                "nameAr": "جلاب",
+                "price": 3.50,
+                "descEn": "Traditional date syrup drink with raisins and pine nuts.",
+                "descAr": "شراب الجلاب التقليدي مع الزبيب والصنوبر."
+            },
+            {
+                "id": "vard",
+                "nameEn": "Vard (Rose syrup)",
+                "nameAr": "ورد",
+                "price": 3.50,
+                "descEn": "Sweet floral rose syrup drink.",
+                "descAr": "شراب الورد البارد."
+            },
+            {
+                "id": "pomegranate_juice",
+                "nameEn": "Pomegranate Juice",
+                "nameAr": "عصير رمان",
+                "price": 6.50,
+                "descEn": "Freshly extracted pomegranate juice.",
+                "descAr": "عصير رمان طازج."
+            },
+            {
+                "id": "fruit_cocktail",
+                "nameEn": "Fruit Cocktail",
+                "nameAr": "كوكتيل فواكه",
+                "price": 7.50,
+                "descEn": "Blended seasonal fruit cocktail.",
+                "descAr": "كوكتيل فواكه طبيعي."
+            },
+            {
+                "id": "passion_fruit_mojito",
+                "nameEn": "Passion Fruit Mojito",
+                "nameAr": "موهيتو باشن فروت",
+                "price": 7.50,
+                "descEn": "Refreshing mocktail with passion fruit and mint.",
+                "descAr": "موهيتو بنكهة الباشن فروت."
+            },
+            {
+                "id": "mango_twist",
+                "nameEn": "Mango Twist",
+                "nameAr": "مانغو تويست",
+                "price": 7.50,
+                "descEn": "Mango-based refreshing beverage.",
+                "descAr": "شراب المانغو المنعش."
+            },
+            {
+                "id": "caramel_frappe",
+                "nameEn": "Caramel Frappe",
+                "nameAr": "كراميل فربي",
+                "price": 6.00,
+                "descEn": "Blended iced coffee with caramel.",
+                "descAr": "قهوة مثلجة بالكراميل."
+            },
+            {
+                "id": "frappuccino",
+                "nameEn": "Frappuccino",
+                "nameAr": "فربشينو",
+                "price": 6.00,
+                "descEn": "Blended iced coffee beverage.",
+                "descAr": "فربشينو مثلج."
+            },
+            {
+                "id": "chocolate_frappe",
+                "nameEn": "Chocolate Frappe",
+                "nameAr": "فرابي شوكولا",
+                "price": 6.00,
+                "descEn": "Blended iced chocolate coffee.",
+                "descAr": "فرابي بالشوكولا."
+            },
+            {
+                "id": "iced_latte",
+                "nameEn": "Iced Latte",
+                "nameAr": "ايس لاتي",
+                "price": 6.00,
+                "descEn": "Espresso poured over cold milk and ice.",
+                "descAr": "ايس لاتي بالحليب البارد."
+            },
+            {
+                "id": "wine_glass",
+                "nameEn": "Wine (Glass)",
+                "nameAr": "كاْس",
+                "price": 6.00,
+                "descEn": "Glass of house wine.",
+                "descAr": "كاس نبيذ."
+            },
+            {
+                "id": "wine_half_bottle",
+                "nameEn": "Wine (Half Bottle)",
+                "nameAr": "نصية",
+                "price": 18.00,
+                "descEn": "Half bottle of wine.",
+                "descAr": "نصف قنينة نبيذ."
+            },
+            {
+                "id": "wine_bottle",
+                "nameEn": "Wine (Bottle)",
+                "nameAr": "قنينة",
+                "price": 30.00,
+                "descEn": "Full bottle of wine.",
+                "descAr": "قنينة نبيذ كاملة."
+            },
+            {
+                "id": "arak_glass",
+                "nameEn": "Arak (Glass)",
+                "nameAr": "كاْس",
+                "price": 5.00,
+                "descEn": "Glass of traditional Lebanese Arak.",
+                "descAr": "كاس عرق."
+            },
+            {
+                "id": "arak_quarter",
+                "nameEn": "Arak (Quarter Bottle)",
+                "nameAr": "ربعية",
+                "price": 12.00,
+                "descEn": "Quarter bottle of Arak.",
+                "descAr": "ربعية عرق."
+            },
+            {
+                "id": "arak_half",
+                "nameEn": "Arak (Half Bottle)",
+                "nameAr": "نصية",
+                "price": 16.00,
+                "descEn": "Half bottle of Arak.",
+                "descAr": "نصف قنينة عرق."
+            },
+            {
+                "id": "arak_bottle",
+                "nameEn": "Arak (Bottle)",
+                "nameAr": "قنينة",
+                "price": 20.00,
+                "descEn": "Full bottle of Arak.",
+                "descAr": "قنينة عرق كاملة."
+            },
+            {
+                "id": "whiskey_glass",
+                "nameEn": "Whiskey (Glass)",
+                "nameAr": "كاْس",
+                "price": 6.00,
+                "descEn": "Standard glass of whiskey.",
+                "descAr": "كاس ويسكي."
+            },
+            {
+                "id": "whiskey_premium_glass",
+                "nameEn": "Whiskey Premium (Glass)",
+                "nameAr": "كاْس بريميوم",
+                "price": 9.50,
+                "descEn": "Premium glass of whiskey.",
+                "descAr": "كاس ويسكي بريميوم."
+            },
+            {
+                "id": "whiskey_half",
+                "nameEn": "Whiskey (Half Bottle)",
+                "nameAr": "نصية",
+                "price": 50.00,
+                "descEn": "Half bottle of whiskey.",
+                "descAr": "نصف قنينة ويسكي."
+            },
+            {
+                "id": "whiskey_bottle",
+                "nameEn": "Whiskey (Bottle)",
+                "nameAr": "قنينة",
+                "price": 60.00,
+                "descEn": "Full bottle of whiskey.",
+                "descAr": "قنينة ويسكي."
+            },
+            {
+                "id": "whiskey_premium_bottle",
+                "nameEn": "Whiskey Premium (Bottle)",
+                "nameAr": "قنينة بريميوم",
+                "price": 95.00,
+                "descEn": "Premium full bottle of whiskey.",
+                "descAr": "قنينة ويسكي بريميوم."
+            },
+            {
+                "id": "spirits_glass",
+                "nameEn": "Spirits (Glass)",
+                "nameAr": "كاْس",
+                "price": 5.00,
+                "descEn": "Standard glass of spirits.",
+                "descAr": "كاس مشروبات روحيّة."
+            },
+            {
+                "id": "spirits_premium_glass",
+                "nameEn": "Spirits Premium (Glass)",
+                "nameAr": "كاْس بريميوم",
+                "price": 9.50,
+                "descEn": "Premium glass of spirits.",
+                "descAr": "كاس مشروبات روحيّة بريميوم."
+            },
+            {
+                "id": "spirits_bottle",
+                "nameEn": "Spirits (Bottle)",
+                "nameAr": "قنينة",
+                "price": 50.00,
+                "descEn": "Full bottle of spirits.",
+                "descAr": "قنينة مشروبات روحيّة."
+            },
+            {
+                "id": "spirits_premium_bottle",
+                "nameEn": "Spirits Premium (Bottle)",
+                "nameAr": "قنينة بريميوم",
+                "price": 95.00,
+                "descEn": "Premium full bottle of spirits.",
+                "descAr": "قنينة مشروبات روحيّة بريميوم."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Hot Beverages",
+        "categoryAr": "المشروبات الساخنة",
+        "items": [
+            {
+                "id": "espresso_single",
+                "nameEn": "Espresso Single",
+                "nameAr": "اسبرسو سنغل",
+                "price": 3.50,
+                "descEn": "Single shot espresso.",
+                "descAr": "اسبرسو سنغل."
+            },
+            {
+                "id": "espresso_ristretto",
+                "nameEn": "Espresso Ristretto",
+                "nameAr": "اسبرسو ريسترتو",
+                "price": 3.50,
+                "descEn": "Short concentrated espresso shot.",
+                "descAr": "اسبرسو ريسترتو."
+            },
+            {
+                "id": "espresso_lungo",
+                "nameEn": "Espresso Lungo",
+                "nameAr": "اسبرسو لونغو",
+                "price": 3.50,
+                "descEn": "Long pulled espresso shot.",
+                "descAr": "اسبرسو لونغو."
+            },
+            {
+                "id": "espresso_decaf",
+                "nameEn": "Espresso Decaf",
+                "nameAr": "اسبرسو ديكاف",
+                "price": 3.50,
+                "descEn": "Decaffeinated espresso shot.",
+                "descAr": "اسبرسو منزوع الكافيين."
+            },
+            {
+                "id": "double_espresso",
+                "nameEn": "Double Espresso",
+                "nameAr": "دوبل اسبرسو",
+                "price": 5.00,
+                "descEn": "Double shot of espresso.",
+                "descAr": "دوبل اسبرسو."
+            },
+            {
+                "id": "lebanese_coffee",
+                "nameEn": "Lebanese Coffee",
+                "nameAr": "قهوه لبنانية",
+                "price": 3.50,
+                "descEn": "Traditional brewed Lebanese coffee.",
+                "descAr": "قهوة لبنانية تقليدية."
+            },
+            {
+                "id": "white_coffee",
+                "nameEn": "White Coffee (Nuwair)",
+                "nameAr": "قهوة بيضاء",
+                "price": 2.00,
+                "descEn": "Orange blossom water hot infusion.",
+                "descAr": "قهوة بيضاء بماء الزهر."
+            },
+            {
+                "id": "american_coffee",
+                "nameEn": "American Coffee",
+                "nameAr": "قهوة أميركية",
+                "price": 4.50,
+                "descEn": "Drip brewed American coffee.",
+                "descAr": "قهوة أمريكية."
+            },
+            {
+                "id": "cortado",
+                "nameEn": "Cortado",
+                "nameAr": "كورتادو",
+                "price": 4.50,
+                "descEn": "Espresso with an equal amount of warm milk.",
+                "descAr": "اسبرسو مع الحليب."
+            },
+            {
+                "id": "flat_white",
+                "nameEn": "Flat White",
+                "nameAr": "فلات وايت",
+                "price": 4.00,
+                "descEn": "Espresso with velvety microfoam milk.",
+                "descAr": "فلات وايت."
+            },
+            {
+                "id": "nescafe",
+                "nameEn": "Nescafe",
+                "nameAr": "نسكافه",
+                "price": 4.00,
+                "descEn": "Instant coffee with milk or water.",
+                "descAr": "نسكافيه بالحليب أو الماء."
+            },
+            {
+                "id": "cafe_latte",
+                "nameEn": "Caffe Latte",
+                "nameAr": "كافه لاتي",
+                "price": 5.00,
+                "descEn": "Espresso with steamed milk and a light foam layer.",
+                "descAr": "كافيه لاتيه."
+            },
+            {
+                "id": "cappuccino",
+                "nameEn": "Cappuccino",
+                "nameAr": "كابوتشينو",
+                "price": 5.00,
+                "descEn": "Espresso with steamed milk and thick foam.",
+                "descAr": "كابوتشينو."
+            },
+            {
+                "id": "tea_selection",
+                "nameEn": "Tea Selection",
+                "nameAr": "تشكيلة من الشاي",
+                "price": 3.50,
+                "descEn": "Assorted infused teas.",
+                "descAr": "تشكيلة من الشاي والأعشاب."
+            },
+            {
+                "id": "americano",
+                "nameEn": "Americano",
+                "nameAr": "امريكانو",
+                "price": 4.50,
+                "descEn": "Espresso diluted with hot water.",
+                "descAr": "قهوة أمريكانو."
+            },
+            {
+                "id": "hot_chocolate",
+                "nameEn": "Hot Chocolate",
+                "nameAr": "شوكولا ساخنة",
+                "price": 7.00,
+                "descEn": "Rich warm melted chocolate drink.",
+                "descAr": "شوكولا ساخنة غنية."
+            }
+        ]
+    },
+    {
+        "categoryEn": "Shisha",
+        "categoryAr": "نرجيله",
+        "items": [
+            {
+                "id": "shisha_mouaasal",
+                "nameEn": "Mouaasal Shisha",
+                "nameAr": "نرجيله معسّل",
+                "price": 12.50,
+                "descEn": "Flavored fruit molasses tobacco waterpipe.",
+                "descAr": "أرجيلة معسل بمختلف النكهات."
+            },
+            {
+                "id": "shisha_ajami",
+                "nameEn": "Ajami Shisha",
+                "nameAr": "نرجيله عجمي",
+                "price": 13.50,
+                "descEn": "Traditional unflavored dark tobacco waterpipe.",
+                "descAr": "أرجيلة تنباك عجمي تقليدية."
+            }
+        ]
+    }
+]

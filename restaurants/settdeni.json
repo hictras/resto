@@ -1,0 +1,958 @@
+[
+    {
+        "categoryEn": "Salads",
+        "categoryAr": "سلطات",
+        "items": [
+            {
+                "id": "item-000",
+                "nameEn": "Tabouleh",
+                "nameAr": "تبولة",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-001",
+                "nameEn": "Fatouch",
+                "nameAr": "فتوش",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-002",
+                "nameEn": "LENTIL SALAD",
+                "nameAr": "سلطة عدس",
+                "price": 6.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-003",
+                "nameEn": "BEETROOT SALAD",
+                "nameAr": "سلطة شمندر",
+                "price": 11.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-004",
+                "nameEn": "POTATO SALAD",
+                "nameAr": "سلطة بطاطا",
+                "price": 6.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-005",
+                "nameEn": "Bastrami Goat Cheese Salad",
+                "nameAr": "سلطة جبنة الماعز بالبسطرما",
+                "price": 17.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-006",
+                "nameEn": "Chicken Ceaser",
+                "nameAr": "سلطة سيزر بالدجاج",
+                "price": 17.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Nayyeh",
+        "categoryAr": "أطباق نية",
+        "items": [
+            {
+                "id": "item-100",
+                "nameEn": "Habra Nayeh",
+                "nameAr": "هبرة نية",
+                "price": 18.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-101",
+                "nameEn": "Kebbeh Nayeh",
+                "nameAr": "كبة نية",
+                "price": 18.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-102",
+                "nameEn": "Frakeh",
+                "nameAr": "فريكة نية",
+                "price": 22.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-103",
+                "nameEn": "Lawha Nayeh",
+                "nameAr": "لوحة نية",
+                "price": 45.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-104",
+                "nameEn": "KAFTA",
+                "nameAr": "كفتة نية",
+                "price": 20.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-105",
+                "nameEn": "NAYE MTAMAME",
+                "nameAr": "نية متاممة",
+                "price": 20.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Lebanese Cold Mezza",
+        "categoryAr": "مازة باردة لبنانية",
+        "items": [
+            {
+                "id": "item-200",
+                "nameEn": "Hommus",
+                "nameAr": "حمص",
+                "price": 8.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-201",
+                "nameEn": "Hommus Bel Snoubar",
+                "nameAr": "حمص بالصنوبر",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-202",
+                "nameEn": "Hommus Kebet Soujouk",
+                "nameAr": "حمص بكبة السجق",
+                "price": 14.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-203",
+                "nameEn": "Moutabal",
+                "nameAr": "متبل",
+                "price": 8.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-204",
+                "nameEn": "Raheb",
+                "nameAr": "سلطة الراهب",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-205",
+                "nameEn": "Mohamara",
+                "nameAr": "محمرة",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-207",
+                "nameEn": "Wara2 Enab",
+                "nameAr": "ورق عنب",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-208",
+                "nameEn": "Hendbeh Bel Zeit",
+                "nameAr": "هندبة بالزيت",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-2013",
+                "nameEn": "ME7CHE SELE2",
+                "nameAr": "محشي سلق",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-2015",
+                "nameEn": "HOUMMUS MOUTAAM",
+                "nameAr": "حمص مطعم",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-2016",
+                "nameEn": "TAJEN SAMAK",
+                "nameAr": "طاجن سمك",
+                "price": 12.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-2017",
+                "nameEn": "MOUTABAL BETTROOT",
+                "nameAr": "متبل شمندر",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-2018",
+                "nameEn": "HOMMUS SETTELDENI",
+                "nameAr": "حمص ست الدني",
+                "price": 15.00,
+                "descEn": "HOMMUS PESTO,HOMMUS SPICY,HOMMUS MOUTAAM",
+                "descAr": "حمص بيستو، حمص حار، حمص مطعم"
+            },
+            {
+                "id": "item-2019",
+                "nameEn": "Mafrouket Tjen",
+                "nameAr": "مفروكة طحينة",
+                "price": 12.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-2020",
+                "nameEn": "Bourghoul Ala Banadoura",
+                "nameAr": "برغل على بندورة",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-2021",
+                "nameEn": "Chicken Avocado",
+                "nameAr": "دجاج بالأفوكادو",
+                "price": 17.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Lebanese Hot Mezza",
+        "categoryAr": "مازة ساخنة لبنانية",
+        "items": [
+            {
+                "id": "item-300",
+                "nameEn": "Hommus Bel Lahmeh",
+                "nameAr": "حمص باللحمة",
+                "price": 20.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-301",
+                "nameEn": "Batata Harra",
+                "nameAr": "بطاطا حرة",
+                "price": 9.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-303",
+                "nameEn": "Lahmeh Rass Asfour",
+                "nameAr": "لحمة راس عصفور",
+                "price": 17.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-304",
+                "nameEn": "Sawdet Djej",
+                "nameAr": "سودت دجاج",
+                "price": 12.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-305",
+                "nameEn": "Kebbeh Me2liyeh",
+                "nameAr": "كبة مقلية",
+                "price": 16.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-306",
+                "nameEn": "Kebbeh Jowz",
+                "nameAr": "كبة بالجوز",
+                "price": 16.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-307",
+                "nameEn": "Rkakat",
+                "nameAr": "رقاقات جبنة",
+                "price": 13.50,
+                "descEn": "Fried Or Grilled",
+                "descAr": "مقلية أو مشوية"
+            },
+            {
+                "id": "item-308",
+                "nameEn": "Makanek",
+                "nameAr": "مقانق",
+                "price": 16.00,
+                "descEn": "Debs Or Hamoud",
+                "descAr": "بدبس الرمان أو بالحامض"
+            },
+            {
+                "id": "item-309",
+                "nameEn": "Sambousek",
+                "nameAr": "سنبوسك",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3010",
+                "nameEn": "Falafel",
+                "nameAr": "فلافل",
+                "price": 8.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3011",
+                "nameEn": "Msakhan Djej",
+                "nameAr": "مسخن دجاج",
+                "price": 14.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3012",
+                "nameEn": "Fries",
+                "nameAr": "بطاطا مقلية",
+                "price": 8.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3013",
+                "nameEn": "3asafir Mtafeyeh",
+                "nameAr": "عصافير مطفية",
+                "price": 26.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3014",
+                "nameEn": "LEBANESE BIFTEK",
+                "nameAr": "بيفتيك لبناني",
+                "price": 27.00,
+                "descEn": "BLACK ANGUS AUSTRALIAN",
+                "descAr": "بلاك أنجوس أسترالي"
+            },
+            {
+                "id": "item-3015",
+                "nameEn": "KEBBE ZGHERTEWIYE",
+                "nameAr": "كبة زغرتاوية",
+                "price": 20.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3016",
+                "nameEn": "JWENEH PROVENCALE",
+                "nameAr": "جوانح بروفنسال",
+                "price": 13.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3017",
+                "nameEn": "FATAYER",
+                "nameAr": "فطاير",
+                "price": 7.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3018",
+                "nameEn": "JWENEH GRILLED",
+                "nameAr": "جوانح مشوية",
+                "price": 13.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3019",
+                "nameEn": "Batata Mechwiye",
+                "nameAr": "بطاطا مشوية",
+                "price": 7.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3020",
+                "nameEn": "Arayes Chicken",
+                "nameAr": "عرايس دجاج",
+                "price": 19.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-3021",
+                "nameEn": "Lekmet Kharouf",
+                "nameAr": "لكمة خروف",
+                "price": 16.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Main Course",
+        "categoryAr": "الأطباق الرئيسية",
+        "items": [
+            {
+                "id": "item-400",
+                "nameEn": "Grilled Steak",
+                "nameAr": "ستيك مشوي",
+                "price": 32.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-401",
+                "nameEn": "Grilled Chicken Breast",
+                "nameAr": "صدر دجاج مشوي",
+                "price": 23.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-402",
+                "nameEn": "Grilled Salmon",
+                "nameAr": "سالمون مشوي",
+                "price": 28.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-403",
+                "nameEn": "Ribeye",
+                "nameAr": "ريب آي",
+                "price": 40.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-404",
+                "nameEn": "Chicken Gnocchi Pesto",
+                "nameAr": "نيوكي بالبيستو والدجاج",
+                "price": 25.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-405",
+                "nameEn": "Chicken Frite",
+                "nameAr": "دجاج مع بطاطا مقلية",
+                "price": 25.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-406",
+                "nameEn": "Steak Frite",
+                "nameAr": "ستيك مع بطاطا مقلية",
+                "price": 32.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Fatteh",
+        "categoryAr": "فتات",
+        "items": [
+            {
+                "id": "item-500",
+                "nameEn": "Fattet Hommus",
+                "nameAr": "فتة حمص",
+                "price": 14.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-501",
+                "nameEn": "Fattet Betenjen",
+                "nameAr": "فتة باذنجان",
+                "price": 14.50,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-502",
+                "nameEn": "Fattet Kawarma",
+                "nameAr": "فتة قاورما",
+                "price": 20.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-504",
+                "nameEn": "Fattet Wara2 3enab",
+                "nameAr": "فتة ورق عنب",
+                "price": 20.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-506",
+                "nameEn": "Fattet Shish Barak",
+                "nameAr": "فتة شيش برك",
+                "price": 16.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Mashewi",
+        "categoryAr": "مشاوي",
+        "items": [
+            {
+                "id": "item-600",
+                "nameEn": "KABAB",
+                "nameAr": "كباب",
+                "price": 21.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-601",
+                "nameEn": "Kheshkhash",
+                "nameAr": "كباب خشخاش",
+                "price": 23.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-602",
+                "nameEn": "Riyash Ghanam 3al Fahem",
+                "nameAr": "ريش غنم على الفحم",
+                "price": 34.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-603",
+                "nameEn": "She2af",
+                "nameAr": "شقف لحم",
+                "price": 33.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-604",
+                "nameEn": "Taouk",
+                "nameAr": "شيش طاووق",
+                "price": 21.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-605",
+                "nameEn": "Farouj Msahab",
+                "nameAr": "فروج مسحب",
+                "price": 26.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-607",
+                "nameEn": "3ARAYES KAFTA",
+                "nameAr": "عرايس كفتة",
+                "price": 25.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-608",
+                "nameEn": "Mansaf Iraqi",
+                "nameAr": "منسف عراقي",
+                "price": 45.00,
+                "descEn": "3 Person",
+                "descAr": "لثلاثة أشخاص"
+            },
+            {
+                "id": "item-609",
+                "nameEn": "Mansaf Ordoni",
+                "nameAr": "منسف أردني",
+                "price": 45.00,
+                "descEn": "for 2 and 3 person",
+                "descAr": "لشخصين أو ثلاثة أشخاص"
+            },
+            {
+                "id": "item-6010",
+                "nameEn": "Ketef Ghanam Maa Warak Enab",
+                "nameAr": "كتف غنم مع ورق عنب",
+                "price": 100.00,
+                "descEn": "for 4 person",
+                "descAr": "لأربعة أشخاص"
+            },
+            {
+                "id": "item-6011",
+                "nameEn": "Mashewi Mshakaleh",
+                "nameAr": "مشاوي مشكلة",
+                "price": 36.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-6012",
+                "nameEn": "CHICKEN KABAB",
+                "nameAr": "كباب دجاج",
+                "price": 21.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-6013",
+                "nameEn": "KABAB BATENJEN",
+                "nameAr": "كباب باذنجان",
+                "price": 22.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-6014",
+                "nameEn": "KABAB OURFALI",
+                "nameAr": "كباب أورفلي",
+                "price": 22.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-6015",
+                "nameEn": "KABAB SETTELDENI",
+                "nameAr": "كباب ست الدني",
+                "price": 18.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-6017",
+                "nameEn": "Tabliyet Setteldeni",
+                "nameAr": "طبلية ست الدني",
+                "price": 95.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Sahen Yawmi",
+        "categoryAr": "الصحن اليومي",
+        "items": [
+            {
+                "id": "item-700",
+                "nameEn": "Riz Shar2i Bel Lahem",
+                "nameAr": "أرز شرقي باللحمة",
+                "price": 33.00,
+                "descEn": "DAILY",
+                "descAr": "يومي"
+            },
+            {
+                "id": "item-701",
+                "nameEn": "Riz Shar2i Bel Djej",
+                "nameAr": "أرز شرقي بالدجاج",
+                "price": 24.00,
+                "descEn": "DAILY",
+                "descAr": "يومي"
+            },
+            {
+                "id": "item-702",
+                "nameEn": "Kebbeh Bel Laban",
+                "nameAr": "كبة لبنية",
+                "price": 18.00,
+                "descEn": "DAILY",
+                "descAr": "يومي"
+            },
+            {
+                "id": "item-703",
+                "nameEn": "Shish Barak",
+                "nameAr": "شيش برك",
+                "price": 17.00,
+                "descEn": "DAILY",
+                "descAr": "يومي"
+            },
+            {
+                "id": "item-704",
+                "nameEn": "Koussa W Wara2 3enab Ma3 El Castaletta",
+                "nameAr": "كوسا وورق عنب مع الكستليتا",
+                "price": 30.00,
+                "descEn": "DAILY",
+                "descAr": "يومي"
+            },
+            {
+                "id": "item-705",
+                "nameEn": "Frikeh Bel Djej",
+                "nameAr": "فريكة بالدجاج",
+                "price": 19.00,
+                "descEn": "TUESDAY",
+                "descAr": "الثلاثاء"
+            },
+            {
+                "id": "item-706",
+                "nameEn": "Frikeh Bel Lahmeh",
+                "nameAr": "فريكة باللحمة",
+                "price": 19.00,
+                "descEn": "TUESDAY",
+                "descAr": "الثلاثاء"
+            },
+            {
+                "id": "item-707",
+                "nameEn": "Mloukhiyeh Bel Djej",
+                "nameAr": "ملوخية بالدجاج",
+                "price": 21.00,
+                "descEn": "WEDNESDAY",
+                "descAr": "الأربعاء"
+            },
+            {
+                "id": "item-708",
+                "nameEn": "Fweregh Wara2 3enab",
+                "nameAr": "فراغ ورق عنب",
+                "price": 29.00,
+                "descEn": "THURSDAY",
+                "descAr": "الخميس"
+            },
+            {
+                "id": "item-709",
+                "nameEn": "LEBANESE BURGER",
+                "nameAr": "برجر لبناني",
+                "price": 16.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-7010",
+                "nameEn": "Ouzi Bel Lahem",
+                "nameAr": "أوزي باللحمة",
+                "price": 25.00,
+                "descEn": "MONDAY",
+                "descAr": "الإثنين"
+            },
+            {
+                "id": "item-7011",
+                "nameEn": "SIYADIYEH",
+                "nameAr": "صيادية سمك",
+                "price": 20.00,
+                "descEn": "FRIDAY",
+                "descAr": "الجمعة"
+            }
+        ]
+    },
+    {
+        "categoryEn": "Dessert",
+        "categoryAr": "حلويات",
+        "items": [
+            {
+                "id": "item-800",
+                "nameEn": "Mafroukeh",
+                "nameAr": "مفروكة",
+                "price": 14.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-801",
+                "nameEn": "Honey Cake",
+                "nameAr": "كيك العسل",
+                "price": 16.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-802",
+                "nameEn": "CHOCOLATE FONDANT",
+                "nameAr": "فوندان الشوكولا",
+                "price": 14.00,
+                "descEn": "WHITE VANILLA ICE CREAM",
+                "descAr": "مع بوظة الفانيليا البيضاء"
+            },
+            {
+                "id": "item-803",
+                "nameEn": "EXOTIC FRUITS",
+                "nameAr": "فواكه استوائية",
+                "price": 21.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-804",
+                "nameEn": "LAYALI BEIRUT",
+                "nameAr": "ليالي بيروت",
+                "price": 18.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-805",
+                "nameEn": "Halawet El Jeben",
+                "nameAr": "حلاوة الجبن",
+                "price": 13.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-806",
+                "nameEn": "3eish El Saraya",
+                "nameAr": "عيش السرايا",
+                "price": 9.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-807",
+                "nameEn": "Fweke with ashta",
+                "nameAr": "فواكه بالقشطة",
+                "price": 25.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-808",
+                "nameEn": "REZ BEL HALIB",
+                "nameAr": "رز بالحليب",
+                "price": 10.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-809",
+                "nameEn": "PAIN PERDU",
+                "nameAr": "بان بيردو",
+                "price": 19.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8010",
+                "nameEn": "Nutella Pancake",
+                "nameAr": "بان كيك نيوتيلا",
+                "price": 15.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8011",
+                "nameEn": "Pistachio Pancake",
+                "nameAr": "بان كيك بالفستق",
+                "price": 17.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8012",
+                "nameEn": "Imm Ali",
+                "nameAr": "أم علي",
+                "price": 20.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8013",
+                "nameEn": "Fweke",
+                "nameAr": "فواكه",
+                "price": 18.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8014",
+                "nameEn": "ASHTA BEL ASHTA",
+                "nameAr": "قشطة بالقشطة",
+                "price": 13.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8015",
+                "nameEn": "Baklawa With Ashta",
+                "nameAr": "بقلاوة بالقشطة",
+                "price": 14.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8016",
+                "nameEn": "Knefet Set El Deni",
+                "nameAr": "كنافة ست الدني",
+                "price": 15.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8017",
+                "nameEn": "Ousamlieh Ashta",
+                "nameAr": "عثملية بالقشطة",
+                "price": 14.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-8018",
+                "nameEn": "Mehalabieh With Mago",
+                "nameAr": "مهلبية بالمانجو",
+                "price": 14.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    },
+    {
+        "categoryEn": "Shisha Menu",
+        "categoryAr": "قائمة الأراجيل",
+        "items": [
+            {
+                "id": "item-900",
+                "nameEn": "Mouassal",
+                "nameAr": "معسل",
+                "price": 12.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-901",
+                "nameEn": "Ajami",
+                "nameAr": "عجمي",
+                "price": 15.00,
+                "descEn": "",
+                "descAr": ""
+            },
+            {
+                "id": "item-902",
+                "nameEn": "Boumali",
+                "nameAr": "بومالي",
+                "price": 16.00,
+                "descEn": "",
+                "descAr": ""
+            }
+        ]
+    }
+]

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Admin Dashboard - Restaurant Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        .restaurant-select { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23f28538%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 9px auto; padding-right: 30px; }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen p-6 max-w-6xl mx-auto">
+    <div id="customModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center text-white">
+            <div id="modalIcon" class="text-3xl mb-2">🔔</div>
+            <h3 id="modalTitle" class="text-lg font-bold mb-1">Notification</h3>
+            <p id="modalMessage" class="text-sm text-gray-300 mb-5">Message goes here...</p>
+            <button onclick="closeCustomModal()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl font-semibold text-sm transition">OK</button>
+        </div>
+    </div>
+
+    <div id="qrPrintModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-gray-800">
+            <div class="flex flex-wrap justify-between items-center mb-4 border-b pb-3 gap-3">
+                <h2 id="qrModalTitle" class="text-xl font-bold">🖨️ Table QR Codes</h2>
+                <div class="flex items-center gap-3">
+                    <label class="text-xs font-semibold text-gray-600 flex items-center gap-1.5">
+                        Token Lifetime:
+                        <select id="tokenLifetimeSelect" onchange="openPrintQRCodesModal()" class="bg-gray-100 border border-gray-300 rounded-lg p-1.5 text-xs font-bold text-gray-800 focus:outline-none">
+                            <option value="1">1 Minute</option>
+                            <option value="2">2 Minutes</option>
+                            <option value="5">5 Minutes</option>
+                            <option value="10">10 Minutes</option>
+                            <option value="15" selected>15 Minutes</option>
+                        </select>
+                    </label>
+                    <button onclick="downloadAllQRZip()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition">Download ZIP 📦</button>
+                    <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition">Print Sheet 🖨️</button>
+                    <button onclick="document.getElementById('qrPrintModal').classList.add('hidden')" class="bg-gray-200 px-3 py-2 rounded-xl text-xs font-bold">Close ✕</button>
+                </div>
+            </div>
+            <div id="qrGridContainer" class="grid grid-cols-2 md:grid-cols-3 gap-6 text-center"></div>
+        </div>
+    </div>
+
+    <header class="flex flex-wrap justify-between items-center mb-6 bg-gray-800 border border-gray-700 p-5 rounded-2xl shadow-lg gap-4">
+        <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">🍔 Management Console <span id="connStatus" class="w-3 h-3 rounded-full bg-red-500 inline-block" title="Disconnected"></span></h1>
+        <div class="flex flex-wrap items-center gap-3">
+            <select id="adminRestaurantSelector" class="restaurant-select bg-gray-700 border border-gray-600 p-2.5 rounded-xl text-sm font-semibold text-amber-400 focus:outline-none cursor-pointer" onchange="switchAdminRestaurant(this.value)" title="Select Restaurant"></select>
+            <button onclick="openPrintQRCodesModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-semibold transition">🖨️ Print QR Codes</button>
+            <button onclick="requestNotificationPermission()" class="text-xs bg-amber-500 text-white px-3 py-2 rounded-xl font-semibold hover:bg-amber-600 transition">Enable Push 🔔</button>
+            <a href="kitchen.html" class="bg-gray-900 border border-gray-700 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-black transition">Kitchen Display →</a>
+        </div>
+    </header>
+
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+        <button onclick="switchTab('tables')" id="tab-tables" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-amber-500 text-white shadow transition">1. Tables</button>
+        <button onclick="switchTab('menu')" id="tab-menu" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">2. Menu Management</button>
+        <button onclick="switchTab('bills')" id="tab-bills" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">3. Bills & Payments</button>
+        <button onclick="switchTab('revenue')" id="tab-revenue" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition">4. Daily Revenue</button>
+    </div>
+
+    <div id="section-tables" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 space-y-6">
+        <div class="flex justify-between items-center border-b border-gray-700 pb-3">
+            <h2 class="text-lg font-bold text-amber-400">🪑 Table Status & Activation Board</h2>
+            <form onsubmit="addNewTable(event)" class="flex gap-2">
+                <input type="text" id="newTableNum" placeholder="Table Number/Name" required class="bg-gray-700 border border-gray-600 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">+ Add Table</button>
+            </form>
+        </div>
+        <div id="tablesGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"></div>
+    </div>
+
+    <div id="section-menu" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
+        <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-3">
+            <h2 id="formTitle" class="text-lg font-bold text-amber-400">📋 Add / Edit Menu Item</h2>
+            <span id="activeMenuRestoLabel" class="text-xs bg-gray-700 text-amber-300 px-3 py-1 rounded-lg font-bold border border-gray-600"></span>
+        </div>
+        <form onsubmit="saveMenu(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-6 bg-gray-700/50 p-4 rounded-xl border border-gray-700">
+            <input type="hidden" id="mId">
+            <input type="text" id="mName" placeholder="Item Name (EN)" required class="border border-gray-600 p-2.5 rounded-lg text-sm bg-gray-700 text-white focus:outline-none focus:border-amber-400">
+            <input type="number" step="0.01" id="mPrice" placeholder="Price ($)" required class="border border-gray-600 p-2.5 rounded-lg text-sm bg-gray-700 text-white focus:outline-none focus:border-amber-400">
+            <select id="mCat" class="border border-gray-600 p-2.5 rounded-lg text-sm bg-gray-700 text-white focus:outline-none focus:border-amber-400">
+                <option value="Salads & Veggies">Salads & Veggies</option>
+                <option value="Cold Mezza">Cold Mezza</option>
+                <option value="Coffee, Tea & Shisha">Coffee, Tea & Shisha</option>
+            </select>
+            <div class="flex gap-2">
+                <button id="submitBtn" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-semibold text-sm transition py-2.5">Add Item</button>
+                <button type="button" id="cancelEditBtn" onclick="resetMenuForm()" class="hidden bg-gray-600 hover:bg-gray-500 text-white rounded-lg font-semibold text-sm px-3 py-2.5">Cancel</button>
+            </div>
+        </form>
+        <div id="menuList" class="space-y-3"></div>
+    </div>
+
+    <div id="section-bills" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
+        <h2 class="text-lg font-bold mb-4 text-amber-400">💵 Unpaid Bills & Active Accounts</h2>
+        <div id="billsList" class="space-y-3"><p class="text-gray-400 italic text-sm">No active bills.</p></div>
+    </div>
+
+    <div id="section-revenue" class="admin-section bg-gray-800 border border-gray-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
+        <h2 class="text-lg font-bold mb-4 text-amber-400">📊 Total Revenue by Table & Day</h2>
+        <div id="revenueContainer" class="space-y-6"><p class="text-gray-400 italic text-sm">No settled revenue data available yet.</p></div>
+    </div>
+
+    <script>
+        const socket = io();
+        let currentTab = 'tables';
+        let globalData = { tables: {}, tableRequests: {}, orders: [], activeSessions: {} };
+        let currentAdminRestaurant = '';
+        const alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+        let previousPendingCount = -1;
+
+        // HTML escape helper — prevents XSS from restaurant/table/item names
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        window.onload = async () => {
+            if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
+            await loadAdminRestaurantsList();
+        };
+
+        async function loadAdminRestaurantsList() {
+            try {
+                const res = await fetch('/api/restaurants');
+                const restaurants = await res.json();
+                const selector = document.getElementById('adminRestaurantSelector');
+                selector.innerHTML = '';
+                if (restaurants.length === 0) {
+                    selector.innerHTML = '<option value="">No restaurants — create one by adding a menu file</option>';
+                    return;
+                }
+                restaurants.forEach(resto => {
+                    const option = document.createElement('option');
+                    option.value = resto; option.textContent = resto;
+                    selector.appendChild(option);
+                });
+                currentAdminRestaurant = restaurants[0];
+                selector.value = currentAdminRestaurant;
+                document.getElementById('activeMenuRestoLabel').innerText = `Active: ${currentAdminRestaurant}`;
+                renderAdmin();
+            } catch (e) { console.error('Failed to load restaurants list', e); }
+        }
+
+        async function switchAdminRestaurant(restaurantName) {
+            currentAdminRestaurant = restaurantName;
+            document.getElementById('activeMenuRestoLabel').innerText = `Active: ${restaurantName}`;
+            if (currentTab === 'menu') loadMenuAdmin();
+            else if (currentTab === 'revenue') loadRevenueAdmin();
+            renderAdmin();
+        }
+
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(p => showModal('Notifications', p === 'granted' ? 'Push enabled!' : 'Denied.', p === 'granted' ? '🎉' : '⚠️'));
+            }
+        }
+        function triggerSystemNotification(title, body) { if ('Notification' in window && Notification.permission === 'granted') new Notification(title, { body }); }
+        function showModal(title, message, icon = '🔔') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalIcon').innerText = icon;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+        function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
+
+        socket.on('connect', () => { document.getElementById('connStatus').className = "w-3 h-3 rounded-full bg-emerald-500 inline-block"; });
+        socket.on('disconnect', () => { document.getElementById('connStatus').className = "w-3 h-3 rounded-full bg-red-500 inline-block"; });
+
+        socket.on('state_update', (data) => {
+            globalData = data;
+            const restoRequests = (data.tableRequests && data.tableRequests[currentAdminRestaurant]) || {};
+            const pendingCount = Object.values(restoRequests).filter(v => v === true).length;
+            if (pendingCount > previousPendingCount && previousPendingCount >= 0) {
+                alertSound.play().catch(e => console.log('Audio blocked.'));
+                triggerSystemNotification('Table Bell Ring 🛎️', 'A table is requesting order submission!');
+            }
+            previousPendingCount = pendingCount;
+            renderAdmin();
+        });
+
+        socket.on('menu_updated', (data) => { if (data && data.restaurant === currentAdminRestaurant) loadMenuAdmin(); });
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.admin-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('section-' + tabName).classList.remove('hidden');
+            document.querySelectorAll('[id^="tab-"]').forEach(b => b.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition");
+            document.getElementById('tab-' + tabName).className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-amber-500 text-white shadow transition";
+            if (tabName === 'tables') document.getElementById('tab-tables').classList.remove('animate-pulse', 'bg-red-600');
+            if (tabName === 'menu') loadMenuAdmin();
+            if (tabName === 'revenue') loadRevenueAdmin();
+        }
+
+        async function addNewTable(e) {
+            e.preventDefault();
+            if (!currentAdminRestaurant) return showModal('No Restaurant', 'Select or create a restaurant first.', '⚠️');
+            const tNum = document.getElementById('newTableNum').value.trim();
+            if (!tNum) return;
+            try {
+                const res = await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tableNumber: tNum })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('newTableNum').value = '';
+                    showModal('Table Added', `Table #${tNum} created successfully!`, '🪑');
+                }
+            } catch (err) { console.error('Failed to add table:', err); }
+        }
+
+        async function deleteTable(tableNum) {
+            if (!confirm(`Are you sure you want to delete Table #${tableNum}?`)) return;
+            try {
+                const res = await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(tableNum)}`, { method: 'DELETE' });
+                const data = await res.json();
+                if (data.success) showModal('Table Deleted', `Table #${tableNum} was removed successfully.`, '🗑️');
+            } catch (err) { console.error('Failed to delete table:', err); }
+        }
+
+        // ---- Event delegation (replaces all inline onclick with interpolated data) ----
+        document.getElementById('tablesGrid').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const tableNum = btn.getAttribute('data-table');
+            const action = btn.getAttribute('data-action');
+            if (action === 'delete') deleteTable(tableNum);
+            else if (action === 'toggle-open') socket.emit('toggle_table', { restaurant: currentAdminRestaurant, tableNum });
+            else if (action === 'toggle-order') socket.emit('toggle_order_permission', { restaurant: currentAdminRestaurant, tableNum });
+        });
+
+        document.getElementById('billsList').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action="mark-paid"]');
+            if (!btn) return;
+            socket.emit('update_bill_status', { orderId: btn.getAttribute('data-order'), billStatus: 'Paid' });
+        });
+
+        document.getElementById('menuList').addEventListener('click', (e) => {
+            const btn = e.target.closest('button[data-action]');
+            if (!btn) return;
+            const action = btn.getAttribute('data-action');
+            if (action === 'delete') deleteMenu(btn.getAttribute('data-id'));
+            else if (action === 'edit') {
+                let item = {};
+                try { item = JSON.parse(btn.getAttribute('data-item') || '{}'); } catch (err) {}
+                startEditMenu(item, btn.getAttribute('data-cat'));
+            }
+        });
+
+        function renderAdmin() {
+            const { tables, tableRequests, orders, activeSessions } = globalData;
+            const restoTables = (tables && tables[currentAdminRestaurant]) || {};
+            const restoRequests = (tableRequests && tableRequests[currentAdminRestaurant]) || {};
+            const restoActiveSessions = (activeSessions && activeSessions[currentAdminRestaurant]) || {};
+
+            const restaurantOrders = (orders || []).filter(o => (o.restaurant || 'Default') === currentAdminRestaurant);
+            const activeTablesForResto = new Set(restaurantOrders.map(o => String(o.tableNumber)));
+            const hasPendingRequests = Object.values(restoRequests).some(v => v === true);
+            const tablesTabBtn = document.getElementById('tab-tables');
+
+            if (hasPendingRequests && currentTab !== 'tables') {
+                tablesTabBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-red-600 text-white animate-pulse shadow-lg border-2 border-red-300";
+            } else if (currentTab !== 'tables') {
+                tablesTabBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-gray-800 text-gray-300 border border-gray-700 transition";
+            }
+
+            const tableKeys = Object.keys(restoTables);
+            const gridContainer = document.getElementById('tablesGrid');
+
+            if (tableKeys.length === 0) {
+                gridContainer.innerHTML = `<p class="text-gray-400 italic text-sm col-span-full text-center py-6">No tables found. Add a table above to get started!</p>`;
+            } else {
+                gridContainer.innerHTML = tableKeys.map(k => {
+                    const t = restoTables[k];
+                    const isWaiting = restoRequests[k];
+                    const isOccupied = activeTablesForResto.has(String(k));
+                    const openCount = restoActiveSessions[k] || 0;
+                    const isMenuOpen = openCount > 0;
+                    return `
+                        <div class="border border-gray-700 p-3 rounded-xl text-center flex flex-col justify-between ${isOccupied ? 'bg-red-900/30 border-red-500 text-red-200' : isWaiting ? 'bg-amber-900/40 border-amber-500 animate-pulse text-amber-200' : 'bg-gray-700/40 text-gray-200'} relative">
+                            <button data-action="delete" data-table="${esc(k)}" title="Delete Table" class="absolute top-2 right-2 text-gray-400 hover:text-red-400 text-xs font-bold transition">✕</button>
+                            <div>
+                                <div class="text-left mb-1"><span class="font-bold text-sm text-amber-300">Table #${esc(k)}</span></div>
+                                <div class="flex justify-between items-center mb-1.5 pr-4">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full ${isMenuOpen ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]' : 'bg-gray-600'}" title="${isMenuOpen ? `${openCount} menu page(s) open` : 'Menu closed'}"></span>
+                                        ${isMenuOpen ? `<span class="bg-emerald-900/80 text-emerald-300 text-[10px] px-1.5 py-0.2 rounded-full font-bold">${openCount} active</span>` : ''}
+                                    </div>
+                                    <span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${isOccupied ? 'bg-red-500 text-white' : 'bg-gray-800 border border-gray-600'}">${isOccupied ? 'Occupied' : esc(t.status)}</span>
+                                </div>
+                                ${isWaiting ? '<span class="inline-block bg-amber-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold mb-1.5">🛎️ Wants to Order!</span>' : ''}
+                                <p class="text-[11px] text-gray-400 mb-0.5">Menu: <b>${t.isOpen ? 'OPEN 🟢' : 'LOCKED 🔒'}</b></p>
+                                <p class="text-[11px] text-gray-400 mb-2">Order: <b>${t.canOrder ? 'ACTIVE 🟢' : 'LOCKED 🔒'}</b></p>
+                            </div>
+                            <div class="flex flex-col gap-1.5 mt-1">
+                                <button data-action="toggle-open" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition ${t.isOpen ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700'}">
+                                    ${t.isOpen ? 'Close Menu 🔒' : '1. Open Menu 🔓'}
+                                </button>
+                                <button data-action="toggle-order" data-table="${esc(k)}" class="w-full py-1.5 rounded-lg text-[11px] font-semibold text-white transition ${t.canOrder ? 'bg-amber-600 hover:bg-amber-700' : 'bg-indigo-600 hover:bg-indigo-700'}">
+                                    ${t.canOrder ? 'Lock Order 🔒' : '2. Open Order 🚀'}
+                                </button>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
+
+            document.getElementById('billsList').innerHTML = restaurantOrders.length === 0
+                ? '<p class="text-gray-400 italic text-sm">No active bills for this restaurant.</p>'
+                : restaurantOrders.map(o => `
+                <div class="flex justify-between items-center border-b border-gray-700 pb-3 text-sm text-gray-300">
+                    <div>
+                        <b>Table #${esc(o.tableNumber)}</b> — Total: <span class="text-amber-400 font-bold">$${o.total.toFixed(2)}</span>
+                        <span class="text-xs ml-2 px-2 py-0.5 rounded bg-gray-700 text-gray-300">Kitchen: ${esc(o.kitchenStatus)}</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-900/60 text-amber-300">${esc(o.billStatus)}</span>
+                        <button data-action="mark-paid" data-order="${esc(o.orderId)}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-xs font-semibold transition">Mark Paid ✓</button>
+                    </div>
+                </div>`).join('');
+        }
+
+        async function loadMenuAdmin() {
+            if (!currentAdminRestaurant) return;
+            const res = await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}`);
+            const cats = await res.json();
+            document.getElementById('menuList').innerHTML = cats.map(cat => `
+                <h3 class="font-bold text-amber-400 mt-4 mb-2 text-sm uppercase tracking-wide border-b border-gray-700 pb-1">${esc(cat.categoryEn)}</h3>
+                ${cat.items.map(m => {
+                    // Item JSON stored in a data attribute, HTML-escaped for safety
+                    const itemJson = esc(JSON.stringify(m));
+                    return `
+                    <div class="flex justify-between items-center border-b border-gray-700 py-2 text-sm text-gray-300">
+                        <span><b>${esc(m.nameEn)}</b> — <span class="text-amber-400 font-bold">$${(m.price || 0).toFixed(2)}</span></span>
+                        <div class="flex gap-2">
+                            <button data-action="edit" data-cat="${esc(cat.categoryEn)}" data-item="${itemJson}" class="bg-amber-500 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-amber-600 transition">Edit</button>
+                            <button data-action="delete" data-id="${esc(m.id)}" class="bg-rose-500 text-white px-3 py-1 rounded text-xs font-semibold hover:bg-rose-600 transition">Delete</button>
+                        </div>
+                    </div>`;
+                }).join('')}`).join('') || '<p class="text-gray-400 text-xs">No items found.</p>';
+        }
+
+        function startEditMenu(item, category) {
+            document.getElementById('mId').value = item.id || '';
+            document.getElementById('mName').value = item.nameEn || '';
+            document.getElementById('mPrice').value = item.price || '';
+            document.getElementById('mCat').value = category || 'Salads & Veggies';
+            document.getElementById('formTitle').innerText = '✏️ Edit Menu Item';
+            document.getElementById('submitBtn').innerText = 'Update Item';
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function resetMenuForm() {
+            document.getElementById('mId').value = '';
+            document.getElementById('mName').value = '';
+            document.getElementById('mPrice').value = '';
+            document.getElementById('formTitle').innerText = '📋 Add / Edit Menu Item';
+            document.getElementById('submitBtn').innerText = 'Add Item';
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        async function saveMenu(e) {
+            e.preventDefault();
+            if (!currentAdminRestaurant) return;
+            const itemId = document.getElementById('mId').value;
+            const nameEn = document.getElementById('mName').value;
+            const price = document.getElementById('mPrice').value;
+            const category = document.getElementById('mCat').value;
+
+            if (itemId) {
+                await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(itemId)}`, {
+                    method: 'PUT', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ nameEn, price, category })
+                });
+            } else {
+                await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}`, {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ nameEn, price, category })
+                });
+            }
+            resetMenuForm();
+            loadMenuAdmin();
+        }
+
+        async function deleteMenu(id) {
+            if (!currentAdminRestaurant) return;
+            if (confirm('Are you sure you want to delete this item?')) {
+                await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+                loadMenuAdmin();
+            }
+        }
+
+        async function loadRevenueAdmin() {
+            const res = await fetch('/api/revenue');
+            const revenueData = await res.json();
+            const revContainer = document.getElementById('revenueContainer');
+            const restoData = revenueData[currentAdminRestaurant];
+
+            if (!restoData || Object.keys(restoData).length === 0) {
+                revContainer.innerHTML = `<p class="text-gray-400 italic text-sm">No settled revenue data available for ${esc(currentAdminRestaurant)}.</p>`;
+            } else {
+                revContainer.innerHTML = Object.keys(restoData).map(date => {
+                    const tableRevenues = restoData[date];
+                    const dailyTotal = Object.values(tableRevenues).reduce((a, b) => a + b, 0);
+                    return `
+                        <div class="border border-gray-700 rounded-xl p-4 bg-gray-700/30 mb-3 text-gray-300">
+                            <div class="flex justify-between items-center mb-3 border-b border-gray-600 pb-2">
+                                <h4 class="font-bold text-amber-400">📅 Date: ${esc(date)}</h4>
+                                <span class="bg-emerald-900/60 text-emerald-300 text-xs px-3 py-1 rounded-full font-bold">Total: $${dailyTotal.toFixed(2)}</span>
+                            </div>
+                            <div class="space-y-1">${Object.keys(tableRevenues).map(tbl => `
+                                <div class="flex justify-between border-b border-gray-700/50 py-1.5 text-sm">
+                                    <span class="font-medium text-gray-300">Table #${esc(tbl)}</span> <span class="font-bold text-emerald-400">$${tableRevenues[tbl].toFixed(2)}</span>
+                                </div>`).join('')}</div>
+                        </div>`;
+                }).join('');
+            }
+        }
+
+        async function openPrintQRCodesModal() {
+            if (!currentAdminRestaurant) return showModal('No Restaurant', 'Select or create a restaurant first.', '⚠️');
+            const lifetime = document.getElementById('tokenLifetimeSelect').value;
+            document.getElementById('qrModalTitle').innerText = `🖨️ Table QR Codes (${currentAdminRestaurant}) - ${lifetime} min`;
+
+            const res = await fetch(`/api/qr-links?restaurant=${encodeURIComponent(currentAdminRestaurant)}&lifetime=${lifetime}`);
+            const links = await res.json();
+            const container = document.getElementById('qrGridContainer');
+
+            if (!links || links.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 italic text-sm col-span-full text-center py-8">No tables found. Add tables first to generate QR codes.</p>';
+            } else {
+                container.innerHTML = links.map(l => {
+                    const fullUrl = window.location.origin + l.encodedUrl;
+                    const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(fullUrl)}`;
+                    return `
+                        <a href="${esc(l.encodedUrl)}" target="_blank" rel="noopener" title="Click to open Table #${esc(l.tableNumber)} view" class="border border-gray-200 p-4 rounded-xl shadow-sm bg-gray-50 hover:bg-indigo-50/50 hover:border-indigo-300 transition flex flex-col items-center cursor-pointer qr-card" data-table="${esc(l.tableNumber)}">
+                            <h3 class="font-bold text-base text-gray-800 mb-1">${esc(l.restaurant)}</h3>
+                            <span class="text-sm font-semibold text-indigo-600 mb-3">Table #${esc(l.tableNumber)} (Click to View 🔗)</span>
+                            <img src="${qrApi}" crossorigin="anonymous" alt="QR Table ${esc(l.tableNumber)}" class="w-32 h-32 mb-3 border p-1 bg-white rounded qr-img">
+                            <span class="text-[10px] text-gray-400 break-all font-mono">${esc(l.encodedUrl)}</span>
+                        </a>`;
+                }).join('');
+            }
+
+            document.getElementById('qrPrintModal').classList.remove('hidden');
+        }
+
+        async function downloadAllQRZip() {
+            const zip = new JSZip();
+            const folder = zip.folder(`${currentAdminRestaurant}_QR_Codes`);
+            const cards = document.querySelectorAll('.qr-card');
+
+            if (cards.length === 0) { alert('No QR codes found to download.'); return; }
+
+            for (const card of cards) {
+                const tableNum = card.getAttribute('data-table');
+                const imgEl = card.querySelector('.qr-img');
+                try {
+                    const response = await fetch(imgEl.src);
+                    const blob = await response.blob();
+                    folder.file(`Table_${tableNum}.png`, blob);
+                } catch (e) { console.error(`Failed to download QR for table ${tableNum}`, e); }
+            }
+
+            const content = await zip.generateAsync({ type: 'blob' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `${currentAdminRestaurant}_Table_QR_Codes.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
