@@ -395,7 +395,7 @@
             transition: all 0.2s;
             cursor: pointer;
             user-select: none;
-            min-height: 130px;
+            min-height: 140px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -429,17 +429,23 @@
             border-radius: 999px;
             background: rgba(0,0,0,0.3);
         }
+
+        /* Badge — top-center */
         .map-tile-lg-badge {
             position: absolute;
-            top: 40px;
-            right: 8px;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
             font-size: 10px;
             font-weight: 800;
-            padding: 2px 8px;
+            padding: 3px 10px;
             border-radius: 999px;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.45);
             color: #fff;
+            white-space: nowrap;
+            z-index: 3;
         }
+
         .map-tile-lg-active {
             background: linear-gradient(180deg, rgba(16,185,129,0.32), rgba(16,185,129,0.08));
             border-color: #10b981;
@@ -456,6 +462,14 @@
             box-shadow: 0 0 10px #34d399;
             animation: pulse-dot 1.6s ease-in-out infinite;
         }
+        /* Green-tinted badge on active tiles */
+        .map-tile-lg-active .map-tile-lg-badge {
+            background: rgba(16,185,129,0.55);
+            border: 1px solid rgba(16,185,129,0.9);
+            color: #ecfdf5;
+            box-shadow: 0 0 10px rgba(16,185,129,0.5);
+        }
+
         .map-tile-lg-requested {
             background: linear-gradient(180deg, rgba(245,158,11,0.32), rgba(245,158,11,0.1));
             border-color: #f59e0b;
@@ -1030,9 +1044,8 @@
             scrollToTableCard(tile.getAttribute('data-jump-to'));
         });
 
-        // Large map click: check action buttons first, otherwise jump to card
+        // Large map click: buttons first, otherwise jump to card
         document.getElementById('floorMapLarge').addEventListener('click', (e) => {
-            // 1) Action button hit?
             const actionBtn = e.target.closest('button[data-map-action]');
             if (actionBtn) {
                 e.stopPropagation();
@@ -1046,7 +1059,6 @@
                 return;
             }
 
-            // 2) Otherwise jump to the card
             const tile = e.target.closest('[data-jump-to]');
             if (!tile) return;
             const tableNum = tile.getAttribute('data-jump-to');
@@ -1090,7 +1102,6 @@
             return { t, isWaiting, isOccupied, isActive, cls, label };
         }
 
-        // ---------- Small floor map ----------
         function renderFloorMap() {
             const container = document.getElementById('floorMap');
             if (!container) return;
@@ -1125,7 +1136,6 @@
             }).join('');
         }
 
-        // ---------- Large floor map (new tab) with compact action buttons ----------
         function renderFloorMapLarge() {
             const container = document.getElementById('floorMapLarge');
             if (!container) return;
@@ -1171,7 +1181,6 @@
                     countdownHtml = `<div class="map-tile-lg-countdown" style="opacity:0.5">--:--:--</div>`;
                 }
 
-                // Compact button state
                 const menuBtnClass = s.t.isOpen ? 'map-tile-lg-btn-close' : 'map-tile-lg-btn-open';
                 const menuBtnIcon  = s.t.isOpen ? '🔒' : '🔓';
                 const menuBtnTitle = s.t.isOpen ? 'Close Menu' : 'Open Menu';
