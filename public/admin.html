@@ -292,7 +292,6 @@
             font-weight: 700;
         }
 
-        /* ================= SMALL FLOOR MAP ================= */
         .map-tile {
             position: relative;
             border-radius: 14px;
@@ -384,7 +383,6 @@
         .map-dot-red   { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.7); }
         .map-dot-gray  { background: #64748b; }
 
-        /* ================= LARGE FLOOR MAP ================= */
         .map-tile-lg {
             position: relative;
             border-radius: 18px;
@@ -429,7 +427,6 @@
             background: rgba(0,0,0,0.3);
         }
 
-        /* Badge — top-center */
         .map-tile-lg-badge {
             position: absolute;
             top: 8px;
@@ -549,6 +546,18 @@
         </div>
     </div>
 
+    <div id="confirmModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
+            <div id="confirmModalIcon" class="text-3xl mb-2">⚠️</div>
+            <h3 id="confirmModalTitle" class="text-lg font-bold mb-1">Confirm</h3>
+            <p id="confirmModalMessage" class="text-sm text-slate-300 mb-5 whitespace-pre-line">Are you sure?</p>
+            <div class="flex gap-2">
+                <button onclick="closeConfirmModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2.5 rounded-xl font-semibold text-sm transition">Cancel</button>
+                <button id="confirmModalYes" onclick="runConfirmAction()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl font-semibold text-sm transition">Confirm</button>
+            </div>
+        </div>
+    </div>
+
     <div id="messageModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl text-white">
             <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
@@ -626,12 +635,35 @@
     </div>
 
     <div id="section-tables" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 space-y-6">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+        <div class="flex flex-wrap justify-between items-center border-b border-slate-700 pb-3 gap-3">
             <h2 class="text-lg font-bold text-amber-400">🪑 Table Status & Activation Board</h2>
-            <form onsubmit="addNewTable(event)" class="flex gap-2">
-                <input type="text" id="newTableNum" placeholder="Table Number/Name" required class="bg-slate-700 border border-slate-600 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">+ Add Table</button>
-            </form>
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm pointer-events-none">🔍</span>
+                    <input
+                        type="text"
+                        id="tableSearchInput"
+                        placeholder="Find table #..."
+                        autocomplete="off"
+                        class="bg-slate-700 border border-slate-600 pl-9 pr-9 py-2 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400 w-44 transition"
+                    >
+                    <button
+                        id="tableSearchClear"
+                        onclick="clearTableSearch()"
+                        class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-sm font-bold hidden"
+                        title="Clear search"
+                    >✕</button>
+                </div>
+                <form onsubmit="addNewTable(event)" class="flex gap-2">
+                    <input type="text" id="newTableNum" placeholder="Table Number/Name" required class="bg-slate-700 border border-slate-600 px-3 py-1.5 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400">
+                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition">+ Add Table</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="tableSearchNotice" class="hidden text-xs font-semibold text-amber-300 bg-amber-900/20 border border-amber-700/50 rounded-xl px-3 py-2">
+            Showing only <span id="tableSearchCount">0</span> table(s) matching "<span id="tableSearchTerm"></span>"
+            <button onclick="clearTableSearch()" class="ml-2 underline hover:text-white">clear</button>
         </div>
 
         <div class="mini-panel">
@@ -705,6 +737,8 @@
 
         let msgTargetTable = null;
         let msgSelectedIcon = '💬';
+
+        let tableSearchFilter = ''; // lowercase substring to filter table numbers by
 
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -799,6 +833,15 @@
             ta.addEventListener('input', () => {
                 document.getElementById('msgCharCount').innerText = ta.value.length;
             });
+
+            const searchInput = document.getElementById('tableSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', onTableSearchInput);
+                searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') clearTableSearch();
+                });
+            }
+
             updateCountdowns();
         };
 
@@ -850,6 +893,27 @@
         }
         function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
 
+        let _confirmAction = null;
+        function showConfirmModal({ title, message, confirmText, confirmClass, icon, onConfirm }) {
+            document.getElementById('confirmModalTitle').innerText = title;
+            document.getElementById('confirmModalMessage').innerText = message;
+            document.getElementById('confirmModalIcon').innerText = icon || '⚠️';
+            const yesBtn = document.getElementById('confirmModalYes');
+            yesBtn.innerText = confirmText || 'Confirm';
+            yesBtn.className = `flex-1 ${confirmClass || 'bg-rose-600 hover:bg-rose-700'} text-white py-2.5 rounded-xl font-semibold text-sm transition`;
+            _confirmAction = onConfirm;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            _confirmAction = null;
+        }
+        function runConfirmAction() {
+            const action = _confirmAction;
+            closeConfirmModal();
+            if (typeof action === 'function') action();
+        }
+
         socket.on('connect', () => { document.getElementById('connStatus').className = "w-3 h-3 rounded-full bg-emerald-500 inline-block"; });
         socket.on('disconnect', () => { document.getElementById('connStatus').className = "w-3 h-3 rounded-full bg-red-500 inline-block"; });
 
@@ -865,6 +929,7 @@
             renderAdmin();
             renderFloorMap();
             if (currentTab === 'floor') renderFloorMapLarge();
+            updateTableSearchNotice();
             updateCountdowns();
         });
 
@@ -902,35 +967,50 @@
             } catch (err) { console.error('Failed to add table:', err); }
         }
 
-        async function deleteTable(tableNum) {
-            if (!confirm(`Are you sure you want to delete Table #${tableNum}?`)) return;
-            try {
-                const res = await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(tableNum)}`, { method: 'DELETE' });
-                const data = await res.json();
-                if (data.success) showModal('Table Deleted', `Table #${tableNum} was removed successfully.`, '🗑️');
-            } catch (err) { console.error('Failed to delete table:', err); }
+        function deleteTable(tableNum) {
+            showConfirmModal({
+                title: `Delete Table #${tableNum}?`,
+                message: 'This will permanently remove the table and its session. This action cannot be undone.',
+                confirmText: 'Yes, Delete',
+                confirmClass: 'bg-rose-600 hover:bg-rose-700',
+                icon: '🗑️',
+                onConfirm: async () => {
+                    try {
+                        const res = await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(tableNum)}`, { method: 'DELETE' });
+                        const data = await res.json();
+                        if (data.success) showModal('Table Deleted', `Table #${tableNum} was removed successfully.`, '🗑️');
+                    } catch (err) { console.error('Failed to delete table:', err); }
+                }
+            });
         }
 
         function resetTableSession(tableNum) {
-            if (!confirm(`Reset session for Table #${tableNum}?\n\nThis will:\n• Close the table\n• Lock the order button\n• Clear all messages\n• Kick any connected devices\n\nActive orders will block this action.`)) return;
-
             const restaurantOrders = (globalData.orders || []).filter(o =>
                 (o.restaurant || 'Default') === currentAdminRestaurant &&
                 String(o.tableNumber) === String(tableNum)
             );
             if (restaurantOrders.length > 0) {
-                showModal('Cannot Reset', `Table #${tableNum} has ${restaurantOrders.length} active order(s). Mark them Paid or clear them first.`, '⚠️');
+                showModal('Cannot Reset', `Table #${tableNum} has ${restaurantOrders.length} active order(s).\n\nMark them Paid or clear them first.`, '⚠️');
                 return;
             }
 
-            socket.emit('reset_table_session', { restaurant: currentAdminRestaurant, tableNum }, (res) => {
-                if (res && res.success) {
-                    showModal('Session Reset', `Table #${tableNum} has been cleared and its devices were disconnected.`, '🔄');
-                    renderAdmin();
-                    renderFloorMap();
-                    if (currentTab === 'floor') renderFloorMapLarge();
-                } else {
-                    showModal('Reset Failed', (res && res.message) || 'Unknown error', '⚠️');
+            showConfirmModal({
+                title: `Reset Table #${tableNum}?`,
+                message: 'This will:\n• Close the table\n• Lock the order button\n• Clear all messages\n• Kick any connected devices',
+                confirmText: 'Yes, Reset',
+                confirmClass: 'bg-rose-600 hover:bg-rose-700',
+                icon: '🔄',
+                onConfirm: () => {
+                    socket.emit('reset_table_session', { restaurant: currentAdminRestaurant, tableNum }, (res) => {
+                        if (res && res.success) {
+                            showModal('Session Reset', `Table #${tableNum} has been cleared and its devices were disconnected.`, '🔄');
+                            renderAdmin();
+                            renderFloorMap();
+                            if (currentTab === 'floor') renderFloorMapLarge();
+                        } else {
+                            showModal('Reset Failed', (res && res.message) || 'Unknown error', '⚠️');
+                        }
+                    });
                 }
             });
         }
@@ -1093,6 +1173,55 @@
             return keys;
         }
 
+        // ---------- Table search ----------
+        function normalizeTableSearch(v) {
+            return String(v == null ? '' : v).trim().toLowerCase();
+        }
+        function tableMatchesSearch(k) {
+            if (!tableSearchFilter) return true;
+            return String(k).toLowerCase().includes(tableSearchFilter);
+        }
+        function onTableSearchInput(e) {
+            const raw = e.target.value;
+            tableSearchFilter = normalizeTableSearch(raw);
+
+            const clearBtn = document.getElementById('tableSearchClear');
+            if (clearBtn) {
+                if (raw.trim()) clearBtn.classList.remove('hidden');
+                else clearBtn.classList.add('hidden');
+            }
+
+            updateTableSearchNotice();
+            renderAdmin();
+            renderFloorMap();
+            if (currentTab === 'floor') renderFloorMapLarge();
+        }
+        function clearTableSearch() {
+            tableSearchFilter = '';
+            const input = document.getElementById('tableSearchInput');
+            if (input) input.value = '';
+            const clearBtn = document.getElementById('tableSearchClear');
+            if (clearBtn) clearBtn.classList.add('hidden');
+            updateTableSearchNotice();
+            renderAdmin();
+            renderFloorMap();
+            if (currentTab === 'floor') renderFloorMapLarge();
+        }
+        function updateTableSearchNotice() {
+            const notice = document.getElementById('tableSearchNotice');
+            if (!notice) return;
+            if (!tableSearchFilter) {
+                notice.classList.add('hidden');
+                return;
+            }
+            const restoTables = (globalData.tables && globalData.tables[currentAdminRestaurant]) || {};
+            const matched = Object.keys(restoTables).filter(tableMatchesSearch).length;
+            document.getElementById('tableSearchCount').innerText = matched;
+            document.getElementById('tableSearchTerm').innerText = tableSearchFilter;
+            notice.classList.remove('hidden');
+        }
+        // -----------------------------
+
         function computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions) {
             const t = restoTables[k];
             const isWaiting = !!restoRequests[k];
@@ -1117,20 +1246,17 @@
             const restaurantOrders = (orders || []).filter(o => (o.restaurant || 'Default') === currentAdminRestaurant);
             const occupiedTables = new Set(restaurantOrders.map(o => String(o.tableNumber)));
 
-            const tableKeys = getSortedTableKeys(restoTables);
+            const tableKeys = getSortedTableKeys(restoTables).filter(tableMatchesSearch);
 
             if (tableKeys.length === 0) {
-                container.innerHTML = `<p class="text-slate-500 italic text-sm col-span-full text-center py-6">No tables yet.</p>`;
+                container.innerHTML = `<p class="text-slate-500 italic text-sm col-span-full text-center py-6">${tableSearchFilter ? 'No tables match your search.' : 'No tables yet.'}</p>`;
                 return;
             }
 
             container.innerHTML = tableKeys.map(k => {
                 const s = computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions);
                 const count = restoActiveSessions[k] || 0;
-                // Badge shows whenever a live socket is connected — regardless of tile color
-                const badge = (count > 0)
-                    ? `<span class="map-tile-badge">${count}</span>`
-                    : '';
+                const badge = (count > 0) ? `<span class="map-tile-badge">${count}</span>` : '';
                 return `
                     <div class="map-tile map-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open card)">
                         ${badge}
@@ -1152,20 +1278,17 @@
             const restaurantOrders = (orders || []).filter(o => (o.restaurant || 'Default') === currentAdminRestaurant);
             const occupiedTables = new Set(restaurantOrders.map(o => String(o.tableNumber)));
 
-            const tableKeys = getSortedTableKeys(restoTables);
+            const tableKeys = getSortedTableKeys(restoTables).filter(tableMatchesSearch);
 
             if (tableKeys.length === 0) {
-                container.innerHTML = `<p class="text-slate-500 italic text-sm col-span-full text-center py-12">No tables yet.</p>`;
+                container.innerHTML = `<p class="text-slate-500 italic text-sm col-span-full text-center py-12">${tableSearchFilter ? 'No tables match your search.' : 'No tables yet.'}</p>`;
                 return;
             }
 
             container.innerHTML = tableKeys.map(k => {
                 const s = computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions);
                 const count = restoActiveSessions[k] || 0;
-                // Badge shows whenever a live socket is connected — regardless of tile color
-                const badge = (count > 0)
-                    ? `<span class="map-tile-lg-badge">${count} device${count > 1 ? 's' : ''}</span>`
-                    : '';
+                const badge = (count > 0) ? `<span class="map-tile-lg-badge">${count} device${count > 1 ? 's' : ''}</span>` : '';
 
                 const idleMinutes = (s.t.idleMinutes == null) ? 360 : s.t.idleMinutes;
                 let countdownHtml = '';
@@ -1247,11 +1370,11 @@
                 tablesTabBtn.className = "px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition";
             }
 
-            const tableKeys = getSortedTableKeys(restoTables);
+            const tableKeys = getSortedTableKeys(restoTables).filter(tableMatchesSearch);
             const gridContainer = document.getElementById('tablesGrid');
 
             if (tableKeys.length === 0) {
-                gridContainer.innerHTML = `<p class="text-slate-400 italic text-sm col-span-full text-center py-6">No tables found. Add a table above to get started!</p>`;
+                gridContainer.innerHTML = `<p class="text-slate-400 italic text-sm col-span-full text-center py-6">${tableSearchFilter ? 'No tables match your search.' : 'No tables found. Add a table above to get started!'}</p>`;
             } else {
                 gridContainer.innerHTML = tableKeys.map(k => {
                     const t = restoTables[k];
@@ -1459,12 +1582,18 @@
             loadMenuAdmin();
         }
 
-        async function deleteMenu(id) {
-            if (!currentAdminRestaurant) return;
-            if (confirm('Are you sure you want to delete this item?')) {
-                await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(id)}`, { method: 'DELETE' });
-                loadMenuAdmin();
-            }
+        function deleteMenu(id) {
+            showConfirmModal({
+                title: 'Delete Menu Item?',
+                message: 'This item will be permanently removed from the menu.',
+                confirmText: 'Yes, Delete',
+                confirmClass: 'bg-rose-600 hover:bg-rose-700',
+                icon: '🗑️',
+                onConfirm: async () => {
+                    await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(id)}`, { method: 'DELETE' });
+                    loadMenuAdmin();
+                }
+            });
         }
 
         async function loadRevenueAdmin() {
@@ -1550,6 +1679,7 @@
             if (e.key === 'Escape') {
                 closeCustomModal();
                 closeMessageModal();
+                closeConfirmModal();
             }
         });
     </script>
