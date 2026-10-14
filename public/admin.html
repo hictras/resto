@@ -11,7 +11,6 @@
         .msg-quick { transition: all 0.15s; }
         .msg-quick:hover { transform: scale(1.05); }
 
-        /* ================= TABLE CARD ================= */
         .table-card {
             position: relative;
             border-radius: 22px;
@@ -385,7 +384,7 @@
         .map-dot-red   { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.7); }
         .map-dot-gray  { background: #64748b; }
 
-        /* ================= LARGE FLOOR MAP (new tab) ================= */
+        /* ================= LARGE FLOOR MAP ================= */
         .map-tile-lg {
             position: relative;
             border-radius: 18px;
@@ -462,12 +461,23 @@
             box-shadow: 0 0 10px #34d399;
             animation: pulse-dot 1.6s ease-in-out infinite;
         }
-        /* Green-tinted badge on active tiles */
         .map-tile-lg-active .map-tile-lg-badge {
             background: rgba(16,185,129,0.55);
             border: 1px solid rgba(16,185,129,0.9);
             color: #ecfdf5;
             box-shadow: 0 0 10px rgba(16,185,129,0.5);
+        }
+        .map-tile-lg-occupied .map-tile-lg-badge {
+            background: rgba(239,68,68,0.55);
+            border: 1px solid rgba(239,68,68,0.9);
+            color: #fee2e2;
+            box-shadow: 0 0 10px rgba(239,68,68,0.5);
+        }
+        .map-tile-lg-requested .map-tile-lg-badge {
+            background: rgba(245,158,11,0.55);
+            border: 1px solid rgba(245,158,11,0.9);
+            color: #fef3c7;
+            box-shadow: 0 0 10px rgba(245,158,11,0.5);
         }
 
         .map-tile-lg-requested {
@@ -489,7 +499,6 @@
             color: #94a3b8;
         }
 
-        /* Compact action buttons on large floor-map tiles */
         .map-tile-lg-btn {
             position: absolute;
             top: 8px;
@@ -531,7 +540,6 @@
 </head>
 <body class="text-white min-h-screen p-6 max-w-6xl mx-auto">
 
-    <!-- ============ CUSTOM MODAL ============ -->
     <div id="customModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
             <div id="modalIcon" class="text-3xl mb-2">🔔</div>
@@ -541,7 +549,6 @@
         </div>
     </div>
 
-    <!-- ============ MESSAGE MODAL ============ -->
     <div id="messageModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl text-white">
             <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
@@ -586,7 +593,6 @@
         </div>
     </div>
 
-    <!-- ============ QR PRINT MODAL ============ -->
     <div id="qrPrintModal" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl text-gray-800">
             <div class="flex flex-wrap justify-between items-center mb-4 border-b pb-3 gap-3">
@@ -601,7 +607,6 @@
         </div>
     </div>
 
-    <!-- ============ HEADER ============ -->
     <header class="flex flex-wrap justify-between items-center mb-6 bg-slate-800/70 backdrop-blur border border-slate-700 p-5 rounded-2xl shadow-lg gap-4">
         <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">🍔 Management Console <span id="connStatus" class="w-3 h-3 rounded-full bg-red-500 inline-block" title="Disconnected"></span></h1>
         <div class="flex flex-wrap items-center gap-3">
@@ -612,7 +617,6 @@
         </div>
     </header>
 
-    <!-- ============ TABS ============ -->
     <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
         <button onclick="switchTab('tables')" id="tab-tables" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-amber-500 text-white shadow transition">Tables</button>
         <button onclick="switchTab('floor')" id="tab-floor" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition">🗺️ Floor Map</button>
@@ -621,7 +625,6 @@
         <button onclick="switchTab('revenue')" id="tab-revenue" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-slate-800 text-slate-300 border border-slate-700 transition">Daily Revenue</button>
     </div>
 
-    <!-- ============ TABLES ============ -->
     <div id="section-tables" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 space-y-6">
         <div class="flex justify-between items-center border-b border-slate-700 pb-3">
             <h2 class="text-lg font-bold text-amber-400">🪑 Table Status & Activation Board</h2>
@@ -647,7 +650,6 @@
         <div id="tablesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
     </div>
 
-    <!-- ============ FLOOR MAP (full view) ============ -->
     <div id="section-floor" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
         <div class="flex items-center justify-between mb-5 flex-wrap gap-3 border-b border-slate-700 pb-4">
             <h2 class="text-lg font-bold text-amber-400">🗺️ Live Floor Map</h2>
@@ -661,7 +663,6 @@
         <div id="floorMapLarge" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
     </div>
 
-    <!-- ============ MENU ============ -->
     <div id="section-menu" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
         <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
             <h2 id="formTitle" class="text-lg font-bold text-amber-400">📋 Add / Edit Menu Item</h2>
@@ -684,13 +685,11 @@
         <div id="menuList" class="space-y-3"></div>
     </div>
 
-    <!-- ============ BILLS ============ -->
     <div id="section-bills" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
         <h2 class="text-lg font-bold mb-4 text-amber-400">💵 Unpaid Bills & Active Accounts</h2>
         <div id="billsList" class="space-y-3"><p class="text-slate-400 italic text-sm">No active bills.</p></div>
     </div>
 
-    <!-- ============ REVENUE ============ -->
     <div id="section-revenue" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
         <h2 class="text-lg font-bold mb-4 text-amber-400">📊 Total Revenue by Table & Day</h2>
         <div id="revenueContainer" class="space-y-6"><p class="text-slate-400 italic text-sm">No settled revenue data available yet.</p></div>
@@ -925,8 +924,14 @@
             }
 
             socket.emit('reset_table_session', { restaurant: currentAdminRestaurant, tableNum }, (res) => {
-                if (res && res.success) showModal('Session Reset', `Table #${tableNum} has been cleared and its devices were disconnected.`, '🔄');
-                else showModal('Reset Failed', (res && res.message) || 'Unknown error', '⚠️');
+                if (res && res.success) {
+                    showModal('Session Reset', `Table #${tableNum} has been cleared and its devices were disconnected.`, '🔄');
+                    renderAdmin();
+                    renderFloorMap();
+                    if (currentTab === 'floor') renderFloorMapLarge();
+                } else {
+                    showModal('Reset Failed', (res && res.message) || 'Unknown error', '⚠️');
+                }
             });
         }
 
@@ -1037,14 +1042,12 @@
             }
         });
 
-        // Small map click → scroll to card
         document.getElementById('floorMap').addEventListener('click', (e) => {
             const tile = e.target.closest('[data-jump-to]');
             if (!tile) return;
             scrollToTableCard(tile.getAttribute('data-jump-to'));
         });
 
-        // Large map click: buttons first, otherwise jump to card
         document.getElementById('floorMapLarge').addEventListener('click', (e) => {
             const actionBtn = e.target.closest('button[data-map-action]');
             if (actionBtn) {
@@ -1124,7 +1127,8 @@
             container.innerHTML = tableKeys.map(k => {
                 const s = computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions);
                 const count = restoActiveSessions[k] || 0;
-                const badge = (s.cls === 'active' && count > 0)
+                // Badge shows whenever a live socket is connected — regardless of tile color
+                const badge = (count > 0)
                     ? `<span class="map-tile-badge">${count}</span>`
                     : '';
                 return `
@@ -1158,7 +1162,8 @@
             container.innerHTML = tableKeys.map(k => {
                 const s = computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions);
                 const count = restoActiveSessions[k] || 0;
-                const badge = (s.cls === 'active' && count > 0)
+                // Badge shows whenever a live socket is connected — regardless of tile color
+                const badge = (count > 0)
                     ? `<span class="map-tile-lg-badge">${count} device${count > 1 ? 's' : ''}</span>`
                     : '';
 
