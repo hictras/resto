@@ -122,38 +122,70 @@
         .map-tile-lg-btn-lock       { background: rgba(217,119,6,0.28); border-color: rgba(217,119,6,0.75); color: #fcd34d; }
         .map-tile-lg-btn-requested  { background: rgba(239,68,68,0.35); border-color: rgba(239,68,68,0.9); color: #fecaca; animation: req-pulse 1.4s ease-in-out infinite; }
 
-        /* SINGLE TABLE FOCUS VIEW */
-        .focus-shell { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 4px 0; }
-        @media (min-width: 1024px) { .focus-shell { grid-template-columns: 380px 1fr; align-items: start; } }
-        .focus-left { display: flex; flex-direction: column; gap: 16px; }
-        .focus-right { display: flex; flex-direction: column; gap: 16px; }
-        .focus-title-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.15); border-radius: 18px; padding: 14px 18px; }
-        .focus-title-bar h2 { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: #fff; }
-        .focus-title-bar h2 span { color: #fbbf24; }
-        .focus-status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .focus-status-active    { background: rgba(16,185,129,0.18); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.5); }
-        .focus-status-occupied  { background: rgba(239,68,68,0.18);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.5); }
-        .focus-status-requested { background: rgba(245,158,11,0.18); color: #fcd34d; border: 1px solid rgba(245,158,11,0.5); }
-        .focus-status-idle      { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.25); }
-        .focus-section-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; }
-        .focus-big-timer { display: flex; align-items: center; justify-content: center; gap: 14px; border-radius: 20px; padding: 22px 18px; font-family: 'SF Mono', 'Menlo', 'Consolas', monospace; font-size: 38px; font-weight: 900; letter-spacing: 2px; border: 1px solid transparent; }
-        .focus-big-timer.safe    { background: linear-gradient(90deg, rgba(16,185,129,0.20), rgba(16,185,129,0.06)); border-color: rgba(16,185,129,0.5); color: #6ee7b7; }
-        .focus-big-timer.warn    { background: linear-gradient(90deg, rgba(245,158,11,0.22), rgba(245,158,11,0.06)); border-color: rgba(245,158,11,0.55); color: #fcd34d; }
-        .focus-big-timer.danger  { background: linear-gradient(90deg, rgba(239,68,68,0.28), rgba(239,68,68,0.08)); border-color: rgba(239,68,68,0.75); color: #fecaca; box-shadow: 0 0 18px rgba(239,68,68,0.35); }
-        .focus-big-timer.no-session { background: rgba(148,163,184,0.06); border-color: rgba(148,163,184,0.15); color: #94a3b8; font-size: 20px; }
-        .focus-big-timer.no-expiry  { background: linear-gradient(90deg, rgba(99,102,241,0.22), rgba(99,102,241,0.06)); border-color: rgba(99,102,241,0.5); color: #a5b4fc; }
-        .focus-actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .focus-mini-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 14px; border-radius: 14px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid; transition: all 0.15s; color: #fff; }
-        .focus-mini-btn:hover { transform: translateY(-1px); filter: brightness(1.15); }
-        .focus-mini-btn-msg     { background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.55); color: #bfdbfe; }
-        .focus-mini-btn-reset   { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.6);  color: #fde68a; }
-        .focus-mini-btn-del     { background: rgba(239,68,68,0.18);  border-color: rgba(239,68,68,0.55);  color: #fecaca; }
+        /* ================= SINGLE TABLE FOCUS VIEW (v2) ================= */
+        .focus-shell { display: grid; grid-template-columns: 1fr; gap: 18px; padding: 4px 0; }
+        @media (min-width: 1024px) { .focus-shell { grid-template-columns: minmax(340px, 420px) 1fr; align-items: stretch; min-height: calc(100vh - 280px); } }
+        .focus-left, .focus-right { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+
+        .focus-hero { position: relative; border-radius: 22px; padding: 20px 22px; background: linear-gradient(180deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.98) 100%); border: 1px solid rgba(148,163,184,0.18); box-shadow: 0 8px 30px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05); overflow: hidden; }
+        .focus-hero.is-active    { border-color: rgba(16,185,129,0.5); }
+        .focus-hero.is-occupied  { border-color: rgba(239,68,68,0.5); }
+        .focus-hero.is-requested { border-color: rgba(245,158,11,0.6); animation: map-pulse 1.6s ease-in-out infinite; }
+        .focus-hero-row1 { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+        .focus-hero-title { font-size: 34px; font-weight: 900; letter-spacing: -1px; line-height: 1; color: #fff; }
+        .focus-hero-title span { color: #fbbf24; }
+        .focus-hero-sub { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8; margin-top: 6px; }
+        .focus-status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+        .focus-status-active    { background: rgba(16,185,129,0.18); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.6); }
+        .focus-status-occupied  { background: rgba(239,68,68,0.18);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.6); }
+        .focus-status-requested { background: rgba(245,158,11,0.22); color: #fcd34d; border: 1px solid rgba(245,158,11,0.65); }
+        .focus-status-idle      { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.3); }
+
+        .focus-hero-timer { margin-top: 14px; display: flex; align-items: baseline; justify-content: center; gap: 12px; font-family: 'SF Mono', 'Menlo', 'Consolas', monospace; font-size: 46px; font-weight: 900; letter-spacing: 3px; padding: 14px 16px; border-radius: 16px; background: rgba(2,6,23,0.6); border: 1px solid rgba(148,163,184,0.15); transition: color 0.2s, border-color 0.2s, background 0.2s; }
+        .focus-hero-timer.safe    { color: #6ee7b7; border-color: rgba(16,185,129,0.4); }
+        .focus-hero-timer.warn    { color: #fcd34d; border-color: rgba(245,158,11,0.5); }
+        .focus-hero-timer.danger  { color: #fca5a5; border-color: rgba(239,68,68,0.7); background: rgba(69,10,10,0.5); box-shadow: 0 0 20px rgba(239,68,68,0.25) inset; }
+        .focus-hero-timer.no-session { color: #64748b; font-size: 20px; letter-spacing: 1px; font-weight: 700; }
+        .focus-hero-timer.no-expiry  { color: #a5b4fc; font-size: 30px; letter-spacing: 1px; }
+        .focus-hero-timer-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8; text-align: center; margin-top: 8px; }
+
         .focus-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .focus-info-cell { background: rgba(15,23,42,0.55); border: 1px solid rgba(148,163,184,0.12); border-radius: 14px; padding: 12px 14px; }
+        .focus-info-cell { background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.12); border-radius: 14px; padding: 12px 14px; }
         .focus-info-cell .label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; }
-        .focus-info-cell .value { font-size: 16px; font-weight: 800; color: #e2e8f0; margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+        .focus-info-cell .value { font-size: 17px; font-weight: 800; color: #e2e8f0; margin-top: 5px; display: flex; align-items: center; gap: 6px; }
         .focus-info-cell .value.open   { color: #6ee7b7; }
         .focus-info-cell .value.locked { color: #fca5a5; }
+
+        .focus-section-title { font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: #94a3b8; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .focus-section-title .count-badge { background: rgba(148,163,184,0.15); color: #e2e8f0; padding: 1px 8px; border-radius: 999px; font-size: 10px; }
+
+        .focus-action-btn { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px; border-radius: 16px; font-weight: 800; font-size: 15px; color: #fff; border: none; cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden; }
+        .focus-action-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .focus-action-btn:active { transform: translateY(0); }
+        .focus-action-btn .icn { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .focus-action-btn .txt { flex: 1; text-align: left; }
+        .focus-action-btn .arr { font-size: 20px; opacity: 0.75; }
+
+        .focus-orders-panel { background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+        .focus-orders-scroll { flex: 1; min-height: 0; overflow-y: auto; padding-right: 4px; }
+        .focus-orders-scroll::-webkit-scrollbar { width: 6px; }
+        .focus-orders-scroll::-webkit-scrollbar-thumb { background: rgba(148,163,184,0.25); border-radius: 3px; }
+
+        .focus-order-card { background: rgba(2,6,23,0.55); border: 1px solid rgba(148,163,184,0.15); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+        .focus-order-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid rgba(148,163,184,0.12); }
+        .focus-order-header .oid { font-size: 12px; font-weight: 800; color: #fbbf24; }
+        .focus-order-header .tag { font-size: 10px; font-weight: 800; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 999px; }
+        .tag-unpaid  { background: rgba(245,158,11,0.18); color: #fcd34d; }
+        .tag-paid    { background: rgba(16,185,129,0.18); color: #6ee7b7; }
+        .tag-kitchen { background: rgba(59,130,246,0.18); color: #93c5fd; }
+
+        .focus-order-item { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; font-size: 13px; color: #cbd5e1; }
+        .focus-order-item .qty { color: #fbbf24; font-weight: 800; margin-right: 6px; }
+        .focus-order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(148,163,184,0.12); font-size: 12px; }
+        .focus-order-total { font-weight: 900; font-size: 16px; color: #fbbf24; }
+
+        .focus-empty-orders { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 40px 20px; color: #64748b; font-size: 13px; text-align: center; }
+        .focus-empty-orders .big { font-size: 40px; opacity: 0.4; }
     </style>
 </head>
 <body class="text-white min-h-screen p-6 max-w-6xl mx-auto">
@@ -445,19 +477,19 @@
                 el.innerText = formatHMS(remaining);
             });
 
-            // Single-table focus big timer
+            // Single-table focus hero timer
             document.querySelectorAll('[data-focus-countdown]').forEach(el => {
                 const tKey = el.getAttribute('data-focus-countdown');
                 const t = tables[tKey];
                 const wrapper = document.getElementById('focusBigTimer');
                 if (!t || !t.hasSession || !t.sessionStart) {
-                    if (wrapper) wrapper.className = 'focus-big-timer no-session';
+                    if (wrapper) wrapper.className = 'focus-hero-timer no-session';
                     el.innerText = '— no session —';
                     return;
                 }
                 const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
                 if (idleMinutes === 0) {
-                    if (wrapper) wrapper.className = 'focus-big-timer no-expiry';
+                    if (wrapper) wrapper.className = 'focus-hero-timer no-expiry';
                     el.innerText = '∞ No expiry';
                     return;
                 }
@@ -466,7 +498,7 @@
                 if (remaining <= 0) cls = 'danger';
                 else if (remaining < 5 * 60 * 1000) cls = 'danger';
                 else if (remaining < 30 * 60 * 1000) cls = 'warn';
-                if (wrapper) wrapper.className = `focus-big-timer ${cls}`;
+                if (wrapper) wrapper.className = `focus-hero-timer ${cls}`;
                 el.innerText = remaining > 0 ? formatHMS(remaining) : 'Expiring…';
             });
         }
@@ -725,7 +757,6 @@
             });
         }
 
-        // Single delegated handler — works for both grid AND focus view since it's on the parent section
         document.getElementById('section-tables').addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-action]');
             if (!btn) return;
@@ -825,7 +856,6 @@
             return keys;
         }
 
-        // ---------- Search ----------
         function normalizeTableSearch(v) { return String(v == null ? '' : v).trim().toLowerCase(); }
         function tableMatchesSearch(k) {
             if (!tableSearchFilter) return true;
@@ -986,7 +1016,7 @@
             }).join('');
         }
 
-        // ---------- Single-table focus view ----------
+        // ---------- SINGLE TABLE FOCUS VIEW ----------
         function renderSingleTableFocus() {
             const container = document.getElementById('singleTableFocus');
             const gridContainer = document.getElementById('tablesGrid');
@@ -1021,10 +1051,11 @@
             const hasSession = !!t.hasSession;
             const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
 
+            let heroClass = 'focus-hero';
             let statusClass = 'focus-status-idle', statusLabel = 'Idle';
-            if (isWaiting)        { statusClass = 'focus-status-requested'; statusLabel = 'Requested'; }
-            else if (isOccupied)  { statusClass = 'focus-status-occupied';  statusLabel = 'Occupied'; }
-            else if (isMenuOpen)  { statusClass = 'focus-status-active';    statusLabel = 'Active'; }
+            if (isWaiting)        { heroClass += ' is-requested'; statusClass = 'focus-status-requested'; statusLabel = 'Requested'; }
+            else if (isOccupied)  { heroClass += ' is-occupied';  statusClass = 'focus-status-occupied';  statusLabel = 'Occupied'; }
+            else if (isMenuOpen)  { heroClass += ' is-active';    statusClass = 'focus-status-active';    statusLabel = 'Active'; }
 
             let timerClass = 'no-session';
             let timerContent = '— no session —';
@@ -1034,65 +1065,83 @@
                     timerContent = '∞ No expiry';
                 } else {
                     timerClass = 'safe';
-                    timerContent = '<span data-focus-countdown="' + esc(k) + '">--:--:--</span>';
+                    timerContent = `<span data-focus-countdown="${esc(k)}">--:--:--</span>`;
                 }
             }
 
+            const menuBtn = t.isOpen
+                ? `<button data-action="toggle-open" data-table="${esc(k)}" class="focus-action-btn btn-close-menu">
+                      <span class="icn">🔒</span><span class="txt">Close Menu</span><span class="arr">→</span>
+                   </button>`
+                : `<button data-action="toggle-open" data-table="${esc(k)}" class="focus-action-btn btn-open-menu">
+                      <span class="icn">🔓</span><span class="txt">Open Menu</span><span class="arr">→</span>
+                   </button>`;
+
             let orderBtn;
             if (isWaiting && !t.canOrder) {
-                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-requested">
-                    <span class="left-icon">🛎️</span><span>Requested! Approve</span><span class="arrow">→</span>
+                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="focus-action-btn btn-requested">
+                    <span class="icn">🛎️</span><span class="txt">Requested — Approve</span><span class="arr">→</span>
                 </button>`;
             } else if (t.canOrder) {
-                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-lock-order">
-                    <span class="left-icon">🔒</span><span>Lock Order</span><span class="arrow">→</span>
+                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="focus-action-btn btn-lock-order">
+                    <span class="icn">🔒</span><span class="txt">Lock Order</span><span class="arr">→</span>
                 </button>`;
             } else {
-                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-open-order">
-                    <span class="left-icon">🚀</span><span>Open Order</span><span class="arrow">→</span>
+                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="focus-action-btn btn-open-order">
+                    <span class="icn">🚀</span><span class="txt">Open Order</span><span class="arr">→</span>
                 </button>`;
             }
 
-            const ordersHtml = restaurantOrders.length === 0
-                ? `<p class="text-slate-500 italic text-sm text-center py-6">No active orders for this table.</p>`
-                : restaurantOrders.map(o => `
-                    <div class="mini-panel mb-2">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-amber-300">Order — $${o.total.toFixed(2)}</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${o.billStatus === 'Paid' ? 'bg-emerald-900/60 text-emerald-300' : 'bg-amber-900/60 text-amber-300'}">${esc(o.billStatus)}</span>
+            let ordersInner = '';
+            if (restaurantOrders.length === 0) {
+                ordersInner = `
+                    <div class="focus-empty-orders">
+                        <div class="big">🍽️</div>
+                        <div>No active orders for this table yet.</div>
+                    </div>`;
+            } else {
+                ordersInner = restaurantOrders.map((o, idx) => `
+                    <div class="focus-order-card">
+                        <div class="focus-order-header">
+                            <span class="oid">Order #${idx + 1} · ${esc(o.timestamp || '')}</span>
+                            <span class="tag ${o.billStatus === 'Paid' ? 'tag-paid' : 'tag-unpaid'}">${esc(o.billStatus)}</span>
                         </div>
-                        <ul class="text-xs space-y-1 mb-2">
+                        <div>
                             ${(o.items || []).map(i => `
-                                <li class="flex justify-between text-slate-300">
-                                    <span>${i.qty}x ${esc(i.name)}</span>
-                                    <span class="text-slate-400">$${((i.price || 0) * (i.qty || 1)).toFixed(2)}</span>
-                                </li>`).join('')}
-                        </ul>
-                        <div class="flex justify-between items-center pt-2 border-t border-slate-700 text-[11px]">
-                            <span class="text-slate-400">Kitchen: <b class="text-slate-200">${esc(o.kitchenStatus)}</b></span>
-                            <button data-action="mark-paid" data-order="${esc(o.orderId)}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-[10px] font-semibold transition">Mark Paid ✓</button>
+                                <div class="focus-order-item">
+                                    <span><span class="qty">${i.qty}x</span>${esc(i.name)}</span>
+                                    <span>$${((i.price || 0) * (i.qty || 1)).toFixed(2)}</span>
+                                </div>`).join('')}
+                        </div>
+                        <div class="focus-order-footer">
+                            <span class="text-slate-400">
+                                <span class="tag tag-kitchen">${esc(o.kitchenStatus)}</span>
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <span class="focus-order-total">$${o.total.toFixed(2)}</span>
+                                <button data-action="mark-paid" data-order="${esc(o.orderId)}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold transition">Mark Paid ✓</button>
+                            </div>
                         </div>
                     </div>`).join('');
+            }
 
             container.innerHTML = `
                 <div class="focus-shell">
                     <div class="focus-left">
-                        <div class="focus-title-bar">
-                            <div class="flex items-center gap-3">
-                                <div class="table-icon-block">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M6 12h12"/><path d="M8 12v6"/><path d="M16 12v6"/>
-                                        <path d="M5 8h14l-1 4H6z"/><path d="M12 8V5"/>
-                                        <circle cx="12" cy="4" r="1"/><path d="M9 18h6"/>
-                                    </svg>
+                        <div class="${heroClass}">
+                            <div class="focus-hero-row1">
+                                <div>
+                                    <div class="focus-hero-title">Table <span>#${esc(k)}</span></div>
+                                    <div class="focus-hero-sub">
+                                        ${isMenuOpen ? `${openCount} ${openCount === 1 ? 'device' : 'devices'} connected` : 'no devices connected'}
+                                    </div>
                                 </div>
-                                <h2>Table <span>#${esc(k)}</span></h2>
+                                <span class="focus-status-pill ${statusClass}">${statusLabel}</span>
                             </div>
-                            <span class="focus-status-pill ${statusClass}">${statusLabel}</span>
-                        </div>
-
-                        <div class="focus-big-timer ${timerClass}" id="focusBigTimer">
-                            ${timerContent}
+                            <div class="focus-hero-timer ${timerClass}" id="focusBigTimer">
+                                ${timerContent}
+                            </div>
+                            <div class="focus-hero-timer-label">Session time remaining</div>
                         </div>
 
                         <div class="focus-info-grid">
@@ -1103,14 +1152,6 @@
                             <div class="focus-info-cell">
                                 <div class="label">Order</div>
                                 <div class="value ${t.canOrder ? 'open' : 'locked'}">${t.canOrder ? '🔓 OPEN' : '🔒 LOCKED'}</div>
-                            </div>
-                            <div class="focus-info-cell">
-                                <div class="label">Live devices</div>
-                                <div class="value">${openCount} ${openCount === 1 ? 'device' : 'devices'}</div>
-                            </div>
-                            <div class="focus-info-cell">
-                                <div class="label">Session timer</div>
-                                <div class="value">${idleMinutes === 0 ? 'No expiry' : (idleMinutes + ' min')}</div>
                             </div>
                         </div>
 
@@ -1124,38 +1165,39 @@
                             </div>
                         </div>
 
-                        <div class="focus-actions-row">
-                            <button data-action="message" data-table="${esc(k)}" class="focus-mini-btn focus-mini-btn-msg">
-                                <span>💬</span><span>Message</span>
+                        <div class="focus-info-grid">
+                            <button data-action="message" data-table="${esc(k)}" class="focus-action-btn" style="background:rgba(59,130,246,0.18);border:1px solid rgba(59,130,246,0.5);">
+                                <span class="icn">💬</span><span class="txt">Message</span>
                             </button>
-                            <button data-action="reset" data-table="${esc(k)}" class="focus-mini-btn focus-mini-btn-reset">
-                                <span>🔄</span><span>Reset</span>
+                            <button data-action="reset" data-table="${esc(k)}" class="focus-action-btn" style="background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.5);">
+                                <span class="icn">🔄</span><span class="txt">Reset</span>
                             </button>
                         </div>
 
-                        <button data-action="delete" data-table="${esc(k)}" class="focus-mini-btn focus-mini-btn-del w-full">
-                            <span>✕</span><span>Delete Table</span>
+                        <button data-action="delete" data-table="${esc(k)}" class="focus-action-btn" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.5);">
+                            <span class="icn">✕</span><span class="txt">Delete Table</span>
                         </button>
                     </div>
 
                     <div class="focus-right">
                         <div class="mini-panel">
-                            <div class="focus-section-title">Menu access</div>
-                            <button data-action="toggle-open" data-table="${esc(k)}" class="action-btn w-full ${t.isOpen ? 'btn-close-menu' : 'btn-open-menu'}">
-                                <span class="left-icon">${t.isOpen ? '🔒' : '🔓'}</span>
-                                <span>${t.isOpen ? 'Close Menu' : 'Open Menu'}</span>
-                                <span class="arrow">→</span>
-                            </button>
+                            <div class="focus-section-title">Menu Access</div>
+                            ${menuBtn}
                         </div>
 
                         <div class="mini-panel">
-                            <div class="focus-section-title">Order access</div>
+                            <div class="focus-section-title">Order Access</div>
                             ${orderBtn}
                         </div>
 
-                        <div class="mini-panel">
-                            <div class="focus-section-title">Active orders (${restaurantOrders.length})</div>
-                            ${ordersHtml}
+                        <div class="focus-orders-panel">
+                            <div class="focus-section-title">
+                                Active Orders
+                                <span class="count-badge">${restaurantOrders.length}</span>
+                            </div>
+                            <div class="focus-orders-scroll">
+                                ${ordersInner}
+                            </div>
                         </div>
                     </div>
                 </div>`;
