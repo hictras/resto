@@ -22,7 +22,7 @@
         header p { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
         .lang-btn, .table-pill, .push-btn { background: #fff; border: 1.5px solid var(--primary); color: var(--primary); padding: 5px 12px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; white-space: nowrap; outline: none; }
         .main-nav-tabs { display: flex; background: #fdfbf7; border-bottom: 1px solid var(--border); max-width: 960px; margin: 0 auto; }
-        .main-tab-btn { flex: 1; padding: 12px 6px; text-align: center; font-weight: bold; font-size: 0.85rem; background: none; border: none; cursor: pointer; color: var(--text-muted); border-bottom: 3px solid transparent; transition: all 0.2s; }
+        .main-tab-btn { flex: 1; padding: 12px 6px; text-align: center; font-weight: bold; font-size: 0.85rem; background: none; border: none; cursor: pointer; color: var(--text-muted); border-bottom: 3px solid transparent; transition: all 0.2s; position: relative; }
         .main-tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); background: #fff; }
         .nav-tabs { display: flex; overflow-x: auto; padding: 0.5rem 1rem; border-bottom: 1px solid var(--border); gap: 0.5rem; white-space: nowrap; scrollbar-width: thin; max-width: 960px; margin: 0 auto; background: #fff; }
         .nav-tabs button { background: none; border: 1px solid var(--border); padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; cursor: pointer; color: var(--text); transition: all 0.2s; }
@@ -41,6 +41,13 @@
         .btn-add:hover { background: var(--primary-dark); }
         .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 0.8rem 1rem; box-shadow: 0 -3px 15px rgba(0,0,0,0.1); max-width: 960px; margin: 0 auto; z-index: 40; border-radius: 16px 16px 0 0; }
         .qty-badge-red { background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 7px; border-radius: 9999px; font-weight: bold; }
+        .msg-card { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 12px; padding: 0.85rem 1rem; display: flex; gap: 0.75rem; align-items: flex-start; }
+        .msg-card.unread { background: #fff; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(242,133,56,0.12); }
+        .msg-icon { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+        .msg-body { flex: 1; min-width: 0; }
+        .msg-text { font-size: 0.92rem; color: var(--text); word-wrap: break-word; overflow-wrap: break-word; white-space: pre-wrap; }
+        .msg-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
+        .msg-badge { position: absolute; top: 4px; right: 6px; background: #ef4444; color: #fff; font-size: 0.62rem; font-weight: bold; padding: 1px 5px; border-radius: 999px; min-width: 15px; text-align: center; }
     </style>
 </head>
 <body>
@@ -53,7 +60,7 @@
         <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl text-center">
             <div id="modalIcon" class="text-3xl mb-2">🔔</div>
             <h3 id="modalTitle" class="text-lg font-bold text-gray-800 mb-1">Notification</h3>
-            <p id="modalMessage" class="text-sm text-gray-600 mb-5">Message goes here...</p>
+            <p id="modalMessage" class="text-sm text-gray-600 mb-5 whitespace-pre-line">Message goes here...</p>
             <button onclick="closeCustomModal()" class="w-full bg-[#f28538] text-white py-2.5 rounded-xl font-semibold text-sm">OK</button>
         </div>
     </div>
@@ -76,6 +83,7 @@
                 <button onclick="switchMainTab('menu')" id="mainTabMenu" class="main-tab-btn active">📖 Menu</button>
                 <button onclick="switchMainTab('status')" id="mainTabStatus" class="main-tab-btn">📦 Status <span id="headerOrderStatusCount" class="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span></button>
                 <button onclick="switchMainTab('served')" id="mainTabServed" class="main-tab-btn">🍽️ Served <span id="headerServedCount" class="bg-emerald-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span></button>
+                <button onclick="switchMainTab('messages')" id="mainTabMessages" class="main-tab-btn">💬 Messages <span id="headerMsgCount" class="msg-badge hidden">0</span></button>
             </div>
 
             <div id="categoryNavWrapper">
@@ -107,6 +115,17 @@
                 <div id="servedGrandTotal" class="hidden mt-5 pt-4 border-t-2 border-emerald-200 flex justify-between items-center">
                     <span class="font-bold text-gray-700">Grand Total</span>
                     <span id="servedGrandTotalValue" class="text-xl font-bold text-emerald-600">$0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-messages" class="container hidden">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border max-w-xl mx-auto">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <span>💬 Messages from Staff</span>
+                </h2>
+                <div id="messagesContainer" class="space-y-3">
+                    <p class="text-gray-400 italic text-sm text-center py-6">No messages yet.</p>
                 </div>
             </div>
         </div>
@@ -150,15 +169,20 @@
         let itemLookup = {};
         let latestServerState = { tables: {}, tableRequests: {}, orders: [] };
         let countdownInterval = null;
+
+        // ---- Messages state ----
+        let messages = [];              // array of { id, message, icon, createdAt }
+        let unreadMsgIds = new Set();   // message IDs not yet viewed
+        let messagesLoaded = false;
+
         const activationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3');
 
-        // HTML escape helper — prevents XSS from any server-provided strings
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
         const i18n = {
-            en: { brandSubtitle: "Prices in USD (Includes VAT & Service)", langBtnText: "عربي", viewList: "🛒 View Order List", items: "items", add: "+ Add", emptyCart: "Your list is empty.", sendOrder: "Send Order 🚀", notifyManager: "Ring Bell & Request Order Approval 🛎️", waitingOrderPermission: "⏳ Waiting for Manager Order Approval..." },
-            ar: { brandSubtitle: "الأسعار بالدولار شاملة الخدمة والضريبة", langBtnText: "English", viewList: "🛒 عرض تفاصيل الطلب", items: "أصناف", add: "+ إضافة", emptyCart: "سلة الطلبات فارغة.", sendOrder: "إرسال الطلب 🚀", notifyManager: "طلب إذن إرسال الطلب من المدير 🛎️", waitingOrderPermission: "⏳ في انتظار تفعيل زر الطلب من المدير..." }
+            en: { brandSubtitle: "Prices in USD (Includes VAT & Service)", langBtnText: "عربي", viewList: "🛒 View Order List", items: "items", add: "+ Add", emptyCart: "Your list is empty.", sendOrder: "Send Order 🚀", notifyManager: "Ring Bell & Request Order Approval 🛎️", waitingOrderPermission: "⏳ Waiting for Manager Order Approval...", noMessages: "No messages yet." },
+            ar: { brandSubtitle: "الأسعار بالدولار شاملة الخدمة والضريبة", langBtnText: "English", viewList: "🛒 عرض تفاصيل الطلب", items: "أصناف", add: "+ إضافة", emptyCart: "سلة الطلبات فارغة.", sendOrder: "إرسال الطلب 🚀", notifyManager: "طلب إذن إرسال الطلب من المدير 🛎️", waitingOrderPermission: "⏳ في انتظار تفعيل زر الطلب من المدير...", noMessages: "لا توجد رسائل بعد." }
         };
 
         function showErrorPage(message = "Invalid or expired session token.") {
@@ -224,6 +248,7 @@
             }
 
             await loadMenuFromServer(currentRestaurant);
+            await loadMessageHistory();
         };
 
         function startSessionCountdown() {
@@ -325,17 +350,27 @@
             const isMenu = tab === 'menu';
             const isStatus = tab === 'status';
             const isServed = tab === 'served';
+            const isMessages = tab === 'messages';
 
             document.getElementById('mainTabMenu').classList.toggle('active', isMenu);
             document.getElementById('mainTabStatus').classList.toggle('active', isStatus);
             document.getElementById('mainTabServed').classList.toggle('active', isServed);
+            document.getElementById('mainTabMessages').classList.toggle('active', isMessages);
 
             document.getElementById('view-status').classList.toggle('hidden', !isStatus);
             document.getElementById('view-served').classList.toggle('hidden', !isServed);
+            document.getElementById('view-messages').classList.toggle('hidden', !isMessages);
 
             const showMenu = tableIsOpen && isMenu;
             document.getElementById('view-menu').classList.toggle('hidden', !showMenu);
             document.getElementById('categoryNavWrapper').style.display = showMenu ? 'block' : 'none';
+
+            // Opening Messages tab clears unread state
+            if (isMessages) {
+                unreadMsgIds.clear();
+                updateMessagesBadge();
+                renderMessages();
+            }
         }
 
         async function loadMenuFromServer(restaurantName) {
@@ -348,6 +383,22 @@
             } catch(e) { console.error('Failed to load menu', e); }
         }
 
+        async function loadMessageHistory() {
+            if (isExpired) return;
+            try {
+                const res = await fetch(`/api/messages/${encodeURIComponent(currentRestaurant)}/${encodeURIComponent(currentTable)}`);
+                const history = await res.json();
+                messages = Array.isArray(history) ? history : [];
+                // On page load, mark all as "read" since the customer is opening now
+                unreadMsgIds.clear();
+                messagesLoaded = true;
+                renderMessages();
+                updateMessagesBadge();
+            } catch (e) {
+                console.error('Failed to load messages', e);
+            }
+        }
+
         socket.on('menu_updated', (data) => {
             if (isExpired) return;
             if (data && data.restaurant === currentRestaurant) {
@@ -356,6 +407,99 @@
                 renderMenu();
             }
         });
+
+        // ---- Admin message (single) ----
+        socket.on('admin_message', (data) => {
+            if (isExpired) return;
+            if (!data || !data.message) return;
+            addMessage({
+                id: data.id,
+                message: data.message,
+                icon: data.icon || '💬',
+                createdAt: data.createdAt || Date.now()
+            }, true);
+        });
+
+        // ---- Admin messages (bulk replay on reconnect) ----
+        socket.on('admin_messages_bulk', (payload) => {
+            if (isExpired) return;
+            const list = (payload && payload.messages) || [];
+            list.forEach(m => addMessage({
+                id: m.id,
+                message: m.message,
+                icon: m.icon || '💬',
+                createdAt: m.createdAt || Date.now()
+            }, true));
+        });
+
+        function addMessage(msg, notify) {
+            // De-dup
+            if (messages.some(m => m.id === msg.id)) return;
+            messages.push(msg);
+            messages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+            unreadMsgIds.add(msg.id);
+
+            renderMessages();
+            updateMessagesBadge();
+
+            if (notify) {
+                activationSound.play().catch(() => {});
+                showModal(msg.icon || '💬', msg.message, msg.icon || '💬');
+                triggerSystemNotification('Message from staff', msg.message);
+                // Soft pulse on the Messages tab
+                const tab = document.getElementById('mainTabMessages');
+                tab.classList.add('bg-amber-100');
+                setTimeout(() => tab.classList.remove('bg-amber-100'), 1500);
+            }
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messagesContainer');
+            const t = i18n[currentLang];
+            if (!messages || messages.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 italic text-sm text-center py-6">${t.noMessages}</p>`;
+                return;
+            }
+            container.innerHTML = messages.map(m => {
+                const time = formatMessageTime(m.createdAt);
+                const isUnread = unreadMsgIds.has(m.id);
+                return `
+                    <div class="msg-card ${isUnread ? 'unread' : ''}">
+                        <div class="msg-icon">${esc(m.icon || '💬')}</div>
+                        <div class="msg-body">
+                            <div class="msg-text">${esc(m.message)}</div>
+                            <div class="msg-time">${esc(time)}</div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function updateMessagesBadge() {
+            const badge = document.getElementById('headerMsgCount');
+            const count = unreadMsgIds.size;
+            if (count > 0) {
+                badge.innerText = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        function formatMessageTime(ts) {
+            if (!ts) return '';
+            const d = new Date(ts);
+            const now = new Date();
+            const diffMs = now - d;
+            const diffMin = Math.floor(diffMs / 60000);
+            if (diffMin < 1) return 'Just now';
+            if (diffMin < 60) return `${diffMin} min ago`;
+            // Same day → show HH:MM
+            if (d.toDateString() === now.toDateString()) {
+                return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+                   d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
 
         function triggerSystemNotification(title, body) {
             if ('Notification' in window && Notification.permission === 'granted') new Notification(title, { body: body });
@@ -436,7 +580,6 @@
             document.getElementById('activationWarning').classList.toggle('hidden', canOrder || isWaitingForOrderPermission || !tableIsOpen);
             updateCartUI();
 
-            // All orders for this table
             const tableOrders = (data.orders || []).filter(o =>
                 (o.restaurant || 'Default') === currentRestaurant &&
                 String(o.tableNumber) === String(currentTable)
@@ -445,7 +588,7 @@
             const activeOrders = tableOrders.filter(o => o.kitchenStatus !== 'Sent to Table');
             const servedOrders = tableOrders.filter(o => o.kitchenStatus === 'Sent to Table');
 
-            // ---- Served notification (persisted per session) ----
+            // ---- Served notification ----
             const notifyKey = `notified_${currentRestaurant}_${currentTable}`;
             let persistentNotified = [];
             try { persistentNotified = JSON.parse(localStorage.getItem(notifyKey) || '[]'); } catch(e) {}
@@ -576,6 +719,7 @@
             document.getElementById('langToggleBtn').innerText = t.langBtnText;
             document.getElementById('lblViewList').innerText = t.viewList;
             renderMenu();
+            renderMessages();
             updateCartUI();
         }
 
@@ -605,7 +749,6 @@
             broadcastCart();
         }
 
-        // Event delegation — cart quantity buttons
         document.getElementById('cartItemsList').addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-action="qty"]');
             if (!btn) return;
@@ -614,13 +757,11 @@
             changeQty(id, delta);
         });
 
-        // Event delegation — "Add" buttons in menu
         document.getElementById('view-menu').addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-add-id]');
             if (btn) addToCart(btn.getAttribute('data-add-id'));
         });
 
-        // Event delegation — category nav
         document.getElementById('categoryNav').addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-sec-target]');
             if (!btn) return;
@@ -739,6 +880,11 @@
                 } else { showModal('Notice', res.message, '⚠️'); }
             });
         }
+
+        // ESC closes modal
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeCustomModal();
+        });
     </script>
 </body>
 </html>

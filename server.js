@@ -33,7 +33,6 @@ if (fs.existsSync(vapidPath)) {
 webpush.setVapidDetails('mailto:admin@lastballoon.net', vapidKeys.publicKey, vapidKeys.privateKey);
 
 app.get('/api/vapid-public-key', (req, res) => res.json({ publicKey: vapidKeys.publicKey }));
-
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customer.html')));
 app.get('/menu.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'menu.html')));
 
@@ -66,10 +65,20 @@ db.exec(`
     CREATE TABLE IF NOT EXISTS push_subs (
         endpoint TEXT PRIMARY KEY, restaurant TEXT, table_number TEXT, sub TEXT
     );
+    CREATE TABLE IF NOT EXISTS messages (
+        id TEXT PRIMARY KEY,
+        restaurant TEXT NOT NULL,
+        table_number TEXT NOT NULL,
+        message TEXT NOT NULL,
+        icon TEXT DEFAULT '💬',
+        created_at INTEGER NOT NULL,
+        delivered INTEGER DEFAULT 0
+    );
     CREATE INDEX IF NOT EXISTS idx_orders_resto_table ON orders(restaurant, table_number);
     CREATE INDEX IF NOT EXISTS idx_paid_resto_date ON paid_history(restaurant, date);
     CREATE INDEX IF NOT EXISTS idx_sessions_resto_table ON sessions(restaurant, table_number);
     CREATE INDEX IF NOT EXISTS idx_push_resto_table ON push_subs(restaurant, table_number);
+    CREATE INDEX IF NOT EXISTS idx_messages_resto_table ON messages(restaurant, table_number, created_at);
 `);
 
 // ---------- Migrations ----------
@@ -85,7 +94,7 @@ if (!columnExists('paid_history', 'created_at')) {
     db.prepare('UPDATE paid_history SET created_at = ? WHERE created_at IS NULL').run(Date.now());
 }
 
-// ---------- Push subscription helpers (persisted) ----------
+// ---------- Push subscription helpers ----------
 function savePushSub(resto, table, sub) {
     db.prepare(`INSERT OR REPLACE INTO push_subs (endpoint, restaurant, table_number, sub) VALUES (?, ?, ?, ?)`)
         .run(sub.endpoint, resto, String(table), JSON.stringify(sub));
@@ -110,7 +119,6 @@ app.post('/api/subscribe-push', (req, res) => {
 // ---------- Socket state ----------
 const tableSockets = {}; // sessionKey -> Set<socketId>
 
-// Cache app state to avoid recomputing on every event
 let cachedState = null;
 let cacheDirty = true;
 function invalidateCache() { cacheDirty = true; }
@@ -124,9 +132,6 @@ function buildAppState() {
         };
     });
 
-    // ---- Active sessions: only report tables that currently have a live socket ----
-    // This prevents "1 active" phantom badges when a session row exists but the
-    // customer has closed their browser tab (or never connected yet).
     const activeSessions = {};
     const now = Date.now();
     db.prepare('SELECT restaurant, table_number, start_time, lifetime_minutes FROM sessions').all().forEach(s => {
@@ -163,11 +168,7 @@ function getAppState() {
     }
     return cachedState;
 }
-
-function broadcastState() {
-    invalidateCache();
-    io.emit('state_update', getAppState());
-}
+function broadcastState() { invalidateCache(); io.emit('state_update', getAppState()); }
 
 function isSessionValid(session) {
     if (!session) return false;
@@ -189,6 +190,23 @@ setInterval(() => {
     });
     if (changed) broadcastState();
 }, 60_000);
+
+// ---------- Message helpers ----------
+function getMessagesForTable(resto, table, limit = 100) {
+    return db.prepare(`SELECT id, message, icon, created_at, delivered
+                       FROM messages WHERE restaurant = ? AND table_number = ?
+                       ORDER BY created_at ASC LIMIT ?`)
+        .all(resto, String(table), limit)
+        .map(m => ({ id: m.id, message: m.message, icon: m.icon, createdAt: m.created_at, delivered: !!m.delivered }));
+}
+
+function undeliveredMessagesForTable(resto, table) {
+    return db.prepare(`SELECT id, message, icon, created_at FROM messages
+                       WHERE restaurant = ? AND table_number = ? AND delivered = 0
+                       ORDER BY created_at ASC`)
+        .all(resto, String(table))
+        .map(m => ({ id: m.id, message: m.message, icon: m.icon, createdAt: m.created_at }));
+}
 
 // ---------- API ----------
 app.get('/api/verify-token', (req, res) => {
@@ -215,9 +233,7 @@ app.post('/api/create-session', (req, res) => {
         const lifetimeMinutes = parseInt(lifetime) || 15;
         const now = Date.now();
 
-        // Delete any existing sessions for this table to avoid orphaning
         db.prepare('DELETE FROM sessions WHERE restaurant = ? AND table_number = ?').run(resto, tKey);
-
         const token = 'tok_' + uuidv4().replace(/-/g, '') + now.toString(36);
         db.prepare(`INSERT INTO sessions (token, restaurant, table_number, start_time, lifetime_minutes) VALUES (?, ?, ?, ?, ?)`)
             .run(token, resto, tKey, now, lifetimeMinutes);
@@ -228,6 +244,13 @@ app.post('/api/create-session', (req, res) => {
         console.error(e);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
+});
+
+// Fetch message history for a table (used by menu.html on load)
+app.get('/api/messages/:restaurantName/:tableNumber', (req, res) => {
+    const resto = path.basename(req.params.restaurantName);
+    const table = String(req.params.tableNumber);
+    res.json(getMessagesForTable(resto, table));
 });
 
 // ---------- Socket.IO ----------
@@ -248,6 +271,15 @@ io.on('connection', (socket) => {
         socket.tableSessionKey = sessionKey;
         socket.tableToken = token;
         socket.join(`table_${resto}_${tKey}`);
+
+        // Replay any undelivered messages to this newly connected client
+        const undelivered = undeliveredMessagesForTable(resto, tKey);
+        if (undelivered.length > 0) {
+            socket.emit('admin_messages_bulk', { messages: undelivered });
+            const ids = undelivered.map(m => m.id);
+            const placeholders = ids.map(() => '?').join(',');
+            db.prepare(`UPDATE messages SET delivered = 1 WHERE id IN (${placeholders})`).run(...ids);
+        }
 
         broadcastState();
         cb({ success: true, restaurant: resto, tableNumber: tKey });
@@ -419,6 +451,46 @@ io.on('connection', (socket) => {
         db.prepare('DELETE FROM orders WHERE order_id = ?').run(orderId);
         broadcastState();
     });
+
+    // ---------- Admin → Table messaging ----------
+    socket.on('admin_message', ({ restaurant, tableNum, message, icon }, callback) => {
+        const cb = typeof callback === 'function' ? callback : () => {};
+        const resto = path.basename(String(restaurant || 'Default'));
+        const tKey = String(tableNum);
+        const text = String(message || '').trim().slice(0, 500);
+        if (!text) return cb({ success: false, message: 'Empty message' });
+
+        const id = uuidv4();
+        const createdAt = Date.now();
+        const safeIcon = String(icon || '💬').slice(0, 8);
+
+        db.prepare(`INSERT INTO messages (id, restaurant, table_number, message, icon, created_at, delivered)
+                    VALUES (?, ?, ?, ?, ?, ?, 0)`)
+            .run(id, resto, tKey, text, safeIcon, createdAt);
+
+        // Emit to any connected clients for this table
+        const room = `table_${resto}_${tKey}`;
+        const roomSockets = io.sockets.adapter.rooms.get(room);
+        if (roomSockets && roomSockets.size > 0) {
+            io.to(room).emit('admin_message', { id, message: text, icon: safeIcon, createdAt });
+            db.prepare('UPDATE messages SET delivered = 1 WHERE id = ?').run(id);
+        }
+
+        // Best-effort push notification (works even if the tab is closed)
+        const subs = getPushSubs(resto, tKey);
+        const payload = JSON.stringify({
+            title: `${safeIcon} Message from staff`,
+            body: text,
+            url: '/menu.html'
+        });
+        subs.forEach(sub => {
+            webpush.sendNotification(sub, payload).catch(err => {
+                if (err.statusCode === 404 || err.statusCode === 410) removePushSub(sub.endpoint);
+            });
+        });
+
+        cb({ success: true, id, delivered: !!(roomSockets && roomSockets.size > 0) });
+    });
 });
 
 // ---------- REST APIs ----------
@@ -448,13 +520,11 @@ app.get('/api/qr-links', (req, res) => {
             const restoTables = db.prepare('SELECT table_number FROM tables_state WHERE restaurant = ?').all(resto);
             restoTables.forEach(t => {
                 const tableNumStr = String(t.table_number);
-                // Fresh session per QR generation
                 db.prepare('DELETE FROM sessions WHERE restaurant = ? AND table_number = ?').run(resto, tableNumStr);
                 const token = 'tok_' + uuidv4().replace(/-/g, '') + Date.now().toString(36);
                 db.prepare(`INSERT INTO sessions (token, restaurant, table_number, start_time, lifetime_minutes) VALUES (?, ?, ?, ?, ?)`)
                     .run(token, resto, tableNumStr, Date.now(), lifetimeMinutes);
 
-                // Encode with padding preserved (reverse after base64)
                 const encodedTbl = Buffer.from(tableNumStr).toString('base64').split('').reverse().join('');
                 const encodedResto = Buffer.from(resto).toString('base64').split('').reverse().join('');
 
@@ -493,6 +563,7 @@ app.delete('/api/tables/:restaurantName/:tableNumber', (req, res) => {
         db.prepare('DELETE FROM table_requests WHERE restaurant = ? AND table_number = ?').run(safeName, tKey);
         db.prepare('DELETE FROM sessions WHERE restaurant = ? AND table_number = ?').run(safeName, tKey);
         db.prepare('DELETE FROM push_subs WHERE restaurant = ? AND table_number = ?').run(safeName, tKey);
+        db.prepare('DELETE FROM messages WHERE restaurant = ? AND table_number = ?').run(safeName, tKey);
     })();
     broadcastState();
     res.json({ success: true });
