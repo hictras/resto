@@ -132,6 +132,7 @@ function buildAppState() {
         };
     });
 
+    // Only report tables with a live socket — fixes "1 active" phantom badge
     const activeSessions = {};
     const now = Date.now();
     db.prepare('SELECT restaurant, table_number, start_time, lifetime_minutes FROM sessions').all().forEach(s => {
@@ -246,7 +247,6 @@ app.post('/api/create-session', (req, res) => {
     }
 });
 
-// Fetch message history for a table (used by menu.html on load)
 app.get('/api/messages/:restaurantName/:tableNumber', (req, res) => {
     const resto = path.basename(req.params.restaurantName);
     const table = String(req.params.tableNumber);
@@ -272,7 +272,7 @@ io.on('connection', (socket) => {
         socket.tableToken = token;
         socket.join(`table_${resto}_${tKey}`);
 
-        // Replay any undelivered messages to this newly connected client
+        // Replay queued messages
         const undelivered = undeliveredMessagesForTable(resto, tKey);
         if (undelivered.length > 0) {
             socket.emit('admin_messages_bulk', { messages: undelivered });
@@ -437,8 +437,16 @@ io.on('connection', (socket) => {
             ).get(order.restaurant, order.table_number).c;
 
             if (remainingUnpaid === 0) {
-                db.prepare('DELETE FROM sessions WHERE restaurant = ? AND table_number = ?')
-                    .run(order.restaurant, order.table_number);
+                // Session is over — wipe everything tied to this dining party
+                db.transaction(() => {
+                    db.prepare('DELETE FROM sessions WHERE restaurant = ? AND table_number = ?')
+                        .run(order.restaurant, order.table_number);
+                    db.prepare('DELETE FROM messages WHERE restaurant = ? AND table_number = ?')
+                        .run(order.restaurant, order.table_number);
+                    db.prepare('DELETE FROM push_subs WHERE restaurant = ? AND table_number = ?')
+                        .run(order.restaurant, order.table_number);
+                })();
+
                 io.to(`table_${order.restaurant}_${order.table_number}`).emit('session_ended', { reason: 'paid' });
             }
         } else {
@@ -468,15 +476,14 @@ io.on('connection', (socket) => {
                     VALUES (?, ?, ?, ?, ?, ?, 0)`)
             .run(id, resto, tKey, text, safeIcon, createdAt);
 
-        // Emit to any connected clients for this table
         const room = `table_${resto}_${tKey}`;
         const roomSockets = io.sockets.adapter.rooms.get(room);
-        if (roomSockets && roomSockets.size > 0) {
+        const isLive = !!(roomSockets && roomSockets.size > 0);
+        if (isLive) {
             io.to(room).emit('admin_message', { id, message: text, icon: safeIcon, createdAt });
             db.prepare('UPDATE messages SET delivered = 1 WHERE id = ?').run(id);
         }
 
-        // Best-effort push notification (works even if the tab is closed)
         const subs = getPushSubs(resto, tKey);
         const payload = JSON.stringify({
             title: `${safeIcon} Message from staff`,
@@ -489,7 +496,7 @@ io.on('connection', (socket) => {
             });
         });
 
-        cb({ success: true, id, delivered: !!(roomSockets && roomSockets.size > 0) });
+        cb({ success: true, id, delivered: isLive });
     });
 });
 
