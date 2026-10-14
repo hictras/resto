@@ -11,528 +11,149 @@
         .msg-quick { transition: all 0.15s; }
         .msg-quick:hover { transform: scale(1.05); }
 
-        .table-card {
-            position: relative;
-            border-radius: 22px;
-            padding: 14px;
-            background: linear-gradient(180deg, rgba(30,41,59,0.85) 0%, rgba(15,23,42,0.95) 100%);
-            border: 1px solid rgba(148,163,184,0.15);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow: hidden;
-        }
-        .table-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 22px;
-            padding: 1px;
-            background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
-            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-            pointer-events: none;
-        }
-        .table-card.is-occupied {
-            background: linear-gradient(180deg, rgba(69,10,10,0.7) 0%, rgba(15,23,42,0.95) 100%);
-            border-color: rgba(248,113,113,0.35);
-        }
-        .table-card.is-waiting {
-            background: linear-gradient(180deg, rgba(69,36,7,0.7) 0%, rgba(15,23,42,0.95) 100%);
-            border-color: rgba(251,191,36,0.4);
-        }
-        @keyframes card-highlight {
-            0%   { box-shadow: 0 0 0 0 rgba(250,204,21,0.9), 0 0 0 0 rgba(250,204,21,0.5); }
-            50%  { box-shadow: 0 0 0 6px rgba(250,204,21,0.55), 0 0 24px 6px rgba(250,204,21,0.35); }
-            100% { box-shadow: 0 0 0 0 rgba(250,204,21,0), 0 0 0 0 rgba(250,204,21,0); }
-        }
-        .table-card.is-highlighted {
-            animation: card-highlight 1.6s ease-out;
-            border-color: #facc15 !important;
-        }
+        .table-card { position: relative; border-radius: 22px; padding: 14px; background: linear-gradient(180deg, rgba(30,41,59,0.85) 0%, rgba(15,23,42,0.95) 100%); border: 1px solid rgba(148,163,184,0.15); box-shadow: 0 4px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04); display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+        .table-card::before { content: ''; position: absolute; inset: 0; border-radius: 22px; padding: 1px; background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+        .table-card.is-occupied { background: linear-gradient(180deg, rgba(69,10,10,0.7) 0%, rgba(15,23,42,0.95) 100%); border-color: rgba(248,113,113,0.35); }
+        .table-card.is-waiting { background: linear-gradient(180deg, rgba(69,36,7,0.7) 0%, rgba(15,23,42,0.95) 100%); border-color: rgba(251,191,36,0.4); }
+        @keyframes card-highlight { 0% { box-shadow: 0 0 0 0 rgba(250,204,21,0.9), 0 0 0 0 rgba(250,204,21,0.5); } 50% { box-shadow: 0 0 0 6px rgba(250,204,21,0.55), 0 0 24px 6px rgba(250,204,21,0.35); } 100% { box-shadow: 0 0 0 0 rgba(250,204,21,0), 0 0 0 0 rgba(250,204,21,0); } }
+        .table-card.is-highlighted { animation: card-highlight 1.6s ease-out; border-color: #facc15 !important; }
 
-        .icon-btn {
-            width: 34px; height: 34px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 15px;
-            border: 1px solid;
-            transition: all 0.15s;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
+        .icon-btn { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; border: 1px solid; transition: all 0.15s; cursor: pointer; flex-shrink: 0; }
         .icon-btn:hover { transform: translateY(-1px); filter: brightness(1.2); }
         .icon-btn-msg { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.4); color: #93c5fd; }
         .icon-btn-reset { background: rgba(245,158,11,0.12); border-color: rgba(245,158,11,0.5); color: #fbbf24; }
         .icon-btn-del { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.5); color: #f87171; }
 
-        .table-icon-block {
-            width: 52px; height: 52px;
-            border-radius: 14px;
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            border: 1px solid rgba(148,163,184,0.18);
-            display: flex; align-items: center; justify-content: center;
-            color: #60a5fa;
-            flex-shrink: 0;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-        }
+        .table-icon-block { width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%); border: 1px solid rgba(148,163,184,0.18); display: flex; align-items: center; justify-content: center; color: #60a5fa; flex-shrink: 0; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
 
-        .pill-active {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(16,185,129,0.15);
-            color: #6ee7b7;
-            border-radius: 999px;
-            padding: 3px 10px 3px 6px;
-            font-size: 11px; font-weight: 700;
-        }
-        .pill-valid {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: rgba(16,185,129,0.08);
-            color: #6ee7b7;
-            border: 1px solid rgba(16,185,129,0.5);
-            border-radius: 999px;
-            padding: 4px 10px;
-            font-size: 11px; font-weight: 700;
-        }
-        .pill-occupied {
-            background: rgba(239,68,68,0.15);
-            color: #fca5a5;
-            border-color: rgba(239,68,68,0.55);
-        }
-        .dot-live {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #34d399;
-            box-shadow: 0 0 8px #34d399, 0 0 2px #34d399;
-            animation: pulse-dot 1.6s ease-in-out infinite;
-        }
+        .pill-active { display: inline-flex; align-items: center; gap: 6px; background: rgba(16,185,129,0.15); color: #6ee7b7; border-radius: 999px; padding: 3px 10px 3px 6px; font-size: 11px; font-weight: 700; }
+        .pill-valid { display: inline-flex; align-items: center; gap: 5px; background: rgba(16,185,129,0.08); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.5); border-radius: 999px; padding: 4px 10px; font-size: 11px; font-weight: 700; }
+        .pill-occupied { background: rgba(239,68,68,0.15); color: #fca5a5; border-color: rgba(239,68,68,0.55); }
+        .dot-live { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399, 0 0 2px #34d399; animation: pulse-dot 1.6s ease-in-out infinite; }
         .dot-offline { width: 8px; height: 8px; border-radius: 50%; background: #475569; }
-        @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(0.85); }
-        }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.85); } }
 
-        .countdown-bar {
-            display: flex; align-items: center; gap: 10px;
-            border-radius: 999px;
-            padding: 10px 16px;
-            font-weight: 800;
-            font-size: 15px;
-            letter-spacing: 0.3px;
-            border: 1px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-        .countdown-bar.safe {
-            background: linear-gradient(90deg, rgba(16,185,129,0.18), rgba(16,185,129,0.08));
-            border-color: rgba(16,185,129,0.45);
-            color: #6ee7b7;
-        }
-        .countdown-bar.warn {
-            background: linear-gradient(90deg, rgba(245,158,11,0.22), rgba(245,158,11,0.08));
-            border-color: rgba(245,158,11,0.5);
-            color: #fcd34d;
-        }
-        .countdown-bar.danger {
-            background: linear-gradient(90deg, rgba(239,68,68,0.28), rgba(239,68,68,0.08));
-            border-color: rgba(239,68,68,0.7);
-            color: #fecaca;
-            box-shadow: 0 0 14px rgba(239,68,68,0.35), inset 0 0 12px rgba(239,68,68,0.15);
-        }
-        .countdown-bar.no-session {
-            background: rgba(148,163,184,0.06);
-            border-color: rgba(148,163,184,0.15);
-            color: #94a3b8;
-            font-size: 12px;
-            justify-content: center;
-            font-weight: 600;
-        }
-        .countdown-bar.no-expiry {
-            background: linear-gradient(90deg, rgba(99,102,241,0.22), rgba(99,102,241,0.08));
-            border-color: rgba(99,102,241,0.5);
-            color: #a5b4fc;
-        }
-        .countdown-clock {
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            border: 2px solid currentColor;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            opacity: 0.9;
-        }
+        .countdown-bar { display: flex; align-items: center; gap: 10px; border-radius: 999px; padding: 10px 16px; font-weight: 800; font-size: 15px; letter-spacing: 0.3px; border: 1px solid transparent; position: relative; overflow: hidden; }
+        .countdown-bar.safe { background: linear-gradient(90deg, rgba(16,185,129,0.18), rgba(16,185,129,0.08)); border-color: rgba(16,185,129,0.45); color: #6ee7b7; }
+        .countdown-bar.warn { background: linear-gradient(90deg, rgba(245,158,11,0.22), rgba(245,158,11,0.08)); border-color: rgba(245,158,11,0.5); color: #fcd34d; }
+        .countdown-bar.danger { background: linear-gradient(90deg, rgba(239,68,68,0.28), rgba(239,68,68,0.08)); border-color: rgba(239,68,68,0.7); color: #fecaca; box-shadow: 0 0 14px rgba(239,68,68,0.35), inset 0 0 12px rgba(239,68,68,0.15); }
+        .countdown-bar.no-session { background: rgba(148,163,184,0.06); border-color: rgba(148,163,184,0.15); color: #94a3b8; font-size: 12px; justify-content: center; font-weight: 600; }
+        .countdown-bar.no-expiry { background: linear-gradient(90deg, rgba(99,102,241,0.22), rgba(99,102,241,0.08)); border-color: rgba(99,102,241,0.5); color: #a5b4fc; }
+        .countdown-clock { width: 26px; height: 26px; border-radius: 50%; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.9; }
 
-        .mini-panel {
-            background: rgba(15,23,42,0.7);
-            border: 1px solid rgba(148,163,184,0.12);
-            border-radius: 16px;
-            padding: 10px 12px;
-        }
-        .mini-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #94a3b8;
-            letter-spacing: 0.3px;
-        }
+        .mini-panel { background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.12); border-radius: 16px; padding: 10px 12px; }
+        .mini-label { font-size: 11px; font-weight: 600; color: #94a3b8; letter-spacing: 0.3px; }
 
-        .timer-select-wrap {
-            position: relative;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .timer-select-icon {
-            width: 30px; height: 30px;
-            border-radius: 50%;
-            border: 1.5px solid rgba(148,163,184,0.4);
-            display: flex; align-items: center; justify-content: center;
-            color: #cbd5e1;
-            flex-shrink: 0;
-        }
-        .timer-select {
-            flex: 1;
-            appearance: none;
-            background: rgba(15,23,42,0.6);
-            border: 1px solid rgba(148,163,184,0.2);
-            border-radius: 12px;
-            padding: 8px 34px 8px 12px;
-            color: #e2e8f0;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%3E%3Cpath%20fill%3D%22%23cbd5e1%22%20d%3D%22M6%208L0%200h12z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-        }
+        .timer-select-wrap { position: relative; display: flex; align-items: center; gap: 10px; }
+        .timer-select-icon { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid rgba(148,163,184,0.4); display: flex; align-items: center; justify-content: center; color: #cbd5e1; flex-shrink: 0; }
+        .timer-select { flex: 1; appearance: none; background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.2); border-radius: 12px; padding: 8px 34px 8px 12px; color: #e2e8f0; font-weight: 700; font-size: 13px; cursor: pointer; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%3E%3Cpath%20fill%3D%22%23cbd5e1%22%20d%3D%22M6%208L0%200h12z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
         .timer-select:focus { outline: none; border-color: #f59e0b; }
 
-        .status-split {
-            display: flex; align-items: stretch;
-            gap: 10px;
-        }
-        .status-cell {
-            flex: 1;
-            display: flex; align-items: center; gap: 8px;
-            padding: 8px 6px;
-        }
-        .status-divider {
-            width: 1px;
-            background: rgba(148,163,184,0.15);
-            align-self: stretch;
-        }
-        .status-cell-icon {
-            width: 32px; height: 32px;
-            border-radius: 10px;
-            background: rgba(15,23,42,0.7);
-            border: 1px solid rgba(148,163,184,0.15);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            font-size: 15px;
-        }
+        .status-split { display: flex; align-items: stretch; gap: 10px; }
+        .status-cell { flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 6px; }
+        .status-divider { width: 1px; background: rgba(148,163,184,0.15); align-self: stretch; }
+        .status-cell-icon { width: 32px; height: 32px; border-radius: 10px; background: rgba(15,23,42,0.7); border: 1px solid rgba(148,163,184,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 15px; }
         .status-cell-text { font-size: 11px; line-height: 1.25; }
         .status-cell-text .label { color: #94a3b8; font-weight: 600; }
         .status-cell-text .value { color: #e2e8f0; font-weight: 800; letter-spacing: 0.3px; display: flex; align-items: center; gap: 6px; }
         .lock-red { color: #f87171; font-size: 13px; }
         .unlock-green { color: #34d399; font-size: 13px; }
 
-        .action-btn {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 10px;
-            padding: 12px 16px;
-            border-radius: 14px;
-            font-weight: 800;
-            font-size: 14px;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            transition: all 0.15s;
-            position: relative;
-            overflow: hidden;
-        }
+        .action-btn { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-radius: 14px; font-weight: 800; font-size: 14px; color: #fff; border: none; cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden; }
         .action-btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
         .action-btn:active { transform: translateY(0); }
-        .action-btn .left-icon {
-            width: 28px; height: 28px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 17px;
-        }
+        .action-btn .left-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
         .action-btn .arrow { font-size: 18px; opacity: 0.85; }
-        .btn-open-menu {
-            background: linear-gradient(180deg, #059669 0%, #047857 100%);
-            box-shadow: 0 6px 16px rgba(5,150,105,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .btn-close-menu {
-            background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
-            box-shadow: 0 6px 16px rgba(220,38,38,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .btn-open-order {
-            background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%);
-            box-shadow: 0 6px 16px rgba(79,70,229,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .btn-lock-order {
-            background: linear-gradient(180deg, #d97706 0%, #b45309 100%);
-            box-shadow: 0 6px 16px rgba(217,119,6,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
-        }
-        .btn-requested {
-            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
-            box-shadow: 0 6px 16px rgba(239,68,68,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
-            animation: req-pulse 1.4s ease-in-out infinite;
-        }
-        @keyframes req-pulse {
-            0%, 100% { box-shadow: 0 6px 16px rgba(239,68,68,0.5), inset 0 1px 0 rgba(255,255,255,0.2); }
-            50% { box-shadow: 0 6px 24px rgba(239,68,68,0.85), inset 0 1px 0 rgba(255,255,255,0.2); }
-        }
+        .btn-open-menu { background: linear-gradient(180deg, #059669 0%, #047857 100%); box-shadow: 0 6px 16px rgba(5,150,105,0.35), inset 0 1px 0 rgba(255,255,255,0.15); }
+        .btn-close-menu { background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%); box-shadow: 0 6px 16px rgba(220,38,38,0.35), inset 0 1px 0 rgba(255,255,255,0.15); }
+        .btn-open-order { background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%); box-shadow: 0 6px 16px rgba(79,70,229,0.35), inset 0 1px 0 rgba(255,255,255,0.15); }
+        .btn-lock-order { background: linear-gradient(180deg, #d97706 0%, #b45309 100%); box-shadow: 0 6px 16px rgba(217,119,6,0.35), inset 0 1px 0 rgba(255,255,255,0.15); }
+        .btn-requested { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 6px 16px rgba(239,68,68,0.5), inset 0 1px 0 rgba(255,255,255,0.2); animation: req-pulse 1.4s ease-in-out infinite; }
+        @keyframes req-pulse { 0%, 100% { box-shadow: 0 6px 16px rgba(239,68,68,0.5), inset 0 1px 0 rgba(255,255,255,0.2); } 50% { box-shadow: 0 6px 24px rgba(239,68,68,0.85), inset 0 1px 0 rgba(255,255,255,0.2); } }
 
-        .wants-chip {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: rgba(245,158,11,0.2);
-            color: #fcd34d;
-            border: 1px solid rgba(245,158,11,0.4);
-            border-radius: 999px;
-            padding: 3px 10px;
-            font-size: 10px;
-            font-weight: 700;
-        }
+        .wants-chip { display: inline-flex; align-items: center; gap: 5px; background: rgba(245,158,11,0.2); color: #fcd34d; border: 1px solid rgba(245,158,11,0.4); border-radius: 999px; padding: 3px 10px; font-size: 10px; font-weight: 700; }
 
-        .map-tile {
-            position: relative;
-            border-radius: 14px;
-            padding: 14px 8px;
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-            cursor: pointer;
-            user-select: none;
-        }
-        .map-tile .map-tile-num {
-            font-size: 20px;
-            font-weight: 900;
-            line-height: 1.1;
-            letter-spacing: -0.5px;
-        }
-        .map-tile .map-tile-label {
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 3px;
-            opacity: 0.85;
-        }
-        .map-tile .map-tile-badge {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            font-size: 9px;
-            font-weight: 800;
-            padding: 1px 6px;
-            border-radius: 999px;
-            background: rgba(0,0,0,0.35);
-            color: #fff;
-        }
-        .map-tile:hover {
-            transform: translateY(-2px) scale(1.03);
-            box-shadow: 0 8px 22px rgba(0,0,0,0.45);
-        }
-        .map-tile.map-active {
-            background: linear-gradient(180deg, rgba(16,185,129,0.28), rgba(16,185,129,0.08));
-            border-color: #10b981;
-            color: #d1fae5;
-            box-shadow: 0 4px 14px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
+        /* SMALL FLOOR MAP */
+        .map-tile { position: relative; border-radius: 14px; padding: 14px 8px; text-align: center; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; user-select: none; }
+        .map-tile .map-tile-num { font-size: 20px; font-weight: 900; line-height: 1.1; letter-spacing: -0.5px; }
+        .map-tile .map-tile-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; opacity: 0.85; }
+        .map-tile .map-tile-badge { position: absolute; top: 6px; right: 6px; font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 999px; background: rgba(0,0,0,0.35); color: #fff; }
+        .map-tile:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 22px rgba(0,0,0,0.45); }
+        .map-tile.map-active { background: linear-gradient(180deg, rgba(16,185,129,0.28), rgba(16,185,129,0.08)); border-color: #10b981; color: #d1fae5; box-shadow: 0 4px 14px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.1); }
         .map-tile.map-active:hover { box-shadow: 0 8px 22px rgba(16,185,129,0.55); }
-        .map-tile.map-active::after {
-            content: '';
-            position: absolute;
-            top: 8px; left: 8px;
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: #34d399;
-            box-shadow: 0 0 8px #34d399;
-            animation: pulse-dot 1.6s ease-in-out infinite;
-        }
-        .map-tile.map-requested {
-            background: linear-gradient(180deg, rgba(245,158,11,0.3), rgba(245,158,11,0.1));
-            border-color: #f59e0b;
-            color: #fef3c7;
-            box-shadow: 0 4px 14px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-            animation: map-pulse 1.4s ease-in-out infinite;
-        }
+        .map-tile.map-active::after { content: ''; position: absolute; top: 8px; left: 8px; width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 8px #34d399; animation: pulse-dot 1.6s ease-in-out infinite; }
+        .map-tile.map-requested { background: linear-gradient(180deg, rgba(245,158,11,0.3), rgba(245,158,11,0.1)); border-color: #f59e0b; color: #fef3c7; box-shadow: 0 4px 14px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.1); animation: map-pulse 1.4s ease-in-out infinite; }
         .map-tile.map-requested:hover { box-shadow: 0 8px 22px rgba(245,158,11,0.6); }
-        @keyframes map-pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-        }
-        .map-tile.map-occupied {
-            background: linear-gradient(180deg, rgba(239,68,68,0.28), rgba(239,68,68,0.08));
-            border-color: #ef4444;
-            color: #fee2e2;
-            box-shadow: 0 4px 14px rgba(239,68,68,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
+        @keyframes map-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        .map-tile.map-occupied { background: linear-gradient(180deg, rgba(239,68,68,0.28), rgba(239,68,68,0.08)); border-color: #ef4444; color: #fee2e2; box-shadow: 0 4px 14px rgba(239,68,68,0.35), inset 0 1px 0 rgba(255,255,255,0.1); }
         .map-tile.map-occupied:hover { box-shadow: 0 8px 22px rgba(239,68,68,0.55); }
-        .map-tile.map-idle {
-            background: rgba(148,163,184,0.08);
-            border-color: rgba(148,163,184,0.2);
-            color: #94a3b8;
-        }
+        .map-tile.map-idle { background: rgba(148,163,184,0.08); border-color: rgba(148,163,184,0.2); color: #94a3b8; }
 
-        .map-dot {
-            width: 10px; height: 10px;
-            border-radius: 3px;
-            display: inline-block;
-        }
+        .map-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
         .map-dot-green { background: #10b981; box-shadow: 0 0 6px rgba(16,185,129,0.7); }
         .map-dot-amber { background: #f59e0b; box-shadow: 0 0 6px rgba(245,158,11,0.7); }
         .map-dot-red   { background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.7); }
         .map-dot-gray  { background: #64748b; }
 
-        .map-tile-lg {
-            position: relative;
-            border-radius: 18px;
-            padding: 42px 12px 14px;
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.2s;
-            cursor: pointer;
-            user-select: none;
-            min-height: 140px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .map-tile-lg:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 28px rgba(0,0,0,0.5);
-        }
-        .map-tile-lg-num {
-            font-size: 38px;
-            font-weight: 900;
-            line-height: 1;
-            letter-spacing: -1px;
-        }
-        .map-tile-lg-label {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.85;
-        }
-        .map-tile-lg-countdown {
-            font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-            font-size: 15px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
-            padding: 3px 10px;
-            border-radius: 999px;
-            background: rgba(0,0,0,0.3);
-        }
+        /* LARGE FLOOR MAP */
+        .map-tile-lg { position: relative; border-radius: 18px; padding: 42px 12px 14px; text-align: center; border: 2px solid transparent; transition: all 0.2s; cursor: pointer; user-select: none; min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+        .map-tile-lg:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.5); }
+        .map-tile-lg-num { font-size: 38px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+        .map-tile-lg-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; opacity: 0.85; }
+        .map-tile-lg-countdown { font-family: 'SF Mono', 'Menlo', 'Consolas', monospace; font-size: 15px; font-weight: 800; letter-spacing: 0.5px; margin-top: 4px; padding: 3px 10px; border-radius: 999px; background: rgba(0,0,0,0.3); }
+        .map-tile-lg-badge { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: rgba(0,0,0,0.45); color: #fff; white-space: nowrap; z-index: 3; }
+        .map-tile-lg-active { background: linear-gradient(180deg, rgba(16,185,129,0.32), rgba(16,185,129,0.08)); border-color: #10b981; color: #d1fae5; box-shadow: 0 6px 20px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .map-tile-lg-active::after { content: ''; position: absolute; bottom: 12px; left: 12px; width: 10px; height: 10px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; animation: pulse-dot 1.6s ease-in-out infinite; }
+        .map-tile-lg-active .map-tile-lg-badge { background: rgba(16,185,129,0.55); border: 1px solid rgba(16,185,129,0.9); color: #ecfdf5; box-shadow: 0 0 10px rgba(16,185,129,0.5); }
+        .map-tile-lg-occupied .map-tile-lg-badge { background: rgba(239,68,68,0.55); border: 1px solid rgba(239,68,68,0.9); color: #fee2e2; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
+        .map-tile-lg-requested .map-tile-lg-badge { background: rgba(245,158,11,0.55); border: 1px solid rgba(245,158,11,0.9); color: #fef3c7; box-shadow: 0 0 10px rgba(245,158,11,0.5); }
+        .map-tile-lg-requested { background: linear-gradient(180deg, rgba(245,158,11,0.32), rgba(245,158,11,0.1)); border-color: #f59e0b; color: #fef3c7; box-shadow: 0 6px 20px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.1); animation: map-pulse 1.4s ease-in-out infinite; }
+        .map-tile-lg-occupied { background: linear-gradient(180deg, rgba(239,68,68,0.3), rgba(239,68,68,0.08)); border-color: #ef4444; color: #fee2e2; box-shadow: 0 6px 20px rgba(239,68,68,0.35), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .map-tile-lg-idle { background: rgba(148,163,184,0.08); border-color: rgba(148,163,184,0.2); color: #94a3b8; }
 
-        .map-tile-lg-badge {
-            position: absolute;
-            top: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
-            font-weight: 800;
-            padding: 3px 10px;
-            border-radius: 999px;
-            background: rgba(0,0,0,0.45);
-            color: #fff;
-            white-space: nowrap;
-            z-index: 3;
-        }
-
-        .map-tile-lg-active {
-            background: linear-gradient(180deg, rgba(16,185,129,0.32), rgba(16,185,129,0.08));
-            border-color: #10b981;
-            color: #d1fae5;
-            box-shadow: 0 6px 20px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-        .map-tile-lg-active::after {
-            content: '';
-            position: absolute;
-            bottom: 12px; left: 12px;
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: #34d399;
-            box-shadow: 0 0 10px #34d399;
-            animation: pulse-dot 1.6s ease-in-out infinite;
-        }
-        .map-tile-lg-active .map-tile-lg-badge {
-            background: rgba(16,185,129,0.55);
-            border: 1px solid rgba(16,185,129,0.9);
-            color: #ecfdf5;
-            box-shadow: 0 0 10px rgba(16,185,129,0.5);
-        }
-        .map-tile-lg-occupied .map-tile-lg-badge {
-            background: rgba(239,68,68,0.55);
-            border: 1px solid rgba(239,68,68,0.9);
-            color: #fee2e2;
-            box-shadow: 0 0 10px rgba(239,68,68,0.5);
-        }
-        .map-tile-lg-requested .map-tile-lg-badge {
-            background: rgba(245,158,11,0.55);
-            border: 1px solid rgba(245,158,11,0.9);
-            color: #fef3c7;
-            box-shadow: 0 0 10px rgba(245,158,11,0.5);
-        }
-
-        .map-tile-lg-requested {
-            background: linear-gradient(180deg, rgba(245,158,11,0.32), rgba(245,158,11,0.1));
-            border-color: #f59e0b;
-            color: #fef3c7;
-            box-shadow: 0 6px 20px rgba(245,158,11,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-            animation: map-pulse 1.4s ease-in-out infinite;
-        }
-        .map-tile-lg-occupied {
-            background: linear-gradient(180deg, rgba(239,68,68,0.3), rgba(239,68,68,0.08));
-            border-color: #ef4444;
-            color: #fee2e2;
-            box-shadow: 0 6px 20px rgba(239,68,68,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
-        }
-        .map-tile-lg-idle {
-            background: rgba(148,163,184,0.08);
-            border-color: rgba(148,163,184,0.2);
-            color: #94a3b8;
-        }
-
-        .map-tile-lg-btn {
-            position: absolute;
-            top: 8px;
-            width: 30px;
-            height: 30px;
-            border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 800;
-            border: 1px solid;
-            cursor: pointer;
-            transition: all 0.15s;
-            z-index: 2;
-            line-height: 1;
-            padding: 0;
-        }
-        .map-tile-lg-btn:hover {
-            transform: scale(1.12);
-            filter: brightness(1.25);
-            box-shadow: 0 0 10px currentColor;
-        }
+        .map-tile-lg-btn { position: absolute; top: 8px; width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; border: 1px solid; cursor: pointer; transition: all 0.15s; z-index: 2; line-height: 1; padding: 0; }
+        .map-tile-lg-btn:hover { transform: scale(1.12); filter: brightness(1.25); box-shadow: 0 0 10px currentColor; }
         .map-tile-lg-btn:active { transform: scale(0.95); }
-
         .map-tile-lg-btn-menu-left  { left: 8px; }
         .map-tile-lg-btn-order-right { right: 8px; }
-
         .map-tile-lg-btn-open  { background: rgba(16,185,129,0.28); border-color: rgba(16,185,129,0.7); color: #6ee7b7; }
         .map-tile-lg-btn-close { background: rgba(239,68,68,0.28); border-color: rgba(239,68,68,0.7); color: #fca5a5; }
-
         .map-tile-lg-btn-order      { background: rgba(79,70,229,0.28); border-color: rgba(79,70,229,0.75); color: #a5b4fc; }
         .map-tile-lg-btn-lock       { background: rgba(217,119,6,0.28); border-color: rgba(217,119,6,0.75); color: #fcd34d; }
-        .map-tile-lg-btn-requested  {
-            background: rgba(239,68,68,0.35); border-color: rgba(239,68,68,0.9); color: #fecaca;
-            animation: req-pulse 1.4s ease-in-out infinite;
-        }
+        .map-tile-lg-btn-requested  { background: rgba(239,68,68,0.35); border-color: rgba(239,68,68,0.9); color: #fecaca; animation: req-pulse 1.4s ease-in-out infinite; }
+
+        /* SINGLE TABLE FOCUS VIEW */
+        .focus-shell { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 4px 0; }
+        @media (min-width: 1024px) { .focus-shell { grid-template-columns: 380px 1fr; align-items: start; } }
+        .focus-left { display: flex; flex-direction: column; gap: 16px; }
+        .focus-right { display: flex; flex-direction: column; gap: 16px; }
+        .focus-title-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: rgba(15,23,42,0.6); border: 1px solid rgba(148,163,184,0.15); border-radius: 18px; padding: 14px 18px; }
+        .focus-title-bar h2 { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: #fff; }
+        .focus-title-bar h2 span { color: #fbbf24; }
+        .focus-status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .focus-status-active    { background: rgba(16,185,129,0.18); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.5); }
+        .focus-status-occupied  { background: rgba(239,68,68,0.18);  color: #fca5a5; border: 1px solid rgba(239,68,68,0.5); }
+        .focus-status-requested { background: rgba(245,158,11,0.18); color: #fcd34d; border: 1px solid rgba(245,158,11,0.5); }
+        .focus-status-idle      { background: rgba(148,163,184,0.12); color: #94a3b8; border: 1px solid rgba(148,163,184,0.25); }
+        .focus-section-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; }
+        .focus-big-timer { display: flex; align-items: center; justify-content: center; gap: 14px; border-radius: 20px; padding: 22px 18px; font-family: 'SF Mono', 'Menlo', 'Consolas', monospace; font-size: 38px; font-weight: 900; letter-spacing: 2px; border: 1px solid transparent; }
+        .focus-big-timer.safe    { background: linear-gradient(90deg, rgba(16,185,129,0.20), rgba(16,185,129,0.06)); border-color: rgba(16,185,129,0.5); color: #6ee7b7; }
+        .focus-big-timer.warn    { background: linear-gradient(90deg, rgba(245,158,11,0.22), rgba(245,158,11,0.06)); border-color: rgba(245,158,11,0.55); color: #fcd34d; }
+        .focus-big-timer.danger  { background: linear-gradient(90deg, rgba(239,68,68,0.28), rgba(239,68,68,0.08)); border-color: rgba(239,68,68,0.75); color: #fecaca; box-shadow: 0 0 18px rgba(239,68,68,0.35); }
+        .focus-big-timer.no-session { background: rgba(148,163,184,0.06); border-color: rgba(148,163,184,0.15); color: #94a3b8; font-size: 20px; }
+        .focus-big-timer.no-expiry  { background: linear-gradient(90deg, rgba(99,102,241,0.22), rgba(99,102,241,0.06)); border-color: rgba(99,102,241,0.5); color: #a5b4fc; }
+        .focus-actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .focus-mini-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 14px; border-radius: 14px; font-size: 13px; font-weight: 800; cursor: pointer; border: 1px solid; transition: all 0.15s; color: #fff; }
+        .focus-mini-btn:hover { transform: translateY(-1px); filter: brightness(1.15); }
+        .focus-mini-btn-msg     { background: rgba(59,130,246,0.18); border-color: rgba(59,130,246,0.55); color: #bfdbfe; }
+        .focus-mini-btn-reset   { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.6);  color: #fde68a; }
+        .focus-mini-btn-del     { background: rgba(239,68,68,0.18);  border-color: rgba(239,68,68,0.55);  color: #fecaca; }
+        .focus-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .focus-info-cell { background: rgba(15,23,42,0.55); border: 1px solid rgba(148,163,184,0.12); border-radius: 14px; padding: 12px 14px; }
+        .focus-info-cell .label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; }
+        .focus-info-cell .value { font-size: 16px; font-weight: 800; color: #e2e8f0; margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+        .focus-info-cell .value.open   { color: #6ee7b7; }
+        .focus-info-cell .value.locked { color: #fca5a5; }
     </style>
 </head>
 <body class="text-white min-h-screen p-6 max-w-6xl mx-auto">
@@ -680,6 +301,7 @@
         </div>
 
         <div id="tablesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        <div id="singleTableFocus" class="hidden"></div>
     </div>
 
     <div id="section-floor" class="admin-section bg-slate-800/50 backdrop-blur border border-slate-700 p-6 rounded-2xl shadow-sm mb-6 hidden">
@@ -737,8 +359,7 @@
 
         let msgTargetTable = null;
         let msgSelectedIcon = '💬';
-
-        let tableSearchFilter = ''; // lowercase substring to filter table numbers by
+        let tableSearchFilter = '';
 
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -823,6 +444,31 @@
                 el.style.color = '';
                 el.innerText = formatHMS(remaining);
             });
+
+            // Single-table focus big timer
+            document.querySelectorAll('[data-focus-countdown]').forEach(el => {
+                const tKey = el.getAttribute('data-focus-countdown');
+                const t = tables[tKey];
+                const wrapper = document.getElementById('focusBigTimer');
+                if (!t || !t.hasSession || !t.sessionStart) {
+                    if (wrapper) wrapper.className = 'focus-big-timer no-session';
+                    el.innerText = '— no session —';
+                    return;
+                }
+                const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
+                if (idleMinutes === 0) {
+                    if (wrapper) wrapper.className = 'focus-big-timer no-expiry';
+                    el.innerText = '∞ No expiry';
+                    return;
+                }
+                const remaining = (t.sessionStart + idleMinutes * 60 * 1000) - now;
+                let cls = 'safe';
+                if (remaining <= 0) cls = 'danger';
+                else if (remaining < 5 * 60 * 1000) cls = 'danger';
+                else if (remaining < 30 * 60 * 1000) cls = 'warn';
+                if (wrapper) wrapper.className = `focus-big-timer ${cls}`;
+                el.innerText = remaining > 0 ? formatHMS(remaining) : 'Expiring…';
+            });
         }
         setInterval(updateCountdowns, 1000);
 
@@ -864,6 +510,7 @@
                 selector.value = currentAdminRestaurant;
                 document.getElementById('activeMenuRestoLabel').innerText = `Active: ${currentAdminRestaurant}`;
                 renderAdmin();
+                renderSingleTableFocus();
                 renderFloorMap();
                 renderFloorMapLarge();
             } catch (e) { console.error('Failed to load restaurants list', e); }
@@ -875,6 +522,7 @@
             if (currentTab === 'menu') loadMenuAdmin();
             else if (currentTab === 'revenue') loadRevenueAdmin();
             renderAdmin();
+            renderSingleTableFocus();
             renderFloorMap();
             if (currentTab === 'floor') renderFloorMapLarge();
         }
@@ -927,6 +575,7 @@
             }
             previousPendingCount = pendingCount;
             renderAdmin();
+            renderSingleTableFocus();
             renderFloorMap();
             if (currentTab === 'floor') renderFloorMapLarge();
             updateTableSearchNotice();
@@ -1005,6 +654,7 @@
                         if (res && res.success) {
                             showModal('Session Reset', `Table #${tableNum} has been cleared and its devices were disconnected.`, '🔄');
                             renderAdmin();
+                            renderSingleTableFocus();
                             renderFloorMap();
                             if (currentTab === 'floor') renderFloorMapLarge();
                         } else {
@@ -1075,7 +725,8 @@
             });
         }
 
-        document.getElementById('tablesGrid').addEventListener('click', (e) => {
+        // Single delegated handler — works for both grid AND focus view since it's on the parent section
+        document.getElementById('section-tables').addEventListener('click', (e) => {
             const btn = e.target.closest('button[data-action]');
             if (!btn) return;
             const tableNum = btn.getAttribute('data-table');
@@ -1085,9 +736,10 @@
             else if (action === 'reset') resetTableSession(tableNum);
             else if (action === 'toggle-open') socket.emit('toggle_table', { restaurant: currentAdminRestaurant, tableNum });
             else if (action === 'toggle-order') socket.emit('toggle_order_permission', { restaurant: currentAdminRestaurant, tableNum });
+            else if (action === 'mark-paid') socket.emit('update_bill_status', { orderId: btn.getAttribute('data-order'), billStatus: 'Paid' });
         });
 
-        document.getElementById('tablesGrid').addEventListener('change', (e) => {
+        document.getElementById('section-tables').addEventListener('change', (e) => {
             const sel = e.target.closest('select[data-idle-for]');
             if (!sel) return;
             const tableNum = sel.getAttribute('data-idle-for');
@@ -1173,10 +825,8 @@
             return keys;
         }
 
-        // ---------- Table search ----------
-        function normalizeTableSearch(v) {
-            return String(v == null ? '' : v).trim().toLowerCase();
-        }
+        // ---------- Search ----------
+        function normalizeTableSearch(v) { return String(v == null ? '' : v).trim().toLowerCase(); }
         function tableMatchesSearch(k) {
             if (!tableSearchFilter) return true;
             return String(k).toLowerCase().includes(tableSearchFilter);
@@ -1184,15 +834,14 @@
         function onTableSearchInput(e) {
             const raw = e.target.value;
             tableSearchFilter = normalizeTableSearch(raw);
-
             const clearBtn = document.getElementById('tableSearchClear');
             if (clearBtn) {
                 if (raw.trim()) clearBtn.classList.remove('hidden');
                 else clearBtn.classList.add('hidden');
             }
-
             updateTableSearchNotice();
             renderAdmin();
+            renderSingleTableFocus();
             renderFloorMap();
             if (currentTab === 'floor') renderFloorMapLarge();
         }
@@ -1204,23 +853,20 @@
             if (clearBtn) clearBtn.classList.add('hidden');
             updateTableSearchNotice();
             renderAdmin();
+            renderSingleTableFocus();
             renderFloorMap();
             if (currentTab === 'floor') renderFloorMapLarge();
         }
         function updateTableSearchNotice() {
             const notice = document.getElementById('tableSearchNotice');
             if (!notice) return;
-            if (!tableSearchFilter) {
-                notice.classList.add('hidden');
-                return;
-            }
+            if (!tableSearchFilter) { notice.classList.add('hidden'); return; }
             const restoTables = (globalData.tables && globalData.tables[currentAdminRestaurant]) || {};
             const matched = Object.keys(restoTables).filter(tableMatchesSearch).length;
             document.getElementById('tableSearchCount').innerText = matched;
             document.getElementById('tableSearchTerm').innerText = tableSearchFilter;
             notice.classList.remove('hidden');
         }
-        // -----------------------------
 
         function computeTileState(k, restoTables, restoRequests, occupiedTables, restoActiveSessions) {
             const t = restoTables[k];
@@ -1331,26 +977,190 @@
                 return `
                     <div class="map-tile-lg map-tile-lg-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open card)">
                         ${badge}
-
-                        <button class="map-tile-lg-btn map-tile-lg-btn-menu-left ${menuBtnClass}"
-                                data-map-action="toggle-open"
-                                data-table="${esc(k)}"
-                                title="${menuBtnTitle}">
-                            ${menuBtnIcon}
-                        </button>
-
-                        <button class="map-tile-lg-btn map-tile-lg-btn-order-right ${orderBtnClass}"
-                                data-map-action="toggle-order"
-                                data-table="${esc(k)}"
-                                title="${orderBtnTitle}">
-                            ${orderBtnIcon}
-                        </button>
-
+                        <button class="map-tile-lg-btn map-tile-lg-btn-menu-left ${menuBtnClass}" data-map-action="toggle-open" data-table="${esc(k)}" title="${menuBtnTitle}">${menuBtnIcon}</button>
+                        <button class="map-tile-lg-btn map-tile-lg-btn-order-right ${orderBtnClass}" data-map-action="toggle-order" data-table="${esc(k)}" title="${orderBtnTitle}">${orderBtnIcon}</button>
                         <div class="map-tile-lg-num">${esc(k)}</div>
                         <div class="map-tile-lg-label">${s.label}</div>
                         ${countdownHtml}
                     </div>`;
             }).join('');
+        }
+
+        // ---------- Single-table focus view ----------
+        function renderSingleTableFocus() {
+            const container = document.getElementById('singleTableFocus');
+            const gridContainer = document.getElementById('tablesGrid');
+            if (!container || !gridContainer) return;
+
+            const restoTables = (globalData.tables && globalData.tables[currentAdminRestaurant]) || {};
+            const matchedKeys = getSortedTableKeys(restoTables).filter(tableMatchesSearch);
+
+            if (!tableSearchFilter || matchedKeys.length !== 1) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                gridContainer.classList.remove('hidden');
+                return;
+            }
+
+            gridContainer.classList.add('hidden');
+            container.classList.remove('hidden');
+
+            const k = matchedKeys[0];
+            const t = restoTables[k] || {};
+            const restoRequests = (globalData.tableRequests && globalData.tableRequests[currentAdminRestaurant]) || {};
+            const restoActiveSessions = (globalData.activeSessions && globalData.activeSessions[currentAdminRestaurant]) || {};
+            const restaurantOrders = (globalData.orders || []).filter(o =>
+                (o.restaurant || 'Default') === currentAdminRestaurant &&
+                String(o.tableNumber) === String(k)
+            );
+
+            const isWaiting = !!restoRequests[k];
+            const isOccupied = restaurantOrders.length > 0;
+            const openCount = restoActiveSessions[k] || 0;
+            const isMenuOpen = openCount > 0;
+            const hasSession = !!t.hasSession;
+            const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
+
+            let statusClass = 'focus-status-idle', statusLabel = 'Idle';
+            if (isWaiting)        { statusClass = 'focus-status-requested'; statusLabel = 'Requested'; }
+            else if (isOccupied)  { statusClass = 'focus-status-occupied';  statusLabel = 'Occupied'; }
+            else if (isMenuOpen)  { statusClass = 'focus-status-active';    statusLabel = 'Active'; }
+
+            let timerClass = 'no-session';
+            let timerContent = '— no session —';
+            if (hasSession && t.sessionStart) {
+                if (idleMinutes === 0) {
+                    timerClass = 'no-expiry';
+                    timerContent = '∞ No expiry';
+                } else {
+                    timerClass = 'safe';
+                    timerContent = '<span data-focus-countdown="' + esc(k) + '">--:--:--</span>';
+                }
+            }
+
+            let orderBtn;
+            if (isWaiting && !t.canOrder) {
+                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-requested">
+                    <span class="left-icon">🛎️</span><span>Requested! Approve</span><span class="arrow">→</span>
+                </button>`;
+            } else if (t.canOrder) {
+                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-lock-order">
+                    <span class="left-icon">🔒</span><span>Lock Order</span><span class="arrow">→</span>
+                </button>`;
+            } else {
+                orderBtn = `<button data-action="toggle-order" data-table="${esc(k)}" class="action-btn btn-open-order">
+                    <span class="left-icon">🚀</span><span>Open Order</span><span class="arrow">→</span>
+                </button>`;
+            }
+
+            const ordersHtml = restaurantOrders.length === 0
+                ? `<p class="text-slate-500 italic text-sm text-center py-6">No active orders for this table.</p>`
+                : restaurantOrders.map(o => `
+                    <div class="mini-panel mb-2">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-amber-300">Order — $${o.total.toFixed(2)}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold ${o.billStatus === 'Paid' ? 'bg-emerald-900/60 text-emerald-300' : 'bg-amber-900/60 text-amber-300'}">${esc(o.billStatus)}</span>
+                        </div>
+                        <ul class="text-xs space-y-1 mb-2">
+                            ${(o.items || []).map(i => `
+                                <li class="flex justify-between text-slate-300">
+                                    <span>${i.qty}x ${esc(i.name)}</span>
+                                    <span class="text-slate-400">$${((i.price || 0) * (i.qty || 1)).toFixed(2)}</span>
+                                </li>`).join('')}
+                        </ul>
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-700 text-[11px]">
+                            <span class="text-slate-400">Kitchen: <b class="text-slate-200">${esc(o.kitchenStatus)}</b></span>
+                            <button data-action="mark-paid" data-order="${esc(o.orderId)}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-[10px] font-semibold transition">Mark Paid ✓</button>
+                        </div>
+                    </div>`).join('');
+
+            container.innerHTML = `
+                <div class="focus-shell">
+                    <div class="focus-left">
+                        <div class="focus-title-bar">
+                            <div class="flex items-center gap-3">
+                                <div class="table-icon-block">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M6 12h12"/><path d="M8 12v6"/><path d="M16 12v6"/>
+                                        <path d="M5 8h14l-1 4H6z"/><path d="M12 8V5"/>
+                                        <circle cx="12" cy="4" r="1"/><path d="M9 18h6"/>
+                                    </svg>
+                                </div>
+                                <h2>Table <span>#${esc(k)}</span></h2>
+                            </div>
+                            <span class="focus-status-pill ${statusClass}">${statusLabel}</span>
+                        </div>
+
+                        <div class="focus-big-timer ${timerClass}" id="focusBigTimer">
+                            ${timerContent}
+                        </div>
+
+                        <div class="focus-info-grid">
+                            <div class="focus-info-cell">
+                                <div class="label">Menu</div>
+                                <div class="value ${t.isOpen ? 'open' : 'locked'}">${t.isOpen ? '🔓 OPEN' : '🔒 LOCKED'}</div>
+                            </div>
+                            <div class="focus-info-cell">
+                                <div class="label">Order</div>
+                                <div class="value ${t.canOrder ? 'open' : 'locked'}">${t.canOrder ? '🔓 OPEN' : '🔒 LOCKED'}</div>
+                            </div>
+                            <div class="focus-info-cell">
+                                <div class="label">Live devices</div>
+                                <div class="value">${openCount} ${openCount === 1 ? 'device' : 'devices'}</div>
+                            </div>
+                            <div class="focus-info-cell">
+                                <div class="label">Session timer</div>
+                                <div class="value">${idleMinutes === 0 ? 'No expiry' : (idleMinutes + ' min')}</div>
+                            </div>
+                        </div>
+
+                        <div class="mini-panel">
+                            <div class="mini-label mb-2">Session timer</div>
+                            <div class="timer-select-wrap">
+                                <div class="timer-select-icon">🕐</div>
+                                <select data-idle-for="${esc(k)}" class="timer-select">
+                                    ${IDLE_OPTIONS.map(o => `<option value="${o.value}" ${o.value === idleMinutes ? 'selected' : ''}>${o.label}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="focus-actions-row">
+                            <button data-action="message" data-table="${esc(k)}" class="focus-mini-btn focus-mini-btn-msg">
+                                <span>💬</span><span>Message</span>
+                            </button>
+                            <button data-action="reset" data-table="${esc(k)}" class="focus-mini-btn focus-mini-btn-reset">
+                                <span>🔄</span><span>Reset</span>
+                            </button>
+                        </div>
+
+                        <button data-action="delete" data-table="${esc(k)}" class="focus-mini-btn focus-mini-btn-del w-full">
+                            <span>✕</span><span>Delete Table</span>
+                        </button>
+                    </div>
+
+                    <div class="focus-right">
+                        <div class="mini-panel">
+                            <div class="focus-section-title">Menu access</div>
+                            <button data-action="toggle-open" data-table="${esc(k)}" class="action-btn w-full ${t.isOpen ? 'btn-close-menu' : 'btn-open-menu'}">
+                                <span class="left-icon">${t.isOpen ? '🔒' : '🔓'}</span>
+                                <span>${t.isOpen ? 'Close Menu' : 'Open Menu'}</span>
+                                <span class="arrow">→</span>
+                            </button>
+                        </div>
+
+                        <div class="mini-panel">
+                            <div class="focus-section-title">Order access</div>
+                            ${orderBtn}
+                        </div>
+
+                        <div class="mini-panel">
+                            <div class="focus-section-title">Active orders (${restaurantOrders.length})</div>
+                            ${ordersHtml}
+                        </div>
+                    </div>
+                </div>`;
+
+            setTimeout(updateCountdowns, 0);
         }
 
         function renderAdmin() {
@@ -1427,13 +1237,9 @@
                             <div class="flex items-center gap-3">
                                 <div class="table-icon-block">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M6 12h12"/>
-                                        <path d="M8 12v6"/>
-                                        <path d="M16 12v6"/>
-                                        <path d="M5 8h14l-1 4H6z"/>
-                                        <path d="M12 8V5"/>
-                                        <circle cx="12" cy="4" r="1"/>
-                                        <path d="M9 18h6"/>
+                                        <path d="M6 12h12"/><path d="M8 12v6"/><path d="M16 12v6"/>
+                                        <path d="M5 8h14l-1 4H6z"/><path d="M12 8V5"/>
+                                        <circle cx="12" cy="4" r="1"/><path d="M9 18h6"/>
                                     </svg>
                                 </div>
                                 <div class="flex-1">
