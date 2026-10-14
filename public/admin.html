@@ -389,7 +389,7 @@
         .map-tile-lg {
             position: relative;
             border-radius: 18px;
-            padding: 18px 12px 14px;
+            padding: 42px 12px 14px;
             text-align: center;
             border: 2px solid transparent;
             transition: all 0.2s;
@@ -431,7 +431,7 @@
         }
         .map-tile-lg-badge {
             position: absolute;
-            top: 8px;
+            top: 40px;
             right: 8px;
             font-size: 10px;
             font-weight: 800;
@@ -449,7 +449,7 @@
         .map-tile-lg-active::after {
             content: '';
             position: absolute;
-            top: 12px; left: 12px;
+            bottom: 12px; left: 12px;
             width: 10px; height: 10px;
             border-radius: 50%;
             background: #34d399;
@@ -473,6 +473,45 @@
             background: rgba(148,163,184,0.08);
             border-color: rgba(148,163,184,0.2);
             color: #94a3b8;
+        }
+
+        /* Compact action buttons on large floor-map tiles */
+        .map-tile-lg-btn {
+            position: absolute;
+            top: 8px;
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            border: 1px solid;
+            cursor: pointer;
+            transition: all 0.15s;
+            z-index: 2;
+            line-height: 1;
+            padding: 0;
+        }
+        .map-tile-lg-btn:hover {
+            transform: scale(1.12);
+            filter: brightness(1.25);
+            box-shadow: 0 0 10px currentColor;
+        }
+        .map-tile-lg-btn:active { transform: scale(0.95); }
+
+        .map-tile-lg-btn-menu-left  { left: 8px; }
+        .map-tile-lg-btn-order-right { right: 8px; }
+
+        .map-tile-lg-btn-open  { background: rgba(16,185,129,0.28); border-color: rgba(16,185,129,0.7); color: #6ee7b7; }
+        .map-tile-lg-btn-close { background: rgba(239,68,68,0.28); border-color: rgba(239,68,68,0.7); color: #fca5a5; }
+
+        .map-tile-lg-btn-order      { background: rgba(79,70,229,0.28); border-color: rgba(79,70,229,0.75); color: #a5b4fc; }
+        .map-tile-lg-btn-lock       { background: rgba(217,119,6,0.28); border-color: rgba(217,119,6,0.75); color: #fcd34d; }
+        .map-tile-lg-btn-requested  {
+            background: rgba(239,68,68,0.35); border-color: rgba(239,68,68,0.9); color: #fecaca;
+            animation: req-pulse 1.4s ease-in-out infinite;
         }
     </style>
 </head>
@@ -578,7 +617,6 @@
             </form>
         </div>
 
-        <!-- Small floor map -->
         <div class="mini-panel">
             <div class="flex items-center justify-between mb-3 flex-wrap gap-3">
                 <div class="mini-label text-base">🗺️ Live Floor Map</div>
@@ -684,7 +722,6 @@
             const tables = (globalData.tables && globalData.tables[currentAdminRestaurant]) || {};
             const now = Date.now();
 
-            // Small card countdowns
             document.querySelectorAll('[data-countdown-for]').forEach(el => {
                 const tKey = el.getAttribute('data-countdown-for');
                 const t = tables[tKey];
@@ -716,7 +753,6 @@
                 el.innerHTML = `<div class="countdown-clock">⏱</div><span>${formatHMS(remaining)}</span>`;
             });
 
-            // Large floor-map countdowns
             document.querySelectorAll('[data-countdown-lg-for]').forEach(el => {
                 const tKey = el.getAttribute('data-countdown-lg-for');
                 const t = tables[tKey];
@@ -994,8 +1030,23 @@
             scrollToTableCard(tile.getAttribute('data-jump-to'));
         });
 
-        // Large map click → jump to Tables tab and scroll to card
+        // Large map click: check action buttons first, otherwise jump to card
         document.getElementById('floorMapLarge').addEventListener('click', (e) => {
+            // 1) Action button hit?
+            const actionBtn = e.target.closest('button[data-map-action]');
+            if (actionBtn) {
+                e.stopPropagation();
+                const tableNum = actionBtn.getAttribute('data-table');
+                const action = actionBtn.getAttribute('data-map-action');
+                if (action === 'toggle-open') {
+                    socket.emit('toggle_table', { restaurant: currentAdminRestaurant, tableNum });
+                } else if (action === 'toggle-order') {
+                    socket.emit('toggle_order_permission', { restaurant: currentAdminRestaurant, tableNum });
+                }
+                return;
+            }
+
+            // 2) Otherwise jump to the card
             const tile = e.target.closest('[data-jump-to]');
             if (!tile) return;
             const tableNum = tile.getAttribute('data-jump-to');
@@ -1074,7 +1125,7 @@
             }).join('');
         }
 
-        // ---------- Large floor map (new tab) ----------
+        // ---------- Large floor map (new tab) with compact action buttons ----------
         function renderFloorMapLarge() {
             const container = document.getElementById('floorMapLarge');
             if (!container) return;
@@ -1120,9 +1171,44 @@
                     countdownHtml = `<div class="map-tile-lg-countdown" style="opacity:0.5">--:--:--</div>`;
                 }
 
+                // Compact button state
+                const menuBtnClass = s.t.isOpen ? 'map-tile-lg-btn-close' : 'map-tile-lg-btn-open';
+                const menuBtnIcon  = s.t.isOpen ? '🔒' : '🔓';
+                const menuBtnTitle = s.t.isOpen ? 'Close Menu' : 'Open Menu';
+
+                let orderBtnClass, orderBtnIcon, orderBtnTitle;
+                if (s.isWaiting && !s.t.canOrder) {
+                    orderBtnClass = 'map-tile-lg-btn-requested';
+                    orderBtnIcon = '🛎️';
+                    orderBtnTitle = 'Requested! Approve';
+                } else if (s.t.canOrder) {
+                    orderBtnClass = 'map-tile-lg-btn-lock';
+                    orderBtnIcon = '🔒';
+                    orderBtnTitle = 'Lock Order';
+                } else {
+                    orderBtnClass = 'map-tile-lg-btn-order';
+                    orderBtnIcon = '🚀';
+                    orderBtnTitle = 'Open Order';
+                }
+
                 return `
                     <div class="map-tile-lg map-tile-lg-${s.cls}" data-jump-to="${esc(k)}" title="Table #${esc(k)} — ${s.label} (click to open card)">
                         ${badge}
+
+                        <button class="map-tile-lg-btn map-tile-lg-btn-menu-left ${menuBtnClass}"
+                                data-map-action="toggle-open"
+                                data-table="${esc(k)}"
+                                title="${menuBtnTitle}">
+                            ${menuBtnIcon}
+                        </button>
+
+                        <button class="map-tile-lg-btn map-tile-lg-btn-order-right ${orderBtnClass}"
+                                data-map-action="toggle-order"
+                                data-table="${esc(k)}"
+                                title="${orderBtnTitle}">
+                            ${orderBtnIcon}
+                        </button>
+
                         <div class="map-tile-lg-num">${esc(k)}</div>
                         <div class="map-tile-lg-label">${s.label}</div>
                         ${countdownHtml}
