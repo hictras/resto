@@ -20,6 +20,8 @@ const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const restaurantsDir = path.join(__dirname, 'restaurants');
 if (!fs.existsSync(restaurantsDir)) fs.mkdirSync(restaurantsDir, { recursive: true });
+const dishPhotosDir = path.join(__dirname, 'public', 'dish-photos');
+if (!fs.existsSync(dishPhotosDir)) fs.mkdirSync(dishPhotosDir, { recursive: true });
 
 // ---------- VAPID keys ----------
 const vapidPath = path.join(dataDir, 'vapid.json');
@@ -789,6 +791,50 @@ app.get('/api/revenue', (req, res) => {
         report[resto][date][tbl] = (report[resto][date][tbl] || 0) + (ord.total || 0);
     });
     res.json(report);
+});
+ const multer = require('multer');
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: (req, file, cb) => cb(null, dishPhotosDir),
+        filename: (req, file, cb) => {
+            const itemId = String(req.params.itemId).replace(/[^a-zA-Z0-9_-]/g, '');
+            const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+            cb(null, `${itemId}${ext}`);
+        }
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+    fileFilter: (req, file, cb) => {
+        const ok = /\.(jpe?g|png|webp)$/i.test(file.originalname);
+        cb(ok ? null : new Error('Only JPG / PNG / WEBP allowed'), ok);
+    }
+});
+
+app.post('/api/menu/:restaurantName/:itemId/photo', upload.single('photo'), (req, res) => {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
+    // Delete any previous photos with a different extension for this item
+    try {
+        const itemId = String(req.params.itemId).replace(/[^a-zA-Z0-9_-]/g, '');
+        fs.readdirSync(dishPhotosDir).forEach(f => {
+            if (f.startsWith(itemId + '.') && f !== req.file.filename) {
+                try { fs.unlinkSync(path.join(dishPhotosDir, f)); } catch (e) {}
+            }
+        });
+    } catch (e) {}
+    res.json({ success: true, filename: req.file.filename });
+});
+
+app.delete('/api/menu/:restaurantName/:itemId/photo', (req, res) => {
+    try {
+        const itemId = String(req.params.itemId).replace(/[^a-zA-Z0-9_-]/g, '');
+        fs.readdirSync(dishPhotosDir).forEach(f => {
+            if (f.startsWith(itemId + '.')) {
+                try { fs.unlinkSync(path.join(dishPhotosDir, f)); } catch (e) {}
+            }
+        });
+        res.json({ success: true });
+    } catch (e) {
+        res.status(500).json({ success: false });
+    }
 });
 
 const PORT = process.env.PORT || 3000;
