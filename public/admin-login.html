@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Login</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+    <style>
+        :root {
+            --menu-paper: #FBF8F1;
+            --menu-paper-ink: #131313;
+            --menu-paper-muted: rgba(19, 19, 19, 0.55);
+            --menu-hairline: rgba(19, 19, 19, 0.12);
+            --menu-accent: #2E7D57;
+            --menu-accent-soft: rgba(46, 125, 87, 0.14);
+            --menu-display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+            --menu-ui-font: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            font-family: var(--menu-ui-font);
+            background: var(--menu-paper);
+            color: var(--menu-paper-ink);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        .login-shell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+        .login-card {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+        .login-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+        .login-card h1 {
+            font-family: var(--menu-display-font);
+            font-weight: 600;
+            font-size: 1.75rem;
+            color: var(--menu-paper-ink);
+            margin-bottom: 0.35rem;
+        }
+        .login-card p {
+            font-size: 0.85rem;
+            color: var(--menu-paper-muted);
+            margin-bottom: 1.75rem;
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+        .field label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--menu-paper-muted);
+        }
+        .field input {
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .field input:focus { border-color: var(--menu-accent); }
+        .btn-login {
+            width: 100%;
+            background: var(--menu-accent);
+            color: white;
+            border: none;
+            padding: 0.95rem;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 0.5rem;
+        }
+        .btn-login:hover { background: #245f42; }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-error {
+            background: rgba(220, 38, 38, 0.08);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #991b1b;
+            font-size: 0.82rem;
+            font-weight: 600;
+            padding: 0.65rem 0.9rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        .login-error.show { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="login-shell">
+        <div class="login-card">
+            <div class="login-icon">🍔</div>
+            <h1>Admin Login</h1>
+            <p>Enter the password to access the management console.</p>
+
+            <div id="errorBox" class="login-error"></div>
+
+            <form onsubmit="doLogin(event)">
+                <div class="field">
+                    <label for="passwordInput">Password</label>
+                    <input
+                        type="password"
+                        id="passwordInput"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        autofocus
+                        required
+                    >
+                </div>
+                <button type="submit" id="loginBtn" class="btn-login">Sign In →</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/admin-auth.js"></script>
+    <script>
+        // If already logged in, skip to home
+        (async () => {
+            if (await adminAuth.verify()) {
+                window.location.replace('/admin-home.html');
+            }
+        })();
+
+        async function doLogin(e) {
+            e.preventDefault();
+            const passwordInput = document.getElementById('passwordInput');
+            const btn = document.getElementById('loginBtn');
+            const errBox = document.getElementById('errorBox');
+
+            const password = passwordInput.value;
+            if (!password) return;
+
+            btn.disabled = true;
+            btn.innerText = 'Signing in…';
+            errBox.classList.remove('show');
+
+            try {
+                const res = await fetch('/api/admin-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const data = await res.json();
+                if (data.success && data.token) {
+                    adminAuth.setToken(data.token);
+                    window.location.replace('/admin-home.html');
+                } else {
+                    errBox.innerText = data.message || 'Login failed';
+                    errBox.classList.add('show');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                    btn.disabled = false;
+                    btn.innerText = 'Sign In →';
+                }
+            } catch (err) {
+                errBox.innerText = 'Network error. Is the server running?';
+                errBox.classList.add('show');
+                btn.disabled = false;
+                btn.innerText = 'Sign In →';
+            }
+        }
+    </script>
+</body>
+</html>

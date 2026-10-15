@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Edit Tables</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+    <style>
+        :root {
+            --menu-paper: #FBF8F1;
+            --menu-paper-ink: #131313;
+            --menu-paper-muted: rgba(19, 19, 19, 0.55);
+            --menu-hairline: rgba(19, 19, 19, 0.12);
+            --menu-accent: #2E7D57;
+            --menu-accent-soft: rgba(46, 125, 87, 0.14);
+            --menu-display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+            --menu-ui-font: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            font-family: var(--menu-ui-font);
+            background: var(--menu-paper);
+            color: var(--menu-paper-ink);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        body { padding: 1.5rem 1rem; max-width: 900px; margin: 0 auto; }
+
+        .topbar {
+            display: flex; flex-wrap: wrap; justify-content: space-between;
+            align-items: center; gap: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            padding-bottom: 1.25rem; margin-bottom: 1.5rem;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+        .back-btn {
+            background: white; border: 1px solid var(--menu-hairline);
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; cursor: pointer; text-decoration: none;
+            color: var(--menu-paper-ink); transition: all 0.15s;
+        }
+        .back-btn:hover { background: var(--menu-accent-soft); border-color: var(--menu-accent); }
+        .topbar-title {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.5rem; letter-spacing: -0.01em;
+        }
+        .sel-resto {
+            background: white; border: 1px solid var(--menu-hairline);
+            padding: 0.55rem 1rem; border-radius: 999px;
+            font-family: inherit; font-size: 0.8rem; font-weight: 600;
+            color: var(--menu-accent); cursor: pointer;
+        }
+
+        .btn {
+            border: none; cursor: pointer; font-family: inherit;
+            font-size: 0.78rem; font-weight: 600;
+            padding: 0.55rem 1rem; border-radius: 999px;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.15s; white-space: nowrap;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--menu-accent); color: white; }
+        .btn-primary:hover { background: #245f42; }
+        .btn-outline {
+            background: transparent; color: var(--menu-paper-ink);
+            border: 1px solid var(--menu-hairline);
+        }
+        .btn-outline:hover { background: var(--menu-accent-soft); }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-sm { font-size: 0.7rem; padding: 0.35rem 0.75rem; }
+
+        .section {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            margin-bottom: 1.5rem;
+        }
+        .section h2 {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.3rem;
+            padding-bottom: 0.75rem; margin-bottom: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+        }
+
+        .add-row {
+            display: flex; gap: 0.5rem; margin-bottom: 1.25rem;
+        }
+        .add-row input {
+            flex: 1;
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            padding: 0.65rem 1rem;
+            border-radius: 12px;
+            font-family: inherit; font-size: 0.9rem;
+            outline: none;
+        }
+        .add-row input:focus { border-color: var(--menu-accent); }
+
+        .table-edit-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            background: var(--menu-paper);
+        }
+        .table-edit-row .tbl-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .table-edit-row .actions {
+            display: flex; gap: 0.4rem;
+        }
+
+        .empty-state {
+            text-align: center; padding: 2rem 1rem;
+            color: var(--menu-paper-muted); font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
+            z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        .modal-card {
+            background: var(--menu-paper);
+            border-radius: 20px; padding: 1.5rem;
+            max-width: 420px; width: 100%;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .modal-card h3 {
+            font-family: var(--menu-display-font); font-weight: 600;
+            font-size: 1.25rem; margin-bottom: 0.5rem;
+        }
+        .modal-card p {
+            font-size: 0.875rem; color: var(--menu-paper-muted);
+            line-height: 1.5; margin-bottom: 1.25rem;
+            white-space: pre-line;
+        }
+        .modal-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .modal-actions { display: flex; gap: 0.5rem; }
+        .modal-actions .btn { flex: 1; justify-content: center; padding: 0.7rem; font-size: 0.85rem; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="customModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div id="modalIcon" class="modal-icon">🔔</div>
+            <h3 id="modalTitle">Notification</h3>
+            <p id="modalMessage">Message goes here...</p>
+            <div class="modal-actions">
+                <button onclick="closeCustomModal()" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div id="confirmModalIcon" class="modal-icon">⚠️</div>
+            <h3 id="confirmModalTitle">Confirm</h3>
+            <p id="confirmModalMessage">Are you sure?</p>
+            <div class="modal-actions">
+                <button onclick="closeConfirmModal()" class="btn btn-outline">Cancel</button>
+                <button id="confirmModalYes" onclick="runConfirmAction()" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/admin-settings.html" class="back-btn" title="Back to settings">←</a>
+            <div class="topbar-title">✏️ <span>Edit Tables</span></div>
+        </div>
+        <div class="topbar-actions">
+            <select id="adminRestaurantSelector" class="sel-resto" onchange="switchAdminRestaurant(this.value)"></select>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Add a Table</h2>
+        <form class="add-row" onsubmit="addNewTable(event)">
+            <input type="text" id="newTableNum" placeholder="Table number or name (e.g. 5 or Terrace A)" required>
+            <button type="submit" class="btn btn-primary">+ Add Table</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>All Tables</h2>
+        <div id="tablesEditList">
+            <p class="empty-state">Loading…</p>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/admin-auth.js"></script>
+    <script>
+        const socket = io();
+        let currentAdminRestaurant = '';
+        let globalData = { tables: {} };
+
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        function showModal(title, message, icon = '🔔') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalIcon').innerText = icon;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+        function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
+
+        let _confirmAction = null;
+        function showConfirmModal({ title, message, confirmText, confirmClass, icon, onConfirm }) {
+            document.getElementById('confirmModalTitle').innerText = title;
+            document.getElementById('confirmModalMessage').innerText = message;
+            document.getElementById('confirmModalIcon').innerText = icon || '⚠️';
+            const yesBtn = document.getElementById('confirmModalYes');
+            yesBtn.innerText = confirmText || 'Confirm';
+            yesBtn.className = 'btn ' + (confirmClass || 'btn-danger');
+            _confirmAction = onConfirm;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            _confirmAction = null;
+        }
+        function runConfirmAction() {
+            const action = _confirmAction;
+            closeConfirmModal();
+            if (typeof action === 'function') action();
+        }
+
+        socket.on('state_update', (data) => {
+            globalData = data;
+            renderTablesEditList();
+        });
+
+        async function loadRestaurants() {
+            try {
+                const res = await fetch('/api/restaurants');
+                const list = await res.json();
+                const sel = document.getElementById('adminRestaurantSelector');
+                sel.innerHTML = '';
+                if (list.length === 0) {
+                    sel.innerHTML = '<option value="">No restaurants</option>';
+                    return;
+                }
+                list.forEach(r => {
+                    const o = document.createElement('option');
+                    o.value = r; o.textContent = r;
+                    sel.appendChild(o);
+                });
+                const saved = localStorage.getItem('adminRestaurant') || list[0];
+                currentAdminRestaurant = list.includes(saved) ? saved : list[0];
+                sel.value = currentAdminRestaurant;
+                renderTablesEditList();
+            } catch (e) { console.error(e); }
+        }
+
+        function switchAdminRestaurant(name) {
+            currentAdminRestaurant = name;
+            localStorage.setItem('adminRestaurant', name);
+            renderTablesEditList();
+        }
+
+        function renderTablesEditList() {
+            const restoTables = (globalData.tables && globalData.tables[currentAdminRestaurant]) || {};
+            const keys = Object.keys(restoTables).sort((a, b) => {
+                const na = Number(a), nb = Number(b);
+                if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                return String(a).localeCompare(String(b));
+            });
+            const container = document.getElementById('tablesEditList');
+            if (keys.length === 0) {
+                container.innerHTML = '<p class="empty-state">No tables yet. Add one above.</p>';
+                return;
+            }
+            container.innerHTML = keys.map(k => {
+                const t = restoTables[k];
+                const isActive = !!(t.hasSession);
+                return `
+                    <div class="table-edit-row">
+                        <div class="tbl-name">
+                            Table #${esc(k)}
+                            ${isActive ? '<span style="font-size:0.7rem; color:var(--menu-accent); margin-left:0.5rem; font-weight:600;">· active</span>' : ''}
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-outline btn-sm" onclick="renameTable('${esc(k)}')">✏️ Rename</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteTable('${esc(k)}')">🗑️ Delete</button>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        async function addNewTable(e) {
+            e.preventDefault();
+            if (!currentAdminRestaurant) return showModal('No Restaurant', 'Select a restaurant first.', '⚠️');
+            const input = document.getElementById('newTableNum');
+            const tNum = input.value.trim();
+            if (!tNum) return;
+            try {
+                const res = await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tableNumber: tNum })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    input.value = '';
+                    showModal('Table Added', `Table #${tNum} created.`, '🪑');
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function renameTable(oldNum) {
+            const newNum = prompt(`Rename Table #${oldNum} to:`, oldNum);
+            if (!newNum || newNum === oldNum) return;
+            showConfirmModal({
+                title: `Rename Table #${oldNum}?`,
+                message: `This will delete the old table and create a new one called "${newNum}".\n\nAny active orders on the old table will be lost.`,
+                confirmText: 'Yes, Rename',
+                confirmClass: 'btn-danger',
+                icon: '✏️',
+                onConfirm: async () => {
+                    try {
+                        await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(oldNum)}`, { method: 'DELETE' });
+                        await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ tableNumber: newNum.trim() })
+                        });
+                        showModal('Table Renamed', `Table #${oldNum} → #${newNum.trim()}`, '✅');
+                    } catch (e) { console.error(e); }
+                }
+            });
+        }
+
+        function deleteTable(tableNum) {
+            showConfirmModal({
+                title: `Delete Table #${tableNum}?`,
+                message: 'This will permanently remove the table and its session.',
+                confirmText: 'Yes, Delete',
+                confirmClass: 'btn-danger',
+                icon: '🗑️',
+                onConfirm: async () => {
+                    try {
+                        await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(tableNum)}`, { method: 'DELETE' });
+                        showModal('Table Deleted', `Table #${tableNum} removed.`, '🗑️');
+                    } catch (e) { console.error(e); }
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCustomModal();
+                closeConfirmModal();
+            }
+        });
+
+        adminAuth.requireLogin(() => {
+            loadRestaurants();
+        });
+    </script>
+</body>
+</html>

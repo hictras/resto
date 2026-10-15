@@ -516,6 +516,23 @@
                 </div>
             </header>
 
+            <div class="main-nav-tabs">
+                <button onclick="switchMainTab('menu')" id="mainTabMenu" class="main-tab-btn active">📖 Menu</button>
+                <button onclick="switchMainTab('status')" id="mainTabStatus" class="main-tab-btn">
+                    📦 Status <span id="headerOrderStatusCount" class="count-badge hidden">0</span>
+                </button>
+                <button onclick="switchMainTab('served')" id="mainTabServed" class="main-tab-btn">
+                    🍽️ Served <span id="headerServedCount" class="count-badge hidden">0</span>
+                </button>
+                <button onclick="switchMainTab('messages')" id="mainTabMessages" class="main-tab-btn">
+                    💬 Messages <span id="headerMsgCount" class="count-badge hidden">0</span>
+                </button>
+            </div>
+
+            <div id="categoryNavWrapper">
+                <div class="cat-pills-row" id="categoryNav"></div>
+            </div>
+        </div>
             <div class="search-row" id="searchRowWrapper">
                 <div class="search-wrap">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
@@ -540,25 +557,6 @@
                     aria-label="Toggle grid or list view"
                 >⊞</button>
             </div>
-
-            <div class="main-nav-tabs">
-                <button onclick="switchMainTab('menu')" id="mainTabMenu" class="main-tab-btn active">📖 Menu</button>
-                <button onclick="switchMainTab('status')" id="mainTabStatus" class="main-tab-btn">
-                    📦 Status <span id="headerOrderStatusCount" class="count-badge hidden">0</span>
-                </button>
-                <button onclick="switchMainTab('served')" id="mainTabServed" class="main-tab-btn">
-                    🍽️ Served <span id="headerServedCount" class="count-badge hidden">0</span>
-                </button>
-                <button onclick="switchMainTab('messages')" id="mainTabMessages" class="main-tab-btn">
-                    💬 Messages <span id="headerMsgCount" class="count-badge hidden">0</span>
-                </button>
-            </div>
-
-            <div id="categoryNavWrapper">
-                <div class="cat-pills-row" id="categoryNav"></div>
-            </div>
-        </div>
-
         <div id="view-menu" class="container"></div>
 
         <div id="view-status" class="view-panel hidden">

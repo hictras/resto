@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Edit Menu</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+    <style>
+        :root {
+            --menu-paper: #FBF8F1;
+            --menu-paper-ink: #131313;
+            --menu-paper-muted: rgba(19, 19, 19, 0.55);
+            --menu-hairline: rgba(19, 19, 19, 0.12);
+            --menu-accent: #2E7D57;
+            --menu-accent-soft: rgba(46, 125, 87, 0.14);
+            --menu-display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+            --menu-ui-font: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            font-family: var(--menu-ui-font);
+            background: var(--menu-paper);
+            color: var(--menu-paper-ink);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        body { padding: 1.5rem 1rem; max-width: 1200px; margin: 0 auto; }
+        .hidden { display: none !important; }
+
+        /* ==================== TOPBAR ==================== */
+        .topbar {
+            display: flex; flex-wrap: wrap; justify-content: space-between;
+            align-items: center; gap: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            padding-bottom: 1.25rem; margin-bottom: 1.5rem;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+        .back-btn {
+            background: white; border: 1px solid var(--menu-hairline);
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; cursor: pointer; text-decoration: none;
+            color: var(--menu-paper-ink); transition: all 0.15s;
+        }
+        .back-btn:hover { background: var(--menu-accent-soft); border-color: var(--menu-accent); }
+        .topbar-title {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.6rem; letter-spacing: -0.01em;
+        }
+        .conn-dot {
+            display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+            background: #dc2626; transition: background 0.2s;
+        }
+        .conn-dot.online { background: var(--menu-accent); box-shadow: 0 0 0 3px rgba(46, 125, 87, 0.2); }
+        .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+        .sel-resto {
+            background: white; border: 1px solid var(--menu-hairline);
+            padding: 0.55rem 1rem; border-radius: 999px;
+            font-family: inherit; font-size: 0.8rem; font-weight: 600;
+            color: var(--menu-accent); cursor: pointer;
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            border: none; cursor: pointer; font-family: inherit;
+            font-size: 0.78rem; font-weight: 600;
+            padding: 0.55rem 1rem; border-radius: 999px;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.15s; white-space: nowrap;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--menu-accent); color: white; }
+        .btn-primary:hover { background: #245f42; }
+        .btn-outline {
+            background: transparent; color: var(--menu-paper-ink);
+            border: 1px solid var(--menu-hairline);
+        }
+        .btn-outline:hover { background: var(--menu-accent-soft); }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-soft { background: var(--menu-accent-soft); color: var(--menu-accent); }
+        .btn-soft:hover { background: rgba(46, 125, 87, 0.22); }
+        .btn-sm { font-size: 0.7rem; padding: 0.35rem 0.75rem; }
+
+        /* ==================== SECTION ==================== */
+        .section {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+        .section-title {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.35rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1rem; padding-bottom: 0.75rem; margin-bottom: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            flex-wrap: wrap;
+        }
+
+        /* ==================== SEARCH BOX ==================== */
+        .search-box {
+            display: flex; align-items: center; gap: 0.5rem;
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            border-radius: 999px;
+            padding: 0 0.9rem;
+            margin-bottom: 1rem;
+            max-width: 380px;
+        }
+        .search-box svg { width: 1rem; height: 1rem; color: var(--menu-paper-muted); flex-shrink: 0; }
+        .search-box input {
+            flex: 1; background: transparent; border: none;
+            padding: 0.65rem 0; font-family: inherit; font-size: 0.9rem;
+            color: var(--menu-paper-ink); outline: none;
+        }
+        .search-box .clear-btn {
+            background: none; border: none;
+            color: var(--menu-paper-muted); cursor: pointer;
+            font-size: 1rem; padding: 0.25rem; display: none;
+        }
+        .search-box .clear-btn.visible { display: block; }
+
+        .search-notice {
+            background: rgba(46, 125, 87, 0.08);
+            border: 1px solid var(--menu-accent-soft);
+            color: var(--menu-accent);
+            font-size: 0.78rem; font-weight: 600;
+            padding: 0.55rem 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        .search-notice button {
+            background: none; border: none; color: inherit;
+            font-family: inherit; font-weight: 700;
+            text-decoration: underline; cursor: pointer;
+            margin-left: 0.5rem;
+        }
+
+        /* ==================== FORM ==================== */
+        .form-panel {
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex; flex-direction: column; gap: 0.9rem;
+        }
+        .form-panel h3 {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.15rem;
+        }
+        .form-grid {
+            display: grid; gap: 0.9rem;
+            grid-template-columns: 1fr;
+        }
+        @media (min-width: 640px) {
+            .form-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+        }
+        .field { display: flex; flex-direction: column; gap: 0.3rem; }
+        .field label {
+            font-size: 0.68rem; font-weight: 700;
+            letter-spacing: 0.03em; text-transform: uppercase;
+            color: var(--menu-paper-muted);
+        }
+        .field input, .field select, .field textarea {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            padding: 0.6rem 0.85rem;
+            border-radius: 10px;
+            font-family: inherit; font-size: 0.88rem;
+            color: var(--menu-paper-ink);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--menu-accent); }
+        .field textarea { resize: vertical; min-height: 68px; }
+
+        /* Photo uploader */
+        .photo-uploader {
+            display: flex; gap: 1rem; align-items: center;
+            padding: 0.9rem; border: 1px dashed var(--menu-hairline);
+            border-radius: 12px;
+            background: white;
+        }
+        .photo-preview {
+            width: 90px; height: 90px; border-radius: 10px;
+            background: var(--menu-accent-soft);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden; flex-shrink: 0;
+            font-size: 1.9rem; opacity: 0.75;
+            position: relative;
+        }
+        .photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+        .photo-uploader-body {
+            flex: 1; min-width: 0;
+            display: flex; flex-direction: column; gap: 0.4rem;
+        }
+        .photo-uploader-body small { font-size: 0.68rem; color: var(--menu-paper-muted); line-height: 1.4; }
+        .photo-uploader-body small code {
+            background: var(--menu-accent-soft); color: var(--menu-accent);
+            padding: 1px 5px; border-radius: 4px; font-size: 0.66rem;
+        }
+        .photo-uploader-body .row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .photo-uploader input[type=file] { display: none; }
+
+        .form-actions {
+            display: flex; gap: 0.5rem; justify-content: flex-end;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--menu-hairline);
+        }
+
+        /* ==================== MENU LIST ==================== */
+        .category-heading {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.15rem;
+            color: var(--menu-accent);
+            margin: 1.75rem 0 0.75rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            display: flex; justify-content: space-between; align-items: baseline;
+        }
+        .category-heading:first-of-type { margin-top: 0; }
+        .category-heading .count {
+            font-family: var(--menu-ui-font); font-size: 0.78rem; font-weight: 600;
+            color: var(--menu-paper-muted);
+        }
+        .menu-list-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+        .menu-item-card {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .menu-item-photo {
+            position: relative;
+            width: 100%; aspect-ratio: 16/10;
+            background: var(--menu-accent-soft);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .menu-item-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .menu-item-photo .placeholder { font-size: 2.5rem; opacity: 0.35; }
+        .menu-item-photo .photo-badge {
+            position: absolute; top: 0.5rem; right: 0.5rem;
+            background: rgba(0,0,0,0.6); color: white;
+            font-size: 0.6rem; font-weight: 700;
+            padding: 3px 8px; border-radius: 999px;
+        }
+        .menu-item-photo .photo-badge.has-photo { background: var(--menu-accent); }
+        .menu-item-body {
+            padding: 0.9rem 1rem 1rem;
+            display: flex; flex-direction: column; gap: 0.4rem;
+            flex: 1;
+        }
+        .menu-item-name {
+            font-weight: 600; font-size: 0.95rem; line-height: 1.25;
+        }
+        .menu-item-name small {
+            display: block; font-weight: 500;
+            font-family: var(--menu-display-font);
+            color: var(--menu-paper-muted); font-size: 0.85rem;
+            margin-top: 2px;
+        }
+        .menu-item-desc {
+            font-size: 0.75rem; color: var(--menu-paper-muted);
+            line-height: 1.35;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .menu-item-price {
+            margin-top: auto;
+            font-weight: 700; color: var(--menu-accent);
+            font-size: 1rem;
+            font-variant-numeric: tabular-nums;
+        }
+        .menu-item-actions {
+            display: flex; gap: 0.4rem;
+            padding-top: 0.7rem; margin-top: 0.5rem;
+            border-top: 1px solid var(--menu-hairline);
+        }
+        .menu-item-actions .btn { flex: 1; justify-content: center; }
+
+        .empty-state {
+            text-align: center; padding: 3rem 1rem;
+            color: var(--menu-paper-muted); font-size: 0.9rem;
+        }
+
+        /* ==================== MODALS ==================== */
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
+            z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        .modal-card {
+            background: var(--menu-paper);
+            border-radius: 20px; padding: 1.5rem;
+            max-width: 420px; width: 100%;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .modal-card h3 {
+            font-family: var(--menu-display-font); font-weight: 600;
+            font-size: 1.25rem; margin-bottom: 0.5rem;
+        }
+        .modal-card p {
+            font-size: 0.875rem; color: var(--menu-paper-muted);
+            line-height: 1.5; margin-bottom: 1.25rem;
+            white-space: pre-line;
+        }
+        .modal-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .modal-actions { display: flex; gap: 0.5rem; }
+        .modal-actions .btn { flex: 1; justify-content: center; padding: 0.7rem; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <div id="customModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div id="modalIcon" class="modal-icon">🔔</div>
+            <h3 id="modalTitle">Notification</h3>
+            <p id="modalMessage">Message goes here...</p>
+            <div class="modal-actions">
+                <button onclick="closeCustomModal()" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div id="confirmModalIcon" class="modal-icon">⚠️</div>
+            <h3 id="confirmModalTitle">Confirm</h3>
+            <p id="confirmModalMessage">Are you sure?</p>
+            <div class="modal-actions">
+                <button onclick="closeConfirmModal()" class="btn btn-outline">Cancel</button>
+                <button id="confirmModalYes" onclick="runConfirmAction()" class="btn btn-danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/admin-settings.html" class="back-btn" title="Back to settings">←</a>
+            <div class="topbar-title">
+                ✏️ <span>Edit Menu</span>
+                <span id="connStatus" class="conn-dot" title="Connecting…"></span>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <select id="adminRestaurantSelector" class="sel-resto" onchange="switchAdminRestaurant(this.value)"></select>
+            <button onclick="adminAuth.logout()" class="btn btn-danger">Logout</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">
+            <span>Menu Items</span>
+            <span id="activeMenuRestoLabel" style="font-size:0.78rem; font-weight:600; color:var(--menu-accent);"></span>
+        </h2>
+
+        <div class="form-panel">
+            <h3 id="formTitle">➕ Add New Item</h3>
+            <input type="hidden" id="mId">
+            <input type="hidden" id="mOldCategory">
+
+            <div class="form-grid">
+                <div class="field">
+                    <label>Name (EN)</label>
+                    <input type="text" id="mName" placeholder="Burrata & Heirloom Tomato" required>
+                </div>
+                <div class="field">
+                    <label>Name (AR)</label>
+                    <input type="text" id="mNameAr" placeholder="بوراتا">
+                </div>
+                <div class="field">
+                    <label>Price ($)</label>
+                    <input type="number" step="0.01" id="mPrice" placeholder="14.00" required>
+                </div>
+                <div class="field">
+                    <label>Category</label>
+                    <select id="mCat">
+                        <option value="Starters">Starters</option>
+                        <option value="Mains">Mains</option>
+                        <option value="Desserts">Desserts</option>
+                        <option value="Drinks">Drinks</option>
+                        <option value="Salads & Veggies">Salads &amp; Veggies</option>
+                        <option value="Cold Mezza">Cold Mezza</option>
+                        <option value="Coffee, Tea & Shisha">Coffee, Tea &amp; Shisha</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Description (EN)</label>
+                <textarea id="mDesc" placeholder="Creamy burrata, basil oil, charred sourdough."></textarea>
+            </div>
+            <div class="field">
+                <label>Description (AR)</label>
+                <textarea id="mDescAr" placeholder="بوراتا كريمية، زيت ريحان، خبز محمص."></textarea>
+            </div>
+
+            <div class="field">
+                <label>Photo</label>
+                <div class="photo-uploader">
+                    <div class="photo-preview" id="photoPreview">🍽️</div>
+                    <div class="photo-uploader-body">
+                        <small>
+                            Upload a JPG / PNG / WEBP — up to 5 MB. The file saves as
+                            <code>&lt;item-id&gt;.jpg</code> in <code>/dish-photos/</code> and the customer menu picks it up automatically.
+                        </small>
+                        <div class="row">
+                            <input type="file" id="photoFileInput" accept="image/jpeg,image/png,image/webp">
+                            <button type="button" class="btn btn-soft btn-sm" onclick="document.getElementById('photoFileInput').click()">
+                                📷 Choose Photo
+                            </button>
+                            <button type="button" class="btn btn-outline btn-sm hidden" id="removePhotoBtn" onclick="removePhoto()">
+                                🗑️ Remove Photo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" id="cancelEditBtn" onclick="resetMenuForm()" class="btn btn-outline hidden">Cancel</button>
+                <button type="button" id="submitBtn" onclick="saveMenu()" class="btn btn-primary">➕ Add Item</button>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
+                <path d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"></path>
+            </svg>
+            <input type="text" id="menuSearchInput" placeholder="Search menu items…" autocomplete="off">
+            <button class="clear-btn" id="menuSearchClearBtn" onclick="clearMenuSearch()" title="Clear">✕</button>
+        </div>
+        <div id="menuSearchNotice" class="search-notice hidden">
+            Showing <span id="menuSearchCount">0</span> item(s) matching "<span id="menuSearchTerm"></span>"
+            <button onclick="clearMenuSearch()">clear</button>
+        </div>
+
+        <div id="menuList">
+            <p class="empty-state">Loading…</p>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/admin-auth.js"></script>
+    <script>
+        const socket = io();
+        let currentAdminRestaurant = '';
+        let menuCategories = [];
+        let menuSearchFilter = '';
+
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        function showModal(title, message, icon = '🔔') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalIcon').innerText = icon;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+        function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
+
+        let _confirmAction = null;
+        function showConfirmModal({ title, message, confirmText, confirmClass, icon, onConfirm }) {
+            document.getElementById('confirmModalTitle').innerText = title;
+            document.getElementById('confirmModalMessage').innerText = message;
+            document.getElementById('confirmModalIcon').innerText = icon || '⚠️';
+            const yesBtn = document.getElementById('confirmModalYes');
+            yesBtn.innerText = confirmText || 'Confirm';
+            yesBtn.className = 'btn ' + (confirmClass || 'btn-danger');
+            _confirmAction = onConfirm;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            _confirmAction = null;
+        }
+        function runConfirmAction() {
+            const action = _confirmAction;
+            closeConfirmModal();
+            if (typeof action === 'function') action();
+        }
+
+        socket.on('connect', () => document.getElementById('connStatus').classList.add('online'));
+        socket.on('disconnect', () => document.getElementById('connStatus').classList.remove('online'));
+
+        socket.on('menu_updated', (data) => {
+            if (data && data.restaurant === currentAdminRestaurant) loadMenu();
+        });
+
+        async function loadRestaurants() {
+            try {
+                const res = await fetch('/api/restaurants');
+                const list = await res.json();
+                const sel = document.getElementById('adminRestaurantSelector');
+                sel.innerHTML = '';
+                if (list.length === 0) {
+                    sel.innerHTML = '<option value="">No restaurants</option>';
+                    return;
+                }
+                list.forEach(r => {
+                    const o = document.createElement('option');
+                    o.value = r; o.textContent = r;
+                    sel.appendChild(o);
+                });
+                const saved = localStorage.getItem('adminRestaurant') || list[0];
+                currentAdminRestaurant = list.includes(saved) ? saved : list[0];
+                sel.value = currentAdminRestaurant;
+                document.getElementById('activeMenuRestoLabel').innerText = currentAdminRestaurant;
+                loadMenu();
+            } catch (e) { console.error(e); }
+        }
+
+        function switchAdminRestaurant(name) {
+            currentAdminRestaurant = name;
+            localStorage.setItem('adminRestaurant', name);
+            document.getElementById('activeMenuRestoLabel').innerText = name;
+            resetMenuForm();
+            clearMenuSearch();
+            loadMenu();
+        }
+
+        async function loadMenu() {
+            if (!currentAdminRestaurant) return;
+            try {
+                const res = await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}`);
+                menuCategories = await res.json();
+                renderMenuList();
+            } catch (e) {
+                console.error(e);
+                document.getElementById('menuList').innerHTML = `<p class="empty-state">Failed to load menu.</p>`;
+            }
+        }
+
+        function onMenuSearchInput(e) {
+            menuSearchFilter = String(e.target.value || '').trim().toLowerCase();
+            const clearBtn = document.getElementById('menuSearchClearBtn');
+            if (menuSearchFilter) clearBtn.classList.add('visible');
+            else clearBtn.classList.remove('visible');
+            updateMenuSearchNotice();
+            renderMenuList();
+        }
+
+        function clearMenuSearch() {
+            menuSearchFilter = '';
+            const input = document.getElementById('menuSearchInput');
+            if (input) input.value = '';
+            const clearBtn = document.getElementById('menuSearchClearBtn');
+            if (clearBtn) clearBtn.classList.remove('visible');
+            updateMenuSearchNotice();
+            renderMenuList();
+        }
+
+        function updateMenuSearchNotice() {
+            const notice = document.getElementById('menuSearchNotice');
+            if (!notice) return;
+            if (!menuSearchFilter) { notice.classList.add('hidden'); return; }
+            let count = 0;
+            menuCategories.forEach(cat => {
+                (cat.items || []).forEach(item => {
+                    if (itemMatchesSearch(item, cat)) count++;
+                });
+            });
+            document.getElementById('menuSearchCount').innerText = count;
+            document.getElementById('menuSearchTerm').innerText = menuSearchFilter;
+            notice.classList.remove('hidden');
+        }
+
+        function itemMatchesSearch(item, cat) {
+            if (!menuSearchFilter) return true;
+            const haystack = [
+                item.nameEn,
+                item.nameAr,
+                item.descEn,
+                item.descAr,
+                cat && cat.categoryEn,
+                cat && cat.categoryAr
+            ].filter(Boolean).join(' ').toLowerCase();
+            return haystack.includes(menuSearchFilter);
+        }
+
+        function renderMenuList() {
+            const container = document.getElementById('menuList');
+            if (!menuCategories || menuCategories.length === 0) {
+                container.innerHTML = `<p class="empty-state">No items yet. Add your first item above ☝️</p>`;
+                return;
+            }
+
+            const filtered = menuCategories.map(cat => ({
+                ...cat,
+                items: (cat.items || []).filter(item => itemMatchesSearch(item, cat))
+            })).filter(cat => cat.items.length > 0);
+
+            if (filtered.length === 0) {
+                container.innerHTML = menuSearchFilter
+                    ? `<p class="empty-state">No items match your search.</p>`
+                    : `<p class="empty-state">No items yet. Add your first item above ☝️</p>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(cat => `
+                <h3 class="category-heading">
+                    <span>${esc(cat.categoryEn)}</span>
+                    <span class="count">${cat.items.length} item${cat.items.length > 1 ? 's' : ''}</span>
+                </h3>
+                <div class="menu-list-grid">
+                    ${cat.items.map(item => `
+                        <div class="menu-item-card" data-item-id="${esc(item.id)}">
+                            <div class="menu-item-photo" data-photo-for="${esc(item.id)}">
+                                <div class="placeholder">🍽️</div>
+                            </div>
+                            <div class="menu-item-body">
+                                <div class="menu-item-name">
+                                    ${esc(item.nameEn || '')}
+                                    ${item.nameAr ? `<small>${esc(item.nameAr)}</small>` : ''}
+                                </div>
+                                ${item.descEn ? `<div class="menu-item-desc">${esc(item.descEn)}</div>` : ''}
+                                <div class="menu-item-price">$${(parseFloat(item.price) || 0).toFixed(2)}</div>
+                                <div class="menu-item-actions">
+                                    <button class="btn btn-outline btn-sm" onclick="startEditItem('${esc(cat.categoryEn)}', '${esc(item.id)}')">✏️ Edit</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteItem('${esc(item.id)}')">🗑️ Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>`).join('');
+
+            filtered.forEach(cat => {
+                (cat.items || []).forEach(item => {
+                    const container = document.querySelector(`[data-photo-for="${cssEscape(item.id)}"]`);
+                    if (container) loadItemPhoto(item.id, container);
+                });
+            });
+        }
+
+        function cssEscape(s) {
+            return String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
+        }
+
+        const PHOTO_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
+        function loadItemPhoto(itemId, containerEl) {
+            function tryNext(idx) {
+                if (idx >= PHOTO_EXTS.length) {
+                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>';
+                    return;
+                }
+                const src = `/dish-photos/${itemId}.${PHOTO_EXTS[idx]}?t=${Date.now()}`;
+                const img = new Image();
+                img.onload = () => {
+                    containerEl.innerHTML = `
+                        <img src="${esc(src)}" alt="">
+                        <span class="photo-badge has-photo">✓ photo</span>`;
+                };
+                img.onerror = () => tryNext(idx + 1);
+                img.src = src;
+            }
+            tryNext(0);
+        }
+
+        function resetMenuForm() {
+            document.getElementById('mId').value = '';
+            document.getElementById('mOldCategory').value = '';
+            document.getElementById('mName').value = '';
+            document.getElementById('mNameAr').value = '';
+            document.getElementById('mPrice').value = '';
+            document.getElementById('mCat').value = 'Starters';
+            document.getElementById('mDesc').value = '';
+            document.getElementById('mDescAr').value = '';
+            document.getElementById('photoPreview').innerHTML = '🍽️';
+            document.getElementById('photoFileInput').value = '';
+            document.getElementById('removePhotoBtn').classList.add('hidden');
+            document.getElementById('formTitle').innerText = '➕ Add New Item';
+            document.getElementById('submitBtn').innerText = '➕ Add Item';
+            document.getElementById('cancelEditBtn').classList.add('hidden');
+        }
+
+        function startEditItem(category, itemId) {
+            let found = null;
+            for (const cat of menuCategories) {
+                if (cat.categoryEn === category) {
+                    found = (cat.items || []).find(i => String(i.id) === String(itemId));
+                    if (found) break;
+                }
+            }
+            if (!found) return showModal('Not Found', 'Could not find this item.', '⚠️');
+
+            document.getElementById('mId').value = found.id || '';
+            document.getElementById('mOldCategory').value = category;
+            document.getElementById('mName').value = found.nameEn || '';
+            document.getElementById('mNameAr').value = found.nameAr || '';
+            document.getElementById('mPrice').value = found.price || '';
+            document.getElementById('mCat').value = category;
+            document.getElementById('mDesc').value = found.descEn || '';
+            document.getElementById('mDescAr').value = found.descAr || '';
+            document.getElementById('formTitle').innerText = `✏️ Edit: ${found.nameEn}`;
+            document.getElementById('submitBtn').innerText = '💾 Save Changes';
+            document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+            const preview = document.getElementById('photoPreview');
+            preview.innerHTML = '🍽️';
+            document.getElementById('removePhotoBtn').classList.add('hidden');
+            function tryNext(idx) {
+                if (idx >= PHOTO_EXTS.length) return;
+                const src = `/dish-photos/${found.id}.${PHOTO_EXTS[idx]}?t=${Date.now()}`;
+                const img = new Image();
+                img.onload = () => {
+                    preview.innerHTML = `<img src="${esc(src)}" alt="">`;
+                    document.getElementById('removePhotoBtn').classList.remove('hidden');
+                };
+                img.onerror = () => tryNext(idx + 1);
+                img.src = src;
+            }
+            tryNext(0);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('photoFileInput').addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            const preview = document.getElementById('photoPreview');
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                preview.innerHTML = `<img src="${ev.target.result}" alt="">`;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        async function saveMenu() {
+            if (!currentAdminRestaurant) return;
+            const itemId = document.getElementById('mId').value;
+            const nameEn = document.getElementById('mName').value.trim();
+            const nameAr = document.getElementById('mNameAr').value.trim();
+            const price = document.getElementById('mPrice').value;
+            const category = document.getElementById('mCat').value;
+            const descEn = document.getElementById('mDesc').value.trim();
+            const descAr = document.getElementById('mDescAr').value.trim();
+
+            if (!nameEn) return showModal('Missing Name', 'Please enter the item name in English.', '⚠️');
+            if (!price) return showModal('Missing Price', 'Please enter the price.', '⚠️');
+
+            const payload = { nameEn, nameAr: nameAr || nameEn, price, category, descEn, descAr };
+            const btn = document.getElementById('submitBtn');
+            const originalLabel = btn.innerText;
+            btn.disabled = true; btn.innerText = 'Saving…';
+
+            let savedItemId = itemId;
+
+            try {
+                if (itemId) {
+                    await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(itemId)}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } else {
+                    const res = await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (data && data.item && data.item.id) savedItemId = data.item.id;
+                    else if (data && data.id) savedItemId = data.id;
+                }
+
+                const photoInput = document.getElementById('photoFileInput');
+                if (photoInput.files && photoInput.files[0] && savedItemId) {
+                    const fd = new FormData();
+                    fd.append('photo', photoInput.files[0]);
+                    const photoRes = await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(savedItemId)}/photo`, {
+                        method: 'POST',
+                        body: fd
+                    });
+                    if (!photoRes.ok) {
+                        const err = await photoRes.json().catch(() => ({}));
+                        showModal('Photo Upload Failed', err.message || 'Could not upload photo.', '⚠️');
+                    }
+                }
+
+                showModal('Saved', itemId ? 'Item updated successfully.' : 'Item added successfully.', '✅');
+                resetMenuForm();
+                loadMenu();
+            } catch (e) {
+                console.error(e);
+                showModal('Error', 'Failed to save item.', '⚠️');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalLabel;
+            }
+        }
+
+        function removePhoto() {
+            const itemId = document.getElementById('mId').value;
+            if (!itemId) {
+                document.getElementById('photoPreview').innerHTML = '🍽️';
+                document.getElementById('photoFileInput').value = '';
+                document.getElementById('removePhotoBtn').classList.add('hidden');
+                return;
+            }
+            showConfirmModal({
+                title: 'Remove Photo?',
+                message: 'The saved photo will be deleted from the server.',
+                confirmText: 'Yes, Remove',
+                confirmClass: 'btn-danger',
+                icon: '🗑️',
+                onConfirm: async () => {
+                    try {
+                        await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(itemId)}/photo`, { method: 'DELETE' });
+                        document.getElementById('photoPreview').innerHTML = '🍽️';
+                        document.getElementById('removePhotoBtn').classList.add('hidden');
+                        document.getElementById('photoFileInput').value = '';
+                        showModal('Photo Removed', 'The photo has been deleted.', '🗑️');
+                        loadMenu();
+                    } catch (e) { console.error(e); }
+                }
+            });
+        }
+
+        function deleteItem(itemId) {
+            showConfirmModal({
+                title: 'Delete Item?',
+                message: 'This item and its photo will be permanently removed.',
+                confirmText: 'Yes, Delete',
+                confirmClass: 'btn-danger',
+                icon: '🗑️',
+                onConfirm: async () => {
+                    try {
+                        await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(itemId)}/photo`, { method: 'DELETE' });
+                        await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(itemId)}`, { method: 'DELETE' });
+                        showModal('Deleted', 'The item has been removed.', '🗑️');
+                        loadMenu();
+                    } catch (e) { console.error(e); }
+                }
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCustomModal();
+                closeConfirmModal();
+            }
+        });
+
+        adminAuth.requireLogin(() => {
+            loadRestaurants();
+            document.getElementById('menuSearchInput').addEventListener('input', onMenuSearchInput);
+        });
+    </script>
+</body>
+</html>

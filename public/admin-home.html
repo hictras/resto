@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin Home</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+    <style>
+        :root {
+            --menu-paper: #FBF8F1;
+            --menu-paper-ink: #131313;
+            --menu-paper-muted: rgba(19, 19, 19, 0.55);
+            --menu-hairline: rgba(19, 19, 19, 0.12);
+            --menu-accent: #2E7D57;
+            --menu-accent-soft: rgba(46, 125, 87, 0.14);
+            --menu-display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+            --menu-ui-font: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            font-family: var(--menu-ui-font);
+            background: var(--menu-paper);
+            color: var(--menu-paper-ink);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        body { padding: 1.5rem 1rem; max-width: 1100px; margin: 0 auto; }
+
+        /* ==================== TOPBAR ==================== */
+        .topbar {
+            display: flex; flex-wrap: wrap; justify-content: space-between;
+            align-items: center; gap: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            padding-bottom: 1.25rem; margin-bottom: 2rem;
+        }
+        .topbar-title {
+            display: flex; align-items: center; gap: 0.75rem;
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.75rem; letter-spacing: -0.01em;
+        }
+        .conn-dot {
+            display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+            background: #dc2626; transition: background 0.2s;
+        }
+        .conn-dot.online { background: var(--menu-accent); box-shadow: 0 0 0 3px rgba(46, 125, 87, 0.2); }
+        .topbar-actions {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+        }
+        .sel-resto {
+            background: white; border: 1px solid var(--menu-hairline);
+            padding: 0.55rem 1rem; border-radius: 999px;
+            font-family: inherit; font-size: 0.8rem; font-weight: 600;
+            color: var(--menu-accent); cursor: pointer;
+        }
+        .btn {
+            border: none; cursor: pointer; font-family: inherit;
+            font-size: 0.78rem; font-weight: 600;
+            padding: 0.55rem 1rem; border-radius: 999px;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.15s; white-space: nowrap;
+        }
+        .btn-outline {
+            background: transparent; color: var(--menu-paper-ink);
+            border: 1px solid var(--menu-hairline);
+        }
+        .btn-outline:hover { background: var(--menu-accent-soft); }
+        .btn-logout {
+            background: #dc2626; color: white;
+        }
+        .btn-logout:hover { background: #b91c1c; }
+
+        /* ==================== WELCOME ==================== */
+        .welcome {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+        .welcome h1 {
+            font-family: var(--menu-display-font);
+            font-weight: 600;
+            font-size: 2.5rem;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.5rem;
+        }
+        .welcome h1 span { color: var(--menu-accent); }
+        .welcome p {
+            font-size: 0.95rem;
+            color: var(--menu-paper-muted);
+        }
+
+        /* ==================== CARDS ==================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        @media (min-width: 600px) {
+            .cards-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (min-width: 900px) {
+            .cards-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        .home-card {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 20px;
+            padding: 1.75rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            min-height: 180px;
+        }
+        .home-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            border-color: var(--menu-accent);
+        }
+        .home-card::after {
+            content: '→';
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.25rem;
+            color: var(--menu-paper-muted);
+            transition: all 0.2s;
+        }
+        .home-card:hover::after {
+            color: var(--menu-accent);
+            transform: translateX(4px);
+        }
+        .home-card-icon {
+            font-size: 2.25rem;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+        .home-card-title {
+            font-family: var(--menu-display-font);
+            font-weight: 600;
+            font-size: 1.5rem;
+            line-height: 1.15;
+            color: var(--menu-paper-ink);
+        }
+        .home-card-desc {
+            font-size: 0.85rem;
+            color: var(--menu-paper-muted);
+            line-height: 1.45;
+            margin-top: auto;
+        }
+        .home-card-badge {
+            position: absolute;
+            top: 1.25rem;
+            right: 3rem;
+            background: #dc2626;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            display: none;
+        }
+        .home-card-badge.show { display: inline-block; }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="topbar-title">
+            🍔 <span>Admin Console</span>
+            <span id="connStatus" class="conn-dot" title="Connecting…"></span>
+        </div>
+        <div class="topbar-actions">
+            <select id="adminRestaurantSelector" class="sel-resto"></select>
+            <button onclick="adminAuth.logout()" class="btn btn-logout">Logout</button>
+        </div>
+    </div>
+
+    <div class="welcome">
+        <h1>Welcome back to <span>Admin</span></h1>
+        <p>Choose what you want to manage today.</p>
+    </div>
+
+    <div class="cards-grid">
+
+        <a href="/admin-tables.html" class="home-card">
+            <div class="home-card-icon">🪑</div>
+            <div class="home-card-title">Tables</div>
+            <div class="home-card-desc">View tables, manage sessions, open menus and orders, send messages.</div>
+        </a>
+
+        <a href="/admin-menu.html" class="home-card">
+            <div class="home-card-icon">📋</div>
+            <div class="home-card-title">Menu Items</div>
+            <div class="home-card-desc">Add, edit, or delete dishes. Upload photos. Organize by category.</div>
+        </a>
+
+        <a href="/admin-bills.html" class="home-card">
+            <div class="home-card-icon">💵</div>
+            <div class="home-card-title">Bills</div>
+            <div class="home-card-desc">Review unpaid bills, mark tables as paid, close sessions.</div>
+        </a>
+
+        <a href="/admin-revenue.html" class="home-card">
+            <div class="home-card-icon">📊</div>
+            <div class="home-card-title">Revenue</div>
+            <div class="home-card-desc">Daily totals, per-table revenue, historical settlements.</div>
+        </a>
+
+        <a href="/kitchen.html" class="home-card">
+            <div class="home-card-icon">🍳</div>
+            <div class="home-card-title">Kitchen Display</div>
+            <div class="home-card-desc">Live cooking queue. Mark items cooking or ready. Send to table.</div>
+        </a>
+
+        <a href="/admin-settings.html" class="home-card">
+            <div class="home-card-icon">⚙️</div>
+            <div class="home-card-title">Settings</div>
+            <div class="home-card-desc">Print QR codes, manage restaurants, enable push, system preferences.</div>
+        </a>
+
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/admin-auth.js"></script>
+    <script>
+        // ---------- Connection indicator ----------
+        const socket = io();
+        socket.on('connect', () => {
+            const dot = document.getElementById('connStatus');
+            dot.classList.add('online');
+            dot.title = 'Connected';
+        });
+        socket.on('disconnect', () => {
+            const dot = document.getElementById('connStatus');
+            dot.classList.remove('online');
+            dot.title = 'Disconnected';
+        });
+
+        // ---------- Restaurant selector ----------
+        async function loadRestaurants() {
+            try {
+                const res = await fetch('/api/restaurants');
+                const restaurants = await res.json();
+                const sel = document.getElementById('adminRestaurantSelector');
+                sel.innerHTML = '';
+                if (restaurants.length === 0) {
+                    sel.innerHTML = '<option value="">No restaurants</option>';
+                    return;
+                }
+                restaurants.forEach(r => {
+                    const opt = document.createElement('option');
+                    opt.value = r;
+                    opt.textContent = r;
+                    sel.appendChild(opt);
+                });
+                // Remember last used one
+                const saved = localStorage.getItem('adminRestaurant') || restaurants[0];
+                sel.value = restaurants.includes(saved) ? saved : restaurants[0];
+                sel.onchange = () => {
+                    localStorage.setItem('adminRestaurant', sel.value);
+                };
+            } catch (e) {
+                console.error('Failed to load restaurants', e);
+            }
+        }
+
+        // ---------- Login gate + boot ----------
+        adminAuth.requireLogin(() => {
+            loadRestaurants();
+        });
+    </script>
+</body>
+</html>

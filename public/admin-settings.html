@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin — Settings</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        :root {
+            --menu-paper: #FBF8F1;
+            --menu-paper-ink: #131313;
+            --menu-paper-muted: rgba(19, 19, 19, 0.55);
+            --menu-hairline: rgba(19, 19, 19, 0.12);
+            --menu-accent: #2E7D57;
+            --menu-accent-soft: rgba(46, 125, 87, 0.14);
+            --menu-display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+            --menu-ui-font: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            font-family: var(--menu-ui-font);
+            background: var(--menu-paper);
+            color: var(--menu-paper-ink);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        body { padding: 1.5rem 1rem; max-width: 1000px; margin: 0 auto; }
+        .hidden { display: none !important; }
+
+        .topbar {
+            display: flex; flex-wrap: wrap; justify-content: space-between;
+            align-items: center; gap: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            padding-bottom: 1.25rem; margin-bottom: 1.5rem;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+        .back-btn {
+            background: white; border: 1px solid var(--menu-hairline);
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; cursor: pointer; text-decoration: none;
+            color: var(--menu-paper-ink); transition: all 0.15s;
+        }
+        .back-btn:hover { background: var(--menu-accent-soft); border-color: var(--menu-accent); }
+        .topbar-title {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.6rem; letter-spacing: -0.01em;
+        }
+        .conn-dot {
+            display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+            background: #dc2626; transition: background 0.2s;
+        }
+        .conn-dot.online { background: var(--menu-accent); box-shadow: 0 0 0 3px rgba(46, 125, 87, 0.2); }
+        .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+        .btn {
+            border: none; cursor: pointer; font-family: inherit;
+            font-size: 0.78rem; font-weight: 600;
+            padding: 0.55rem 1rem; border-radius: 999px;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.15s; white-space: nowrap;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--menu-accent); color: white; }
+        .btn-primary:hover { background: #245f42; }
+        .btn-outline {
+            background: transparent; color: var(--menu-paper-ink);
+            border: 1px solid var(--menu-hairline);
+        }
+        .btn-outline:hover { background: var(--menu-accent-soft); }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-lg { font-size: 0.9rem; padding: 0.85rem 1.3rem; }
+
+        .card-section {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            margin-bottom: 1.25rem;
+        }
+        .card-section h2 {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.3rem;
+            display: flex; align-items: center; gap: 0.5rem;
+            padding-bottom: 0.75rem; margin-bottom: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+        }
+        .card-section p.desc {
+            font-size: 0.85rem;
+            color: var(--menu-paper-muted);
+            line-height: 1.55;
+            margin-bottom: 1rem;
+        }
+        .row-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+        .resto-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .resto-item {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 12px;
+            background: var(--menu-paper);
+        }
+        .resto-item .name {
+            font-weight: 700;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .resto-item .name .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--menu-accent);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        @media (min-width: 600px) {
+            .info-grid { grid-template-columns: 1fr 1fr; }
+        }
+        .info-cell {
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+        }
+        .info-cell .lbl {
+            font-size: 0.68rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--menu-paper-muted);
+        }
+        .info-cell .val {
+            font-size: 0.95rem; font-weight: 700;
+            margin-top: 0.25rem;
+            word-break: break-all;
+        }
+        .info-cell .val.online { color: var(--menu-accent); }
+        .info-cell .val.offline { color: #dc2626; }
+
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
+            z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        .modal-card {
+            background: var(--menu-paper);
+            border-radius: 20px; padding: 1.5rem;
+            max-width: 420px; width: 100%;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .modal-card h3 {
+            font-family: var(--menu-display-font); font-weight: 600;
+            font-size: 1.25rem; margin-bottom: 0.5rem;
+        }
+        .modal-card p {
+            font-size: 0.875rem; color: var(--menu-paper-muted);
+            line-height: 1.5; margin-bottom: 1.25rem;
+            white-space: pre-line;
+        }
+        .modal-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .modal-actions { display: flex; gap: 0.5rem; }
+        .modal-actions .btn { flex: 1; justify-content: center; padding: 0.7rem; font-size: 0.85rem; }
+
+        .modal-card.qr-modal {
+            max-width: 900px; max-height: 90vh; overflow-y: auto;
+            text-align: left;
+        }
+        .qr-modal-head {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--menu-hairline);
+        }
+        .qr-modal-head h3 { margin: 0; }
+        .qr-modal-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            text-align: center;
+        }
+        @media (min-width: 640px) {
+            .qr-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        .qr-card {
+            border: 1px solid var(--menu-hairline);
+            border-radius: 14px;
+            padding: 1rem;
+            background: white;
+            text-decoration: none;
+            color: inherit;
+            display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+        }
+        .qr-card .tbl-num { font-weight: 700; font-size: 1rem; }
+        .qr-card img {
+            width: 130px; height: 130px;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 8px;
+            padding: 4px;
+            background: white;
+        }
+        .qr-card .url {
+            font-size: 0.62rem;
+            font-family: monospace;
+            color: var(--menu-paper-muted);
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="customModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div id="modalIcon" class="modal-icon">🔔</div>
+            <h3 id="modalTitle">Notification</h3>
+            <p id="modalMessage">Message goes here...</p>
+            <div class="modal-actions">
+                <button onclick="closeCustomModal()" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="qrPrintModal" class="modal-backdrop hidden">
+        <div class="modal-card qr-modal">
+            <div class="qr-modal-head">
+                <h3 id="qrModalTitle">🖨️ Table QR Codes</h3>
+                <div class="qr-modal-actions">
+                    <button onclick="downloadAllQRZip()" class="btn btn-primary">Download ZIP 📦</button>
+                    <button onclick="window.print()" class="btn btn-outline">Print 🖨️</button>
+                    <button onclick="document.getElementById('qrPrintModal').classList.add('hidden')" class="btn btn-outline">Close ✕</button>
+                </div>
+            </div>
+            <div class="qr-grid" id="qrGridContainer"></div>
+        </div>
+    </div>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/admin-home.html" class="back-btn" title="Back to home">←</a>
+            <div class="topbar-title">
+                ⚙️ <span>Settings</span>
+                <span id="connStatus" class="conn-dot" title="Connecting…"></span>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <button onclick="adminAuth.logout()" class="btn btn-danger">Logout</button>
+        </div>
+    </div>
+
+    <!-- NEW: Edit pages -->
+    <div class="card-section">
+        <h2>✏️ Edit Tables</h2>
+        <p class="desc">
+            Add, rename, or delete tables. This is a destructive area — use it only when you're setting up the restaurant or making structural changes. The daily <b>Tables</b> page is view-only for safety.
+        </p>
+        <div class="row-actions">
+            <a href="/admin-tables-edit.html" class="btn btn-primary btn-lg">✏️ Open Tables Editor</a>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2>✏️ Edit Menu</h2>
+        <p class="desc">
+            Add new menu items, edit prices and descriptions, upload photos, delete items. The daily <b>Menu</b> page is view-only for safety.
+        </p>
+        <div class="row-actions">
+            <a href="/admin-menu-edit.html" class="btn btn-primary btn-lg">✏️ Open Menu Editor</a>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2>🖨️ Table QR Codes</h2>
+        <p class="desc">
+            Generate printable QR codes for each table. When a customer scans one, they'll be connected directly to that table's menu and ordering session.
+        </p>
+        <div class="row-actions">
+            <button onclick="openPrintQRCodesModal()" class="btn btn-primary btn-lg">🖨️ Print QR Codes</button>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2>🔔 Notifications</h2>
+        <p class="desc">
+            Enable browser push notifications to get alerts on this device when a table rings the bell or requests order approval.
+        </p>
+        <div class="row-actions">
+            <button onclick="requestNotificationPermission()" class="btn btn-outline btn-lg">🔔 Enable Push</button>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2>🏢 Restaurants</h2>
+        <p class="desc">
+            All restaurants known to this server. To add a new one, create an empty <code>.json</code> file in the <code>restaurants/</code> folder on the server and reload this page.
+        </p>
+        <div id="restoList" class="resto-list">
+            <p style="color:var(--menu-paper-muted); font-style:italic; font-size:0.85rem;">Loading…</p>
+        </div>
+        <div class="row-actions" style="margin-top: 1rem;">
+            <button onclick="loadRestoList()" class="btn btn-outline">🔄 Reload list</button>
+        </div>
+    </div>
+
+    <div class="card-section">
+        <h2>ℹ️ System Info</h2>
+        <div class="info-grid">
+            <div class="info-cell">
+                <div class="lbl">Server Connection</div>
+                <div class="val" id="infoConn">Connecting…</div>
+            </div>
+            <div class="info-cell">
+                <div class="lbl">Socket ID</div>
+                <div class="val" id="infoSocketId" style="font-family:monospace; font-size:0.78rem;">—</div>
+            </div>
+            <div class="info-cell">
+                <div class="lbl">Current Restaurant</div>
+                <div class="val" id="infoCurrentResto">—</div>
+            </div>
+            <div class="info-cell">
+                <div class="lbl">Page URL</div>
+                <div class="val" style="font-size:0.72rem; font-family:monospace; color:var(--menu-paper-muted);">/admin-settings.html</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/admin-auth.js"></script>
+    <script>
+        const socket = io();
+        let currentAdminRestaurant = '';
+
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        function showModal(title, message, icon = '🔔') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalIcon').innerText = icon;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+        function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
+
+        socket.on('connect', () => {
+            document.getElementById('connStatus').classList.add('online');
+            document.getElementById('infoConn').innerText = 'Connected ✓';
+            document.getElementById('infoConn').className = 'val online';
+            document.getElementById('infoSocketId').innerText = socket.id || '—';
+        });
+        socket.on('disconnect', () => {
+            document.getElementById('connStatus').classList.remove('online');
+            document.getElementById('infoConn').innerText = 'Disconnected ✕';
+            document.getElementById('infoConn').className = 'val offline';
+        });
+
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) return showModal('Not Supported', 'This browser does not support notifications.', '⚠️');
+            Notification.requestPermission().then(p => {
+                if (p === 'granted') {
+                    showModal('Push Enabled 🔔', 'You will now receive notifications for table bells.', '🎉');
+                    new Notification('Test notification', { body: 'Push is working!' });
+                } else if (p === 'denied') {
+                    showModal('Permission Denied', 'You must allow notifications in your browser settings.', '⚠️');
+                } else {
+                    showModal('Not Enabled', 'Permission was dismissed. Try again later.', '⚠️');
+                }
+            });
+        }
+
+        async function loadRestoList() {
+            try {
+                const res = await fetch('/api/restaurants');
+                const list = await res.json();
+                const container = document.getElementById('restoList');
+                if (list.length === 0) {
+                    container.innerHTML = '<p style="color:var(--menu-paper-muted); font-style:italic; font-size:0.85rem;">No restaurants found.</p>';
+                    return;
+                }
+                container.innerHTML = list.map(r => `
+                    <div class="resto-item">
+                        <div>
+                            <div class="name"><span class="dot"></span>${esc(r)}</div>
+                        </div>
+                        <div class="row-actions">
+                            <a href="/admin-tables.html" class="btn btn-outline" onclick="localStorage.setItem('adminRestaurant', '${esc(r)}')">🪑 Open</a>
+                        </div>
+                    </div>
+                `).join('');
+                const saved = localStorage.getItem('adminRestaurant') || list[0];
+                currentAdminRestaurant = list.includes(saved) ? saved : list[0];
+                document.getElementById('infoCurrentResto').innerText = currentAdminRestaurant;
+            } catch (e) {
+                console.error(e);
+                document.getElementById('restoList').innerHTML = '<p style="color:#991b1b; font-size:0.85rem;">Failed to load restaurants.</p>';
+            }
+        }
+
+        async function openPrintQRCodesModal() {
+            const resto = localStorage.getItem('adminRestaurant') || currentAdminRestaurant;
+            if (!resto) return showModal('No Restaurant', 'Select a restaurant first.', '⚠️');
+            document.getElementById('qrModalTitle').innerText = `🖨️ QR Codes — ${resto}`;
+            const container = document.getElementById('qrGridContainer');
+            container.innerHTML = '<p style="grid-column:1/-1;">Loading…</p>';
+            try {
+                const res = await fetch(`/api/qr-links?restaurant=${encodeURIComponent(resto)}`);
+                const links = await res.json();
+                if (!links || links.length === 0) {
+                    container.innerHTML = '<p style="grid-column:1/-1; color:var(--menu-paper-muted); font-style:italic;">No tables found. Add tables first.</p>';
+                    document.getElementById('qrPrintModal').classList.remove('hidden');
+                    return;
+                }
+                container.innerHTML = links.map(l => {
+                    const fullUrl = location.origin + l.encodedUrl;
+                    const qr = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(fullUrl)}`;
+                    return `
+                        <a href="${esc(l.encodedUrl)}" target="_blank" rel="noopener" class="qr-card" data-table="${esc(l.tableNumber)}">
+                            <span class="tbl-num">Table #${esc(l.tableNumber)}</span>
+                            <img src="${qr}" crossorigin="anonymous" class="qr-img" alt="">
+                            <span class="url">${esc(l.encodedUrl)}</span>
+                        </a>`;
+                }).join('');
+                document.getElementById('qrPrintModal').classList.remove('hidden');
+            } catch (e) {
+                container.innerHTML = '<p style="grid-column:1/-1; color:#991b1b;">Failed to load QR codes.</p>';
+                document.getElementById('qrPrintModal').classList.remove('hidden');
+            }
+        }
+
+        async function downloadAllQRZip() {
+            const resto = localStorage.getItem('adminRestaurant') || currentAdminRestaurant;
+            const zip = new JSZip();
+            const folder = zip.folder(`${resto}_QR_Codes`);
+            const cards = document.querySelectorAll('.qr-card');
+            if (cards.length === 0) return showModal('Nothing to Download', 'No QR codes were generated.', '⚠️');
+            for (const card of cards) {
+                const num = card.getAttribute('data-table');
+                const img = card.querySelector('.qr-img');
+                try {
+                    const r = await fetch(img.src);
+                    folder.file(`Table_${num}.png`, await r.blob());
+                } catch (e) { console.error(e); }
+            }
+            const content = await zip.generateAsync({ type: 'blob' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `${resto}_QR_Codes.zip`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCustomModal();
+                document.getElementById('qrPrintModal').classList.add('hidden');
+            }
+        });
+
+        adminAuth.requireLogin(() => {
+            loadRestoList();
+        });
+    </script>
+</body>
+</html>

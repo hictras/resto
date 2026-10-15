@@ -11,6 +11,11 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// ---------- Admin auth ----------
+const ADMIN_PASSWORD = 'admin123';   // ← change this to your password
+const adminSessions = new Map();
+const ADMIN_SESSION_MS = 12 * 60 * 60 * 1000;   // 12 hours
+
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -668,6 +673,39 @@ app.get('/api/restaurants', (req, res) => {
     } catch (e) {
         res.status(500).json({ error: 'Unable to scan restaurants directory' });
     }
+});
+// ---------- Admin login ----------
+app.post('/api/admin-login', express.json(), (req, res) => {
+    const { password } = req.body || {};
+    if (!password) return res.status(400).json({ success: false, message: 'Password required' });
+
+    // Simple timing-safe-ish compare (good enough for a local admin login)
+    if (String(password) !== ADMIN_PASSWORD) {
+        return res.status(401).json({ success: false, message: 'Incorrect password' });
+    }
+
+    const token = 'adm_' + uuidv4().replace(/-/g, '') + Date.now().toString(36);
+    adminSessions.set(token, { expiresAt: Date.now() + ADMIN_SESSION_MS });
+    res.json({ success: true, token, expiresAt: Date.now() + ADMIN_SESSION_MS });
+});
+
+app.get('/api/admin-check', (req, res) => {
+    const token = req.query.token || req.headers['x-admin-token'];
+    if (!token) return res.status(401).json({ success: false });
+    const rec = adminSessions.get(token);
+    if (!rec || rec.expiresAt < Date.now()) {
+        adminSessions.delete(token);
+        return res.status(401).json({ success: false });
+    }
+    // Extend on each check (sliding window)
+    rec.expiresAt = Date.now() + ADMIN_SESSION_MS;
+    res.json({ success: true, expiresAt: rec.expiresAt });
+});
+
+app.post('/api/admin-logout', express.json(), (req, res) => {
+    const token = (req.body && req.body.token) || req.headers['x-admin-token'];
+    if (token) adminSessions.delete(token);
+    res.json({ success: true });
 });
 
 app.get('/api/qr-links', (req, res) => {

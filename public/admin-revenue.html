@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Admin — Daily Revenue</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+    <style>
+        :root {
+            --menu-paper: #FBF8F1;
+            --menu-paper-ink: #131313;
+            --menu-paper-muted: rgba(19, 19, 19, 0.55);
+            --menu-hairline: rgba(19, 19, 19, 0.12);
+            --menu-accent: #2E7D57;
+            --menu-accent-soft: rgba(46, 125, 87, 0.14);
+            --menu-display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+            --menu-ui-font: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            font-family: var(--menu-ui-font);
+            background: var(--menu-paper);
+            color: var(--menu-paper-ink);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        body { padding: 1.5rem 1rem; max-width: 1200px; margin: 0 auto; }
+        .hidden { display: none !important; }
+
+        /* ==================== TOPBAR ==================== */
+        .topbar {
+            display: flex; flex-wrap: wrap; justify-content: space-between;
+            align-items: center; gap: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            padding-bottom: 1.25rem; margin-bottom: 1.5rem;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+        .back-btn {
+            background: white; border: 1px solid var(--menu-hairline);
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; cursor: pointer; text-decoration: none;
+            color: var(--menu-paper-ink); transition: all 0.15s;
+        }
+        .back-btn:hover { background: var(--menu-accent-soft); border-color: var(--menu-accent); }
+        .topbar-title {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.6rem; letter-spacing: -0.01em;
+        }
+        .conn-dot {
+            display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+            background: #dc2626; transition: background 0.2s;
+        }
+        .conn-dot.online { background: var(--menu-accent); box-shadow: 0 0 0 3px rgba(46, 125, 87, 0.2); }
+        .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+        .sel-resto {
+            background: white; border: 1px solid var(--menu-hairline);
+            padding: 0.55rem 1rem; border-radius: 999px;
+            font-family: inherit; font-size: 0.8rem; font-weight: 600;
+            color: var(--menu-accent); cursor: pointer;
+        }
+
+        /* ==================== BUTTONS ==================== */
+        .btn {
+            border: none; cursor: pointer; font-family: inherit;
+            font-size: 0.78rem; font-weight: 600;
+            padding: 0.55rem 1rem; border-radius: 999px;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.15s; white-space: nowrap;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--menu-accent); color: white; }
+        .btn-primary:hover { background: #245f42; }
+        .btn-outline {
+            background: transparent; color: var(--menu-paper-ink);
+            border: 1px solid var(--menu-hairline);
+        }
+        .btn-outline:hover { background: var(--menu-accent-soft); }
+        .btn-danger { background: #dc2626; color: white; }
+        .btn-sm { font-size: 0.7rem; padding: 0.35rem 0.75rem; }
+
+        /* ==================== SUMMARY ==================== */
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (min-width: 600px) {
+            .summary-row { grid-template-columns: 1fr 1fr 1fr; }
+        }
+        .summary-card {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 16px;
+            padding: 1.1rem 1.25rem;
+            display: flex; flex-direction: column; gap: 0.25rem;
+        }
+        .summary-card .lbl {
+            font-size: 0.68rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--menu-paper-muted);
+        }
+        .summary-card .val {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.9rem;
+            color: var(--menu-paper-ink);
+            line-height: 1.1;
+            font-variant-numeric: tabular-nums;
+        }
+        .summary-card .val.accent { color: var(--menu-accent); }
+
+        /* ==================== SECTION ==================== */
+        .section {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+        .section-title {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.35rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1rem; padding-bottom: 0.75rem; margin-bottom: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            flex-wrap: wrap;
+        }
+        .filter-row {
+            display: flex; gap: 0.5rem; align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+        .filter-row select,
+        .filter-row input[type="date"] {
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            padding: 0.55rem 0.9rem;
+            border-radius: 999px;
+            font-family: inherit; font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--menu-paper-ink);
+            outline: none;
+        }
+        .filter-row select:focus,
+        .filter-row input[type="date"]:focus { border-color: var(--menu-accent); }
+
+        /* ==================== REVENUE DAY CARD ==================== */
+        .revenue-day {
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            border-radius: 16px;
+            padding: 1.1rem 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .revenue-day-head {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem; margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            flex-wrap: wrap;
+        }
+        .revenue-day-head .date {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.2rem;
+        }
+        .revenue-day-head .date .day-of-week {
+            color: var(--menu-paper-muted);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-left: 0.4rem;
+        }
+        .revenue-day-head .total {
+            background: var(--menu-accent);
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.4rem 0.9rem;
+            border-radius: 999px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .rev-table-row {
+            display: flex; justify-content: space-between;
+            align-items: center; gap: 0.75rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--menu-hairline);
+            font-size: 0.88rem;
+        }
+        .rev-table-row:last-child { border-bottom: none; }
+        .rev-table-row .tbl {
+            font-weight: 600;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .rev-table-row .tbl .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--menu-accent);
+        }
+        .rev-table-row .amount {
+            font-weight: 700;
+            color: var(--menu-accent);
+            font-variant-numeric: tabular-nums;
+        }
+        .rev-table-row .bar-wrap {
+            flex: 1;
+            height: 6px;
+            background: rgba(46, 125, 87, 0.12);
+            border-radius: 3px;
+            margin: 0 0.75rem;
+            overflow: hidden;
+            min-width: 40px;
+        }
+        .rev-table-row .bar-fill {
+            height: 100%;
+            background: var(--menu-accent);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .empty-state {
+            text-align: center; padding: 3rem 1rem;
+            color: var(--menu-paper-muted); font-size: 0.9rem;
+            display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+        }
+        .empty-state .big { font-size: 2.5rem; opacity: 0.4; }
+
+        /* ==================== MODALS ==================== */
+        .modal-backdrop {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
+            z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        .modal-card {
+            background: var(--menu-paper);
+            border-radius: 20px; padding: 1.5rem;
+            max-width: 420px; width: 100%;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .modal-card h3 {
+            font-family: var(--menu-display-font); font-weight: 600;
+            font-size: 1.25rem; margin-bottom: 0.5rem;
+        }
+        .modal-card p {
+            font-size: 0.875rem; color: var(--menu-paper-muted);
+            line-height: 1.5; margin-bottom: 1.25rem;
+            white-space: pre-line;
+        }
+        .modal-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .modal-actions { display: flex; gap: 0.5rem; }
+        .modal-actions .btn { flex: 1; justify-content: center; padding: 0.7rem; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== MODALS ==================== -->
+    <div id="customModal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div id="modalIcon" class="modal-icon">🔔</div>
+            <h3 id="modalTitle">Notification</h3>
+            <p id="modalMessage">Message goes here...</p>
+            <div class="modal-actions">
+                <button onclick="closeCustomModal()" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TOPBAR ==================== -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/admin-home.html" class="back-btn" title="Back to home">←</a>
+            <div class="topbar-title">
+                📊 <span>Daily Revenue</span>
+                <span id="connStatus" class="conn-dot" title="Connecting…"></span>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <select id="adminRestaurantSelector" class="sel-resto" onchange="switchAdminRestaurant(this.value)"></select>
+            <button onclick="adminAuth.logout()" class="btn btn-danger">Logout</button>
+        </div>
+    </div>
+
+    <!-- ==================== SUMMARY ==================== -->
+    <div class="summary-row">
+        <div class="summary-card">
+            <span class="lbl">Today</span>
+            <span class="val accent" id="summaryToday">$0.00</span>
+        </div>
+        <div class="summary-card">
+            <span class="lbl">This Month</span>
+            <span class="val" id="summaryMonth">$0.00</span>
+        </div>
+        <div class="summary-card">
+            <span class="lbl">All Time</span>
+            <span class="val" id="summaryAll">$0.00</span>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN ==================== -->
+    <div class="section">
+        <h2 class="section-title">
+            <span>Revenue Breakdown</span>
+            <span id="activeMenuRestoLabel" style="font-size:0.78rem; font-weight:600; color:var(--menu-accent);"></span>
+        </h2>
+
+        <div class="filter-row">
+            <select id="dateFilterSelect" onchange="onFilterChanged()">
+                <option value="all">📅 All time</option>
+                <option value="today">📅 Today</option>
+                <option value="yesterday">📅 Yesterday</option>
+                <option value="week">📅 This week</option>
+                <option value="month">📅 This month</option>
+                <option value="custom">📅 Custom date…</option>
+            </select>
+            <input type="date" id="customDateInput" class="hidden" onchange="loadRevenue()">
+            <button class="btn btn-outline btn-sm" onclick="exportCSV()">⬇️ Export CSV</button>
+        </div>
+
+        <div id="revenueContainer">
+            <div class="empty-state">
+                <div class="big">📊</div>
+                <div>Loading revenue…</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/admin-auth.js"></script>
+    <script>
+        // ==================== STATE ====================
+        const socket = io();
+        let currentAdminRestaurant = '';
+        let revenueData = {};       // full { restaurant: { date: { table: total } } }
+        let revenueByTableOnly = {}; // used by the current view
+
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+            ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+        // ==================== MODAL ====================
+        function showModal(title, message, icon = '🔔') {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('modalIcon').innerText = icon;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+        function closeCustomModal() { document.getElementById('customModal').classList.add('hidden'); }
+
+        // ==================== SOCKET ====================
+        socket.on('connect', () => {
+            document.getElementById('connStatus').classList.add('online');
+        });
+        socket.on('disconnect', () => {
+            document.getElementById('connStatus').classList.remove('online');
+        });
+
+        // Any state change may add a paid order — refresh revenue (lazy)
+        socket.on('state_update', () => {
+            // Only refresh if the user is actively on this page
+            if (document.visibilityState === 'visible') {
+                loadRevenue();
+            }
+        });
+
+        // ==================== LOAD RESTAURANTS ====================
+        async function loadRestaurants() {
+            try {
+                const res = await fetch('/api/restaurants');
+                const list = await res.json();
+                const sel = document.getElementById('adminRestaurantSelector');
+                sel.innerHTML = '';
+                if (list.length === 0) {
+                    sel.innerHTML = '<option value="">No restaurants</option>';
+                    return;
+                }
+                list.forEach(r => {
+                    const o = document.createElement('option');
+                    o.value = r; o.textContent = r;
+                    sel.appendChild(o);
+                });
+                const saved = localStorage.getItem('adminRestaurant') || list[0];
+                currentAdminRestaurant = list.includes(saved) ? saved : list[0];
+                sel.value = currentAdminRestaurant;
+                document.getElementById('activeMenuRestoLabel').innerText = currentAdminRestaurant;
+                loadRevenue();
+            } catch (e) { console.error(e); }
+        }
+
+        function switchAdminRestaurant(name) {
+            currentAdminRestaurant = name;
+            localStorage.setItem('adminRestaurant', name);
+            document.getElementById('activeMenuRestoLabel').innerText = name;
+            loadRevenue();
+        }
+
+        // ==================== FILTER HANDLING ====================
+        function onFilterChanged() {
+            const val = document.getElementById('dateFilterSelect').value;
+            const customInput = document.getElementById('customDateInput');
+            if (val === 'custom') {
+                customInput.classList.remove('hidden');
+                // Default to today if empty
+                if (!customInput.value) {
+                    customInput.value = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                customInput.classList.add('hidden');
+            }
+            loadRevenue();
+        }
+
+        // Return true if a date string (YYYY-MM-DD) matches the current filter
+        function dateMatchesFilter(dateStr) {
+            const filter = document.getElementById('dateFilterSelect').value;
+            if (filter === 'all') return true;
+
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+            if (filter === 'today') {
+                return dateStr === today.toISOString().split('T')[0];
+            }
+            if (filter === 'yesterday') {
+                const y = new Date(today);
+                y.setDate(y.getDate() - 1);
+                return dateStr === y.toISOString().split('T')[0];
+            }
+            if (filter === 'week') {
+                const startOfWeek = new Date(today);
+                startOfWeek.setDate(today.getDate() - 6);
+                return dateStr >= startOfWeek.toISOString().split('T')[0] && dateStr <= today.toISOString().split('T')[0];
+            }
+            if (filter === 'month') {
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                return dateStr >= startOfMonth.toISOString().split('T')[0] && dateStr <= today.toISOString().split('T')[0];
+            }
+            if (filter === 'custom') {
+                const custom = document.getElementById('customDateInput').value;
+                return dateStr === custom;
+            }
+            return true;
+        }
+
+        // ==================== LOAD REVENUE ====================
+        async function loadRevenue() {
+            if (!currentAdminRestaurant) return;
+            try {
+                const res = await fetch('/api/revenue');
+                revenueData = await res.json();
+                renderRevenue();
+            } catch (e) {
+                console.error(e);
+                document.getElementById('revenueContainer').innerHTML = `<div class="empty-state"><div class="big">⚠️</div><div>Failed to load revenue.</div></div>`;
+            }
+        }
+
+        // ==================== RENDER ====================
+        function renderRevenue() {
+            const restoData = revenueData[currentAdminRestaurant] || {};
+
+            // Filter dates
+            const allDates = Object.keys(restoData).filter(d => dateMatchesFilter(d));
+
+            // ---- Summary totals ----
+            const todayStr = new Date().toISOString().split('T')[0];
+            const monthStart = new Date();
+            monthStart.setDate(1);
+            const monthStr = monthStart.toISOString().split('T')[0];
+
+            let todayTotal = 0, monthTotal = 0, allTotal = 0;
+            Object.keys(restoData).forEach(date => {
+                const dayTotal = Object.values(restoData[date]).reduce((s, v) => s + v, 0);
+                allTotal += dayTotal;
+                if (date === todayStr) todayTotal += dayTotal;
+                if (date >= monthStr && date <= todayStr) monthTotal += dayTotal;
+            });
+            document.getElementById('summaryToday').innerText = '$' + todayTotal.toFixed(2);
+            document.getElementById('summaryMonth').innerText = '$' + monthTotal.toFixed(2);
+            document.getElementById('summaryAll').innerText = '$' + allTotal.toFixed(2);
+
+            // ---- Daily breakdown ----
+            const container = document.getElementById('revenueContainer');
+            if (allDates.length === 0) {
+                const filter = document.getElementById('dateFilterSelect').value;
+                const msg = filter === 'all'
+                    ? 'No settled revenue data available yet.'
+                    : 'No settled revenue data for this date range.';
+                container.innerHTML = `<div class="empty-state"><div class="big">📊</div><div>${esc(msg)}</div></div>`;
+                return;
+            }
+
+            // Sort dates descending (newest first)
+            allDates.sort((a, b) => b.localeCompare(a));
+
+            // Find max single-table amount for bar sizing
+            let maxCell = 0;
+            allDates.forEach(date => {
+                Object.values(restoData[date]).forEach(v => { if (v > maxCell) maxCell = v; });
+            });
+
+            container.innerHTML = allDates.map(date => {
+                const tablesMap = restoData[date];
+                const dailyTotal = Object.values(tablesMap).reduce((s, v) => s + v, 0);
+
+                // Day-of-week label
+                const d = new Date(date + 'T00:00:00');
+                const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+
+                // Sort tables numerically
+                const tableKeys = Object.keys(tablesMap).sort((a, b) => {
+                    const na = Number(a), nb = Number(b);
+                    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                    return a.localeCompare(b);
+                });
+
+                return `
+                    <div class="revenue-day">
+                        <div class="revenue-day-head">
+                            <div class="date">
+                                ${esc(date)}
+                                <span class="day-of-week">${esc(dayName)}</span>
+                            </div>
+                            <div class="total">$${dailyTotal.toFixed(2)}</div>
+                        </div>
+                        ${tableKeys.map(tbl => {
+                            const amt = tablesMap[tbl];
+                            const pct = maxCell > 0 ? (amt / maxCell) * 100 : 0;
+                            return `
+                                <div class="rev-table-row">
+                                    <span class="tbl"><span class="dot"></span>Table #${esc(tbl)}</span>
+                                    <span class="bar-wrap"><span class="bar-fill" style="width:${pct}%;"></span></span>
+                                    <span class="amount">$${amt.toFixed(2)}</span>
+                                </div>`;
+                        }).join('')}
+                    </div>`;
+            }).join('');
+        }
+
+        // ==================== EXPORT CSV ====================
+        function exportCSV() {
+            const restoData = revenueData[currentAdminRestaurant] || {};
+            const rows = [['Date', 'Table', 'Total']];
+
+            Object.keys(restoData).forEach(date => {
+                Object.keys(restoData[date]).forEach(tbl => {
+                    rows.push([date, tbl, restoData[date][tbl].toFixed(2)]);
+                });
+            });
+
+            if (rows.length === 1) {
+                showModal('Nothing to Export', 'There is no revenue data yet.', '⚠️');
+                return;
+            }
+
+            const csv = rows.map(r => r.map(v => {
+                const s = String(v);
+                return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+            }).join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${currentAdminRestaurant}_revenue_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==================== KEYBOARD ====================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeCustomModal();
+        });
+
+        // ==================== BOOT ====================
+        adminAuth.requireLogin(() => {
+            loadRestaurants();
+        });
+    </script>
+</body>
+</html>

@@ -2,30 +2,247 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Kitchen Display System (KDS)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/socket.io/socket.io.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+    <style>
+        :root {
+            --menu-paper: #FBF8F1;
+            --menu-paper-ink: #131313;
+            --menu-paper-muted: rgba(19, 19, 19, 0.55);
+            --menu-hairline: rgba(19, 19, 19, 0.12);
+            --menu-accent: #2E7D57;
+            --menu-accent-soft: rgba(46, 125, 87, 0.14);
+            --menu-amber: #C4872E;
+            --menu-amber-soft: rgba(196, 135, 46, 0.14);
+            --menu-danger: #C0392B;
+            --menu-display-font: "Cormorant Garamond", ui-serif, Georgia, serif;
+            --menu-ui-font: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            font-family: var(--menu-ui-font);
+            background: var(--menu-paper);
+            color: var(--menu-paper-ink);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
+        body { padding: 1.5rem 1rem; max-width: 1200px; margin: 0 auto; }
+        .hidden { display: none !important; }
+
+        /* ==================== TOPBAR ==================== */
+        .topbar {
+            display: flex; flex-wrap: wrap; justify-content: space-between;
+            align-items: center; gap: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            padding-bottom: 1.25rem; margin-bottom: 1.5rem;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+        .topbar-title {
+            display: flex; align-items: center; gap: 0.5rem;
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.6rem; letter-spacing: -0.01em;
+        }
+        .conn-dot {
+            display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+            background: var(--menu-danger); transition: background 0.2s;
+        }
+        .conn-dot.online { background: var(--menu-accent); box-shadow: 0 0 0 3px rgba(46, 125, 87, 0.2); }
+        .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+        .btn {
+            border: none; cursor: pointer; font-family: inherit;
+            font-size: 0.78rem; font-weight: 600;
+            padding: 0.55rem 1rem; border-radius: 999px;
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: all 0.15s; white-space: nowrap;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--menu-accent); color: white; }
+        .btn-primary:hover { background: #245f42; }
+        .btn-outline {
+            background: transparent; color: var(--menu-paper-ink);
+            border: 1px solid var(--menu-hairline);
+        }
+        .btn-outline:hover { background: var(--menu-accent-soft); }
+        .btn-amber { background: var(--menu-amber); color: white; }
+        .btn-amber:hover { background: #a56f22; }
+        .btn-danger { background: var(--menu-danger); color: white; }
+        .btn-danger:hover { background: #a1301f; }
+        .btn-soft { background: var(--menu-accent-soft); color: var(--menu-accent); }
+        .btn-soft:hover { background: rgba(46, 125, 87, 0.22); }
+        .btn-sm { font-size: 0.7rem; padding: 0.35rem 0.75rem; }
+        .btn-block { width: 100%; justify-content: center; }
+
+        /* ==================== SECTION ==================== */
+        .section {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.35rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1rem; padding-bottom: 0.75rem; margin-bottom: 1rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            flex-wrap: wrap;
+        }
+        .count-badge {
+            background: var(--menu-accent-soft); color: var(--menu-accent);
+            font-family: var(--menu-ui-font);
+            font-size: 0.75rem; font-weight: 700;
+            padding: 0.3rem 0.75rem; border-radius: 999px;
+        }
+
+        /* ==================== RESTAURANT NAV ==================== */
+        .resto-nav {
+            display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+        }
+        .resto-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            color: var(--menu-paper-muted);
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            font-family: inherit; font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .resto-btn:hover { background: var(--menu-accent-soft); color: var(--menu-accent); }
+        .resto-btn.active {
+            background: var(--menu-accent); border-color: var(--menu-accent); color: white;
+            box-shadow: 0 4px 10px rgba(46, 125, 87, 0.25);
+        }
+        .resto-btn .pill {
+            background: rgba(0,0,0,0.08);
+            color: inherit;
+            font-size: 0.65rem; font-weight: 700;
+            padding: 1px 7px; border-radius: 999px;
+        }
+        .resto-btn.active .pill { background: rgba(255,255,255,0.25); }
+
+        /* ==================== ORDERS GRID ==================== */
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        .order-card {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            border-radius: 16px;
+            padding: 1.1rem;
+            display: flex; flex-direction: column; gap: 0.9rem;
+        }
+        .order-card.ready { border-color: var(--menu-accent); box-shadow: 0 0 0 3px var(--menu-accent-soft); }
+        .order-card.cooking { border-color: var(--menu-amber); box-shadow: 0 0 0 3px var(--menu-amber-soft); }
+
+        .order-head {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 0.7rem;
+            border-bottom: 1px solid var(--menu-hairline);
+        }
+        .order-table {
+            font-family: var(--menu-display-font);
+            font-weight: 600; font-size: 1.15rem;
+            color: var(--menu-accent);
+        }
+        .status-pill {
+            font-size: 0.65rem; font-weight: 700;
+            padding: 0.25rem 0.7rem; border-radius: 999px;
+            text-transform: uppercase; letter-spacing: 0.03em;
+        }
+        .status-pill.new { background: rgba(46, 125, 87, 0.12); color: var(--menu-accent); }
+        .status-pill.cooking { background: var(--menu-amber-soft); color: var(--menu-amber); }
+        .status-pill.ready { background: var(--menu-accent); color: white; }
+
+        .items-list { display: flex; flex-direction: column; gap: 0.6rem; list-style: none; }
+        .item-row {
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            border-radius: 12px;
+            padding: 0.7rem 0.8rem;
+            display: flex; flex-direction: column; gap: 0.55rem;
+        }
+        .item-line {
+            display: flex; align-items: baseline; gap: 0.5rem;
+            font-size: 0.85rem; font-weight: 600;
+            line-height: 1.3;
+        }
+        .item-qty { color: var(--menu-accent); font-weight: 700; }
+        .item-name { color: var(--menu-paper-ink); }
+
+        .item-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+        .item-btn {
+            border: 1px solid var(--menu-hairline);
+            background: white;
+            color: var(--menu-paper-muted);
+            font-family: inherit; font-size: 0.7rem; font-weight: 700;
+            padding: 0.4rem 0.5rem; border-radius: 8px;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .item-btn:hover { background: var(--menu-accent-soft); color: var(--menu-accent); }
+        .item-btn.cooking-on {
+            background: var(--menu-amber); border-color: var(--menu-amber); color: white;
+        }
+        .item-btn.ready-on {
+            background: var(--menu-accent); border-color: var(--menu-accent); color: white;
+        }
+
+        .order-foot {
+            padding-top: 0.7rem;
+            border-top: 1px solid var(--menu-hairline);
+            display: flex; flex-direction: column; gap: 0.6rem;
+        }
+        .order-total {
+            display: flex; justify-content: space-between; align-items: baseline;
+            font-size: 0.78rem; font-weight: 600; color: var(--menu-paper-muted);
+        }
+        .order-total strong {
+            font-size: 1rem; color: var(--menu-paper-ink);
+            font-variant-numeric: tabular-nums;
+        }
+        .order-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center; padding: 3rem 1rem;
+            color: var(--menu-paper-muted); font-size: 0.9rem;
+            font-style: italic;
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen p-6 max-w-7xl mx-auto">
-    <header class="flex flex-wrap justify-between items-center mb-6 bg-gray-800 border border-gray-700 p-5 rounded-2xl shadow-lg gap-4">
-        <h1 class="text-2xl font-bold text-amber-400 flex items-center gap-2">
-            🍳 Kitchen Display <span id="connStatus" class="w-3 h-3 rounded-full bg-red-500 inline-block" title="Disconnected"></span>
-        </h1>
-        <div id="restaurantNavButtons" class="flex flex-wrap items-center gap-2"></div>
-        <a href="admin.html" class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition">← Admin Panel</a>
-    </header>
+<body>
 
-    <main class="space-y-6">
-        <div class="flex justify-between items-center border-b border-gray-700 pb-3">
-            <h2 id="activeRestoTitle" class="text-xl font-bold text-amber-300">Active Kitchen Orders</h2>
-            <span id="orderCountBadge" class="bg-indigo-600 text-white text-xs px-3 py-1 rounded-full font-bold">0 Active Orders</span>
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-title">
+                🍳 <span>Kitchen Display</span>
+                <span id="connStatus" class="conn-dot" title="Connecting…"></span>
+            </div>
         </div>
-        <div id="kitchenOrdersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <p class="text-gray-400 italic">Loading kitchen orders...</p>
+        <div class="topbar-actions">
+            <div id="restaurantNavButtons" class="resto-nav"></div>
+            <a href="admin-home.html" class="btn btn-outline">← Admin Panel</a>
         </div>
-    </main>
+    </div>
 
+    <div class="section">
+        <h2 class="section-title">
+            <span id="activeRestoTitle">Active Kitchen Orders</span>
+            <span id="orderCountBadge" class="count-badge">0 Active Orders</span>
+        </h2>
+        <div id="kitchenOrdersGrid" class="orders-grid">
+            <p class="empty-state">Loading kitchen orders…</p>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
         let latestState = { tables: {}, tableRequests: {}, orders: [] };
@@ -33,11 +250,11 @@
         const alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
         let previousOrderCount = -1;
 
-        const esc = s => String(s).replace(/[&<>"']/g, c =>
+        const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-        socket.on('connect', () => { document.getElementById('connStatus').className = "w-3 h-3 rounded-full bg-emerald-500 inline-block"; });
-        socket.on('disconnect', () => { document.getElementById('connStatus').className = "w-3 h-3 rounded-full bg-red-500 inline-block"; });
+        socket.on('connect', () => document.getElementById('connStatus').classList.add('online'));
+        socket.on('disconnect', () => document.getElementById('connStatus').classList.remove('online'));
 
         socket.on('state_update', (data) => {
             latestState = data;
@@ -49,7 +266,6 @@
             renderKitchen();
         });
 
-        // Event delegation — no inline onclick with restaurant name in attributes
         document.getElementById('restaurantNavButtons').addEventListener('click', (e) => {
             const btn = e.target.closest('[data-resto]');
             if (btn) {
@@ -89,67 +305,80 @@
 
             const navContainer = document.getElementById('restaurantNavButtons');
             if (restaurantsWithOrders.length === 0) {
-                navContainer.innerHTML = `<span class="text-xs text-gray-400 italic">No restaurants with active orders</span>`;
+                navContainer.innerHTML = `<span style="font-size:0.75rem; color:var(--menu-paper-muted); font-style:italic;">No active restaurants</span>`;
             } else {
                 navContainer.innerHTML = restaurantsWithOrders.map(resto => {
                     const isActive = resto === selectedKitchenRestaurant;
                     const count = activeOrders.filter(o => (o.restaurant || 'Default') === resto).length;
                     return `
-                        <button data-resto="${esc(resto)}" class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${isActive ? 'bg-amber-500 text-white shadow-md' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}">
+                        <button data-resto="${esc(resto)}" class="resto-btn ${isActive ? 'active' : ''}">
                             <span>🍽️ ${esc(resto)}</span>
-                            <span class="bg-black/30 text-white px-1.5 py-0.2 rounded-full text-[10px]">${count}</span>
+                            <span class="pill">${count}</span>
                         </button>`;
                 }).join('');
             }
 
             const filteredOrders = activeOrders.filter(o => (o.restaurant || 'Default') === selectedKitchenRestaurant);
-            document.getElementById('activeRestoTitle').innerText = selectedKitchenRestaurant ? `Orders for: ${selectedKitchenRestaurant}` : `Kitchen Display`;
-            document.getElementById('orderCountBadge').innerText = `${filteredOrders.length} Active Orders`;
+            document.getElementById('activeRestoTitle').innerText = selectedKitchenRestaurant
+                ? `Orders for: ${selectedKitchenRestaurant}`
+                : `Kitchen Display`;
+            document.getElementById('orderCountBadge').innerText =
+                `${filteredOrders.length} Active Order${filteredOrders.length === 1 ? '' : 's'}`;
 
             const grid = document.getElementById('kitchenOrdersGrid');
             if (filteredOrders.length === 0) {
-                grid.innerHTML = `<p class="text-gray-400 italic col-span-full text-center py-12">No active orders in the kitchen for this restaurant.</p>`;
+                grid.innerHTML = `<p class="empty-state">No active orders in the kitchen for this restaurant.</p>`;
                 return;
             }
 
             grid.innerHTML = filteredOrders.map((ord) => {
                 const isReady = ord.kitchenStatus === 'Ready';
                 const isCooking = ord.kitchenStatus === 'Cooking';
+                const statusClass = isReady ? 'ready' : isCooking ? 'cooking' : 'new';
+                const cardClass = isReady ? 'ready' : isCooking ? 'cooking' : '';
                 const safeOrderId = esc(ord.orderId);
                 return `
-                <div class="bg-gray-800 border ${isReady ? 'border-emerald-500 shadow-emerald-500/10' : 'border-gray-700'} rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
-                    <div>
-                        <div class="flex justify-between items-center border-b border-gray-700 pb-3 mb-3">
-                            <span class="font-bold text-base text-amber-300">Table #${esc(ord.tableNumber)}</span>
-                            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${isReady ? 'bg-emerald-500/20 text-emerald-300' : isCooking ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300'}">${esc(ord.kitchenStatus)}</span>
-                        </div>
-                        <ul class="space-y-3">
-                            ${(ord.items || []).map((i, itemIdx) => {
-                                const checks = i.checks || [false, false];
-                                return `
-                                <li class="bg-gray-700/50 border border-gray-600/60 p-3 rounded-xl flex flex-col gap-2">
-                                    <div class="flex justify-between items-center text-sm">
-                                        <span class="font-bold text-white"><span class="text-amber-400">${i.qty}x</span>${esc(i.name)}</span>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-2 pt-1">
-                                        <button data-action="toggle-item" data-order="${safeOrderId}" data-item="${itemIdx}" data-check="0" class="py-1.5 rounded-lg text-xs font-bold transition ${checks[0] ? 'bg-amber-600 text-white' : 'bg-gray-600 text-gray-300 hover:bg-gray-500'}">
-                                            ${checks[0] ? '🔥 Cooking' : 'Start Cooking'}
-                                        </button>
-                                        <button data-action="toggle-item" data-order="${safeOrderId}" data-item="${itemIdx}" data-check="1" class="py-1.5 rounded-lg text-xs font-bold transition ${checks[1] ? 'bg-emerald-600 text-white' : 'bg-gray-600 text-gray-300 hover:bg-gray-500'}">
-                                            ${checks[1] ? '✅ Ready' : 'Mark Ready'}
-                                        </button>
-                                    </div>
-                                </li>`;
-                            }).join('')}
-                        </ul>
+                <div class="order-card ${cardClass}">
+                    <div class="order-head">
+                        <span class="order-table">Table #${esc(ord.tableNumber)}</span>
+                        <span class="status-pill ${statusClass}">${esc(ord.kitchenStatus || 'New')}</span>
                     </div>
-                    <div class="space-y-2 pt-3 border-t border-gray-700">
-                        <div class="flex justify-between items-center text-xs font-bold text-gray-400">
-                            <span>Total: <span class="text-white">$${(ord.total || 0).toFixed(2)}</span></span>
+                    <ul class="items-list">
+                        ${(ord.items || []).map((i, itemIdx) => {
+                            const checks = i.checks || [false, false];
+                            return `
+                            <li class="item-row">
+                                <div class="item-line">
+                                    <span class="item-qty">${i.qty}×</span>
+                                    <span class="item-name">${esc(i.name)}</span>
+                                </div>
+                                <div class="item-btn-row">
+                                    <button class="item-btn ${checks[0] ? 'cooking-on' : ''}"
+                                            data-action="toggle-item" data-order="${safeOrderId}"
+                                            data-item="${itemIdx}" data-check="0">
+                                        ${checks[0] ? '🔥 Cooking' : 'Start Cooking'}
+                                    </button>
+                                    <button class="item-btn ${checks[1] ? 'ready-on' : ''}"
+                                            data-action="toggle-item" data-order="${safeOrderId}"
+                                            data-item="${itemIdx}" data-check="1">
+                                        ${checks[1] ? '✅ Ready' : 'Mark Ready'}
+                                    </button>
+                                </div>
+                            </li>`;
+                        }).join('')}
+                    </ul>
+                    <div class="order-foot">
+                        <div class="order-total">
+                            <span>Total</span>
+                            <strong>$${(ord.total || 0).toFixed(2)}</strong>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button data-action="set-cooking" data-order="${safeOrderId}" class="bg-amber-600 hover:bg-amber-700 py-2 rounded-xl text-xs font-bold transition text-white">Set Cooking 🍳</button>
-                            <button data-action="send-table" data-order="${safeOrderId}" class="bg-emerald-600 hover:bg-emerald-700 py-2 rounded-xl text-xs font-bold transition text-white">Send to Table 🚀</button>
+                        <div class="order-actions">
+                            <button class="btn btn-amber btn-sm btn-block" data-action="set-cooking" data-order="${safeOrderId}">
+                                🍳 Set Cooking
+                            </button>
+                            <button class="btn btn-primary btn-sm btn-block" data-action="send-table" data-order="${safeOrderId}">
+                                🚀 Send to Table
+                            </button>
                         </div>
                     </div>
                 </div>`;
