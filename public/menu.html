@@ -510,6 +510,7 @@
                     <p id="brandSubtitle">Prices in USD (Includes VAT & Service)</p>
                 </div>
                 <div class="header-actions">
+                    <button class="icon-btn-header" onclick="subscribeToPush()" title="Enable notifications">🔔</button>
                     <div class="table-pill-display" id="tableBtnDisplay">Table --</div>
                     <button class="icon-btn-header" id="langToggleBtn" onclick="toggleLanguage()">عربي</button>
                 </div>
@@ -629,7 +630,7 @@
         let unreadMsgIds = new Set();
 
         let menuSearchFilter = '';
-        let menuViewMode = 'list'; // 'list' | 'grid'
+        let menuViewMode = 'list';
 
         const activationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3');
         const PHOTO_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
@@ -774,7 +775,6 @@
                 });
             }
 
-            // Restore saved view mode
             try {
                 const saved = localStorage.getItem('menuViewMode');
                 if (saved === 'grid' || saved === 'list') menuViewMode = saved;
@@ -808,6 +808,52 @@
             countdownInterval = setInterval(tick, 1000);
         }
 
+        // ============ Push notifications ============
+        async function subscribeToPush() {
+            if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+                return showModal('Not Supported', 'Push notifications are not supported in this browser.', '⚠️');
+            }
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    return showModal('Permission Denied', 'You must allow notifications to receive order updates.', '⚠️');
+                }
+                const reg = await navigator.serviceWorker.ready;
+                const keyRes = await fetch('/api/vapid-public-key');
+                const { publicKey } = await keyRes.json();
+
+                const sub = await reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(publicKey)
+                });
+
+                await fetch('/api/subscribe-push', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        restaurant: currentRestaurant,
+                        tableNumber: currentTable,
+                        subscription: sub
+                    })
+                });
+
+                showModal('Push Enabled 🔔', 'You will now receive notifications about your order.', '🎉');
+            } catch (e) {
+                console.error(e);
+                showModal('Push Error', 'Could not enable push notifications.', '⚠️');
+            }
+        }
+
+        function urlBase64ToUint8Array(base64String) {
+            const padding = '='.repeat((4 - base64String.length % 4) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+            const rawData = atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+            for (let i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+            return outputArray;
+        }
+
+        // ============ Menu loading ============
         async function loadMenuFromServer(restaurantName) {
             if (isExpired) return;
             try {
@@ -816,7 +862,7 @@
                 rebuildLookup();
                 renderCategoryPills();
                 renderMenu();
-            } catch (e) {}
+            } catch (e) { console.error('Failed to load menu', e); }
         }
 
         async function loadMessageHistory() {
