@@ -133,13 +133,11 @@ let cacheDirty = true;
 function invalidateCache() { cacheDirty = true; }
 
 function buildAppState() {
-    // Preload session starts keyed by "restaurant_table"
     const sessionStarts = {};
     db.prepare('SELECT restaurant, table_number, start_time FROM sessions').all().forEach(s => {
         sessionStarts[`${s.restaurant}_${s.table_number}`] = s.start_time;
     });
 
-    // Each table carries its own session + idle info
     const tables = {};
     db.prepare('SELECT * FROM tables_state').all().forEach(r => {
         if (!tables[r.restaurant]) tables[r.restaurant] = {};
@@ -155,7 +153,6 @@ function buildAppState() {
         };
     });
 
-    // Live socket count (used for the "N active" pill)
     const activeSessions = {};
     db.prepare('SELECT restaurant, table_number FROM sessions').all().forEach(s => {
         const sessionKey = `${s.restaurant}_${s.table_number}`;
@@ -190,9 +187,6 @@ function getAppState() {
 }
 function broadcastState() { invalidateCache(); io.emit('state_update', getAppState()); }
 
-// Session valid if:
-//   idleMinutes === 0  → no expiry (lives until bill is paid)
-//   otherwise          → now - start_time <= idleMinutes (total session lifetime)
 function isSessionValid(session, resto, table) {
     if (!session) return false;
     let idleMinutes = 360;
@@ -200,13 +194,12 @@ function isSessionValid(session, resto, table) {
         const row = db.prepare('SELECT idle_minutes FROM tables_state WHERE restaurant = ? AND table_number = ?').get(resto, String(table));
         if (row && row.idle_minutes != null) idleMinutes = row.idle_minutes;
     } catch (e) {}
-    if (idleMinutes === 0) return true;
+    if (idleMinutes === 0) return true; // No expiry
     const start = session.start_time || 0;
     return (Date.now() - start) <= (idleMinutes * 60 * 1000);
 }
 
-// No-op — activity no longer resets the session clock (Option B).
-function touchSession(_token) { /* intentionally empty */ }
+function touchSession(_token) { /* no-op — session clock doesn't reset on activity */ }
 
 // ---------- Message helpers ----------
 function getMessagesForTable(resto, table, limit = 100) {
@@ -312,7 +305,10 @@ app.get('/api/verify-token', (req, res) => {
     });
 });
 
-// ---------- Create session (with 30s grace window for multi-device scans) ----------
+// ================================================================
+// CREATE-SESSION: any device on the same table reuses the SAME session
+// as long as it's still valid. No more 30-second grace period.
+// ================================================================
 app.post('/api/create-session', (req, res) => {
     const { restaurant, tableNumber } = req.body;
     if (!restaurant || !tableNumber) {
@@ -323,25 +319,19 @@ app.post('/api/create-session', (req, res) => {
         const tKey = String(tableNumber);
         const now = Date.now();
 
+        // Reuse the existing valid session (multi-device, no grace period)
         const existing = db.prepare('SELECT * FROM sessions WHERE restaurant = ? AND table_number = ?').get(resto, tKey);
-
-        if (existing) {
-            const age = now - (existing.start_time || 0);
-            const withinGracePeriod = age < 30 * 1000;           // same-party multi-scan
-            const stillValid = isSessionValid(existing, resto, tKey);
-
-            if (withinGracePeriod && stillValid) {
-                return res.json({
-                    success: true,
-                    token: existing.token,
-                    expiresAt: null,
-                    lifetimeMinutes: null,
-                    reused: true
-                });
-            }
+        if (existing && isSessionValid(existing, resto, tKey)) {
+            return res.json({
+                success: true,
+                token: existing.token,
+                expiresAt: null,
+                lifetimeMinutes: null,
+                reused: true
+            });
         }
 
-        // New party — wipe any prior session and start fresh
+        // Session truly expired/was wiped → start fresh
         if (existing) endTableSession(resto, tKey);
 
         const token = 'tok_' + uuidv4().replace(/-/g, '') + now.toString(36);
@@ -426,7 +416,7 @@ io.on('connection', (socket) => {
         const cb = typeof callback === 'function' ? callback : () => {};
         const resto = path.basename(String(restaurant || 'Default'));
         const tKey = String(tableNum);
-        const minutes = Math.max(0, Math.min(1440 * 7, parseInt(idleMinutes) || 0)); // 0..7 days
+        const minutes = Math.max(0, Math.min(1440 * 7, parseInt(idleMinutes) || 0));
 
         const row = db.prepare('SELECT 1 FROM tables_state WHERE restaurant = ? AND table_number = ?').get(resto, tKey);
         if (!row) return cb({ success: false, message: 'Table not found' });
@@ -435,7 +425,7 @@ io.on('connection', (socket) => {
             db.prepare('UPDATE tables_state SET idle_minutes = ? WHERE restaurant = ? AND table_number = ?')
                 .run(minutes, resto, tKey);
 
-            // Restart the session clock from now if a session is alive
+            // Restart the session clock from now
             const sess = db.prepare('SELECT token FROM sessions WHERE restaurant = ? AND table_number = ?').get(resto, tKey);
             if (sess) {
                 const now = Date.now();
@@ -678,7 +668,6 @@ app.get('/api/restaurants', (req, res) => {
     }
 });
 
-// ---------- QR links (no session creation, no broadcast) ----------
 app.get('/api/qr-links', (req, res) => {
     try {
         const targetResto = req.query.restaurant;
@@ -695,13 +684,11 @@ app.get('/api/qr-links', (req, res) => {
                 const encodedResto = Buffer.from(resto).toString('base64').split('').reverse().join('');
 
                 allLinks.push({
-                    restaurant: resto,
-                    tableNumber: t.table_number,
+                    restaurant: resto, tableNumber: t.table_number,
                     encodedUrl: `/customer.html?tbl=${encodeURIComponent(encodedTbl)}&rst=${encodeURIComponent(encodedResto)}`
                 });
             });
         });
-        // Nothing changed in the DB → no broadcastState()
         res.json(allLinks);
     } catch (e) {
         console.error('QR Links Error:', e);
