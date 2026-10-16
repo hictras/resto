@@ -1,22 +1,7 @@
-# Dependencies
+.env
+.env.local
 node_modules/
-
-# Runtime data
 data/
 restaurants/*.json
 public/dish-photos/
-
-# Logs
-*.log
-npm-debug.log*
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Env
-.env
-.env.local
-
-# Test helpers
 test-r2.js
