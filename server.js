@@ -6,6 +6,8 @@ const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
 const webpush = require('web-push');
+const multer = require('multer');
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 
 const app = express();
 const server = http.createServer(app);
@@ -27,6 +29,26 @@ const restaurantsDir = path.join(__dirname, 'restaurants');
 if (!fs.existsSync(restaurantsDir)) fs.mkdirSync(restaurantsDir, { recursive: true });
 const dishPhotosDir = path.join(__dirname, 'public', 'dish-photos');
 if (!fs.existsSync(dishPhotosDir)) fs.mkdirSync(dishPhotosDir, { recursive: true });
+
+// ---------- Cloudflare R2 client (S3-compatible) ----------
+const r2Client = new S3Client({
+    region: 'auto',
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
+    },
+});
+
+// ---------- Multer (memory storage → upload to R2) ----------
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+    fileFilter: (req, file, cb) => {
+        const ok = /\.(jpe?g|png|webp)$/i.test(file.originalname);
+        cb(ok ? null : new Error('Only JPG / PNG / WEBP allowed'), ok);
+    }
+});
 
 // ---------- VAPID keys ----------
 const vapidPath = path.join(dataDir, 'vapid.json');
@@ -206,7 +228,7 @@ function isSessionValid(session, resto, table) {
     return (Date.now() - start) <= (idleMinutes * 60 * 1000);
 }
 
-function touchSession(_token) { /* no-op — session clock doesn't reset on activity */ }
+function touchSession(_token) { /* no-op */ }
 
 // ---------- Message helpers ----------
 function getMessagesForTable(resto, table, limit = 100) {
@@ -312,10 +334,6 @@ app.get('/api/verify-token', (req, res) => {
     });
 });
 
-// ================================================================
-// CREATE-SESSION: any device on the same table reuses the SAME session
-// as long as it's still valid. No more 30-second grace period.
-// ================================================================
 app.post('/api/create-session', (req, res) => {
     const { restaurant, tableNumber } = req.body;
     if (!restaurant || !tableNumber) {
@@ -326,19 +344,11 @@ app.post('/api/create-session', (req, res) => {
         const tKey = String(tableNumber);
         const now = Date.now();
 
-        // Reuse the existing valid session (multi-device, no grace period)
         const existing = db.prepare('SELECT * FROM sessions WHERE restaurant = ? AND table_number = ?').get(resto, tKey);
         if (existing && isSessionValid(existing, resto, tKey)) {
-            return res.json({
-                success: true,
-                token: existing.token,
-                expiresAt: null,
-                lifetimeMinutes: null,
-                reused: true
-            });
+            return res.json({ success: true, token: existing.token, expiresAt: null, lifetimeMinutes: null, reused: true });
         }
 
-        // Session truly expired/was wiped → start fresh
         if (existing) endTableSession(resto, tKey);
 
         const token = 'tok_' + uuidv4().replace(/-/g, '') + now.toString(36);
@@ -350,13 +360,7 @@ app.post('/api/create-session', (req, res) => {
         })();
 
         broadcastState();
-        res.json({
-            success: true,
-            token,
-            expiresAt: null,
-            lifetimeMinutes: null,
-            reused: false
-        });
+        res.json({ success: true, token, expiresAt: null, lifetimeMinutes: null, reused: false });
     } catch (e) {
         console.error(e);
         res.status(500).json({ success: false, message: 'Internal server error' });
@@ -432,7 +436,6 @@ io.on('connection', (socket) => {
             db.prepare('UPDATE tables_state SET idle_minutes = ? WHERE restaurant = ? AND table_number = ?')
                 .run(minutes, resto, tKey);
 
-            // Restart the session clock from now
             const sess = db.prepare('SELECT token FROM sessions WHERE restaurant = ? AND table_number = ?').get(resto, tKey);
             if (sess) {
                 const now = Date.now();
@@ -674,12 +677,12 @@ app.get('/api/restaurants', (req, res) => {
         res.status(500).json({ error: 'Unable to scan restaurants directory' });
     }
 });
+
 // ---------- Admin login ----------
 app.post('/api/admin-login', express.json(), (req, res) => {
     const { password } = req.body || {};
     if (!password) return res.status(400).json({ success: false, message: 'Password required' });
 
-    // Simple timing-safe-ish compare (good enough for a local admin login)
     if (String(password) !== ADMIN_PASSWORD) {
         return res.status(401).json({ success: false, message: 'Incorrect password' });
     }
@@ -697,7 +700,6 @@ app.get('/api/admin-check', (req, res) => {
         adminSessions.delete(token);
         return res.status(401).json({ success: false });
     }
-    // Extend on each check (sliding window)
     rec.expiresAt = Date.now() + ADMIN_SESSION_MS;
     res.json({ success: true, expiresAt: rec.expiresAt });
 });
@@ -763,6 +765,7 @@ app.delete('/api/tables/:restaurantName/:tableNumber', (req, res) => {
     res.json({ success: true });
 });
 
+// ---------- Menu APIs ----------
 app.get('/api/menu/:restaurantName', (req, res) => {
     const safeName = path.basename(req.params.restaurantName);
     const menuFilePath = path.join(restaurantsDir, `${safeName}.json`);
@@ -776,9 +779,16 @@ app.post('/api/menu/:restaurantName', (req, res) => {
     const menuFilePath = path.join(restaurantsDir, `${safeName}.json`);
     let menu = fs.existsSync(menuFilePath) ? JSON.parse(fs.readFileSync(menuFilePath, 'utf8')) : [];
 
-    const { category, nameEn, nameAr, price } = req.body;
+    const { category, nameEn, nameAr, price, descEn, descAr } = req.body;
     let cat = menu.find(c => c.categoryEn === category);
-    const newItem = { id: uuidv4(), nameEn, nameAr: nameAr || nameEn, price: parseFloat(price) || 0 };
+    const newItem = {
+        id: uuidv4(),
+        nameEn,
+        nameAr: nameAr || nameEn,
+        price: parseFloat(price) || 0,
+        descEn: descEn || '',
+        descAr: descAr || ''
+    };
     if (cat) cat.items.push(newItem);
     else menu.push({ categoryEn: category, categoryAr: category, items: [newItem] });
 
@@ -793,12 +803,39 @@ app.put('/api/menu/:restaurantName/:itemId', (req, res) => {
     if (!fs.existsSync(menuFilePath)) return res.status(404).json({ success: false });
 
     let menu = JSON.parse(fs.readFileSync(menuFilePath, 'utf8'));
-    const { category, nameEn, nameAr, price } = req.body;
-    menu.forEach(cat => { cat.items = cat.items.filter(i => i.id !== req.params.itemId); });
+    const { category, nameEn, nameAr, price, descEn, descAr } = req.body;
 
-    let cat = menu.find(c => c.categoryEn === category);
-    if (!cat) { cat = { categoryEn: category, categoryAr: category, items: [] }; menu.push(cat); }
-    cat.items.push({ id: req.params.itemId, nameEn, nameAr: nameAr || nameEn, price: parseFloat(price) || 0 });
+    // Find existing item
+    let currentCat = null, currentIndex = -1;
+    for (const cat of menu) {
+        const idx = cat.items.findIndex(i => String(i.id) === String(req.params.itemId));
+        if (idx !== -1) { currentCat = cat; currentIndex = idx; break; }
+    }
+    if (!currentCat) return res.status(404).json({ success: false, message: 'Item not found' });
+
+    const existing = currentCat.items[currentIndex];
+    const updatedItem = {
+        ...existing,
+        nameEn,
+        nameAr: nameAr || nameEn,
+        price: parseFloat(price) || 0,
+        descEn: descEn || '',
+        descAr: descAr || ''
+    };
+
+    if (currentCat.categoryEn === category) {
+        currentCat.items[currentIndex] = updatedItem;
+    } else {
+        currentCat.items.splice(currentIndex, 1);
+        let targetCat = menu.find(c => c.categoryEn === category);
+        if (!targetCat) {
+            targetCat = { categoryEn: category, categoryAr: category, items: [] };
+            menu.push(targetCat);
+        }
+        targetCat.items.push(updatedItem);
+    }
+
+    menu = menu.filter(c => c.items.length > 0);
 
     fs.writeFileSync(menuFilePath, JSON.stringify(menu, null, 4), 'utf8');
     io.emit('menu_updated', { restaurant: safeName, menu });
@@ -812,9 +849,90 @@ app.delete('/api/menu/:restaurantName/:itemId', (req, res) => {
 
     let menu = JSON.parse(fs.readFileSync(menuFilePath, 'utf8'));
     menu.forEach(cat => { cat.items = cat.items.filter(i => i.id !== req.params.itemId); });
+    menu = menu.filter(c => c.items.length > 0);
     fs.writeFileSync(menuFilePath, JSON.stringify(menu, null, 4), 'utf8');
     io.emit('menu_updated', { restaurant: safeName, menu });
     res.json({ success: true });
+});
+
+// ---------- Photo Upload (Cloudflare R2) ----------
+app.post('/api/menu/:restaurantName/:itemId/photo', upload.single('photo'), async (req, res) => {
+    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
+
+    try {
+        const itemId = String(req.params.itemId).replace(/[^a-zA-Z0-9_-]/g, '');
+        const ext = path.extname(req.file.originalname).toLowerCase() || '.jpg';
+        const key = `dish-photos/${itemId}${ext}`;
+
+        await r2Client.send(new PutObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME,
+            Key: key,
+            Body: req.file.buffer,
+            ContentType: req.file.mimetype,
+        }));
+
+        const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+
+        // Save the URL into the menu JSON for this item
+        const safeName = path.basename(req.params.restaurantName);
+        const menuFilePath = path.join(restaurantsDir, `${safeName}.json`);
+        if (fs.existsSync(menuFilePath)) {
+            const menu = JSON.parse(fs.readFileSync(menuFilePath, 'utf8'));
+            let updated = false;
+            menu.forEach(cat => cat.items.forEach(it => {
+                if (String(it.id) === itemId) {
+                    it.image = publicUrl;
+                    updated = true;
+                }
+            }));
+            if (updated) {
+                fs.writeFileSync(menuFilePath, JSON.stringify(menu, null, 4), 'utf8');
+                io.emit('menu_updated', { restaurant: safeName, menu });
+            }
+        }
+
+        res.json({ success: true, url: publicUrl });
+    } catch (err) {
+        console.error('R2 Upload Error:', err);
+        res.status(500).json({ success: false, message: 'Upload to R2 failed: ' + err.message });
+    }
+});
+
+app.delete('/api/menu/:restaurantName/:itemId/photo', async (req, res) => {
+    try {
+        const itemId = String(req.params.itemId).replace(/[^a-zA-Z0-9_-]/g, '');
+
+        const exts = ['.jpg', '.jpeg', '.png', '.webp'];
+        await Promise.allSettled(exts.map(ext =>
+            r2Client.send(new DeleteObjectCommand({
+                Bucket: process.env.R2_BUCKET_NAME,
+                Key: `dish-photos/${itemId}${ext}`,
+            }))
+        ));
+
+        // Remove the image URL from the menu JSON
+        const safeName = path.basename(req.params.restaurantName);
+        const menuFilePath = path.join(restaurantsDir, `${safeName}.json`);
+        if (fs.existsSync(menuFilePath)) {
+            const menu = JSON.parse(fs.readFileSync(menuFilePath, 'utf8'));
+            let updated = false;
+            menu.forEach(cat => cat.items.forEach(it => {
+                if (String(it.id) === itemId && it.image) {
+                    delete it.image;
+                    updated = true;
+                }
+            }));
+            if (updated) {
+                fs.writeFileSync(menuFilePath, JSON.stringify(menu, null, 4), 'utf8');
+                io.emit('menu_updated', { restaurant: safeName, menu });
+            }
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error('R2 Delete Error:', err);
+        res.status(500).json({ success: false, message: err.message });
+    }
 });
 
 app.get('/api/revenue', (req, res) => {
@@ -829,50 +947,6 @@ app.get('/api/revenue', (req, res) => {
         report[resto][date][tbl] = (report[resto][date][tbl] || 0) + (ord.total || 0);
     });
     res.json(report);
-});
- const multer = require('multer');
-const upload = multer({
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => cb(null, dishPhotosDir),
-        filename: (req, file, cb) => {
-            const itemId = String(req.params.itemId).replace(/[^a-zA-Z0-9_-]/g, '');
-            const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
-            cb(null, `${itemId}${ext}`);
-        }
-    }),
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
-    fileFilter: (req, file, cb) => {
-        const ok = /\.(jpe?g|png|webp)$/i.test(file.originalname);
-        cb(ok ? null : new Error('Only JPG / PNG / WEBP allowed'), ok);
-    }
-});
-
-app.post('/api/menu/:restaurantName/:itemId/photo', upload.single('photo'), (req, res) => {
-    if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
-    // Delete any previous photos with a different extension for this item
-    try {
-        const itemId = String(req.params.itemId).replace(/[^a-zA-Z0-9_-]/g, '');
-        fs.readdirSync(dishPhotosDir).forEach(f => {
-            if (f.startsWith(itemId + '.') && f !== req.file.filename) {
-                try { fs.unlinkSync(path.join(dishPhotosDir, f)); } catch (e) {}
-            }
-        });
-    } catch (e) {}
-    res.json({ success: true, filename: req.file.filename });
-});
-
-app.delete('/api/menu/:restaurantName/:itemId/photo', (req, res) => {
-    try {
-        const itemId = String(req.params.itemId).replace(/[^a-zA-Z0-9_-]/g, '');
-        fs.readdirSync(dishPhotosDir).forEach(f => {
-            if (f.startsWith(itemId + '.')) {
-                try { fs.unlinkSync(path.join(dishPhotosDir, f)); } catch (e) {}
-            }
-        });
-        res.json({ success: true });
-    } catch (e) {
-        res.status(500).json({ success: false });
-    }
 });
 
 const PORT = process.env.PORT || 3000;
