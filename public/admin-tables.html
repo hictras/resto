@@ -100,7 +100,6 @@
             flex-wrap: wrap;
         }
 
-        /* Search box */
         .search-box {
             display: flex; align-items: center; gap: 0.5rem;
             background: var(--menu-paper);
@@ -214,7 +213,6 @@
             50% { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
         }
 
-        /* Focus panel */
         .focus-panel {
             background: white;
             border: 2px solid var(--menu-accent);
@@ -409,7 +407,6 @@
         }
         .empty-orders .big { font-size: 2rem; opacity: 0.4; }
 
-        /* Table cards */
         .grid-tables {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -479,6 +476,24 @@
         .pill-waiting  { background: #f59e0b; color: white; }
         .pill-valid    { background: rgba(16, 185, 129, 0.15); color: #065f46; }
         .table-pills { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+        /* Small icon button in top-right of table card (Open as customer) */
+        .open-customer-btn {
+            width: 32px; height: 32px; border-radius: 10px;
+            border: 1px solid var(--menu-hairline);
+            background: white;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; line-height: 1;
+            color: var(--menu-paper-muted);
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .open-customer-btn:hover {
+            background: var(--menu-accent-soft);
+            border-color: var(--menu-accent);
+            color: var(--menu-accent);
+        }
 
         .modal-backdrop {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55);
@@ -551,7 +566,6 @@
             <span>Live Floor Map</span>
         </h2>
 
-        <!-- Search box -->
         <div class="search-box">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor">
                 <path d="M232.49,215.51,185,168a92.12,92.12,0,1,0-17,17l47.53,47.54a12,12,0,0,0,17-17ZM44,112a68,68,0,1,1,68,68A68.07,68.07,0,0,1,44,112Z"></path>
@@ -735,6 +749,21 @@
             return String(k).toLowerCase().includes(tableSearchFilter);
         }
 
+        // -------- OPEN AS CUSTOMER --------
+        function openAsCustomer(tableNum) {
+            const resto = currentAdminRestaurant;
+            if (!resto) return showModal('No Restaurant', 'Select a restaurant first.', '⚠️');
+
+            // Same encoding as the QR code generator
+            const tableNumStr = String(tableNum);
+            const encodedTbl = btoa(tableNumStr).split('').reverse().join('');
+            const encodedResto = btoa(resto).split('').reverse().join('');
+            const url = `/customer.html?tbl=${encodeURIComponent(encodedTbl)}&rst=${encodeURIComponent(encodedResto)}`;
+
+            // Open in a new tab
+            window.open(url, '_blank', 'noopener');
+        }
+
         // -------- FLOOR MAP --------
         function renderFloorMap() {
             const { tables, tableRequests, orders, activeSessions } = globalData;
@@ -895,6 +924,10 @@
                                 </select>
                             </div>
 
+                            <button class="btn btn-soft btn-lg" onclick="openAsCustomer('${esc(focusedTable)}')">
+                                <span>🔗 Open as Customer</span>
+                                <span>→</span>
+                            </button>
                             <button class="btn btn-soft btn-lg" onclick="openMsgComposer()">
                                 <span>💬 ${msgComposerOpen ? 'Message (open)' : 'Message Table'}</span>
                                 <span>→</span>
@@ -994,6 +1027,7 @@
                                     ${isMenuOpen ? `${openCount} device${openCount > 1 ? 's' : ''}` : 'no devices'}
                                 </div>
                             </div>
+                            <button class="open-customer-btn" title="Open as customer" onclick="event.stopPropagation(); openAsCustomer('${esc(k)}')">👁️</button>
                         </div>
 
                         <div class="table-pills">
