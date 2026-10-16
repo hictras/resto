@@ -83,7 +83,7 @@ app.get('/api/vapid-public-key', (req, res) => res.json({ publicKey: vapidKeys.p
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customer.html')));
 app.get('/menu.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'menu.html')));
 
-// ---------- Schema ----------
+// ---------- Schema bootstrap ----------
 let schemaReady = false;
 async function ensureSchema() {
     if (schemaReady) return;
@@ -122,12 +122,6 @@ async function ensureSchema() {
             created_at INTEGER NOT NULL,
             delivered INTEGER DEFAULT 0
         )`,
-        `CREATE TABLE IF NOT EXISTS settings (
-            restaurant TEXT NOT NULL,
-            key TEXT NOT NULL,
-            value TEXT,
-            PRIMARY KEY (restaurant, key)
-        )`,
         `CREATE TABLE IF NOT EXISTS menu_categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             restaurant TEXT NOT NULL,
@@ -147,6 +141,12 @@ async function ensureSchema() {
             image TEXT,
             PRIMARY KEY (restaurant, id),
             FOREIGN KEY (category_id) REFERENCES menu_categories(id) ON DELETE CASCADE
+        )`,
+        `CREATE TABLE IF NOT EXISTS settings (
+            restaurant TEXT NOT NULL,
+            key TEXT NOT NULL,
+            value TEXT,
+            PRIMARY KEY (restaurant, key)
         )`,
         'CREATE INDEX IF NOT EXISTS idx_orders_resto_table ON orders(restaurant, table_number)',
         'CREATE INDEX IF NOT EXISTS idx_paid_resto_date ON paid_history(restaurant, date)',
@@ -890,6 +890,40 @@ app.delete('/api/tables/:restaurantName/:tableNumber', async (req, res) => {
     }
 });
 
+// ---------- Settings ----------
+app.get('/api/settings/:restaurantName', async (req, res) => {
+    try {
+        const safeName = path.basename(req.params.restaurantName);
+        const rows = await dbAll('SELECT key, value FROM settings WHERE restaurant = ?', [safeName]);
+        const out = {};
+        rows.forEach(r => { out[r.key] = r.value; });
+        if (out.show_photos == null) out.show_photos = '1';
+        res.json(out);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({});
+    }
+});
+
+app.put('/api/settings/:restaurantName', express.json(), async (req, res) => {
+    try {
+        const safeName = path.basename(req.params.restaurantName);
+        const updates = req.body || {};
+        for (const [key, value] of Object.entries(updates)) {
+            await dbRun(
+                `INSERT INTO settings (restaurant, key, value) VALUES (?, ?, ?)
+                 ON CONFLICT(restaurant, key) DO UPDATE SET value = excluded.value`,
+                [safeName, String(key), String(value)]
+            );
+        }
+        io.emit('settings_updated', { restaurant: safeName, settings: updates });
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 // ---------- Menu APIs (Turso-backed) ----------
 app.get('/api/menu/:restaurantName', async (req, res) => {
     try {
@@ -931,6 +965,88 @@ app.get('/api/menu/:restaurantName', async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).json([]);
+    }
+});
+
+// ---------- Preview endpoint (read-only, no session, no writes) ----------
+app.get('/api/preview/:restaurantName', async (req, res) => {
+    try {
+        const safeName = path.basename(req.params.restaurantName);
+        const tableNumber = String(req.query.table || '');
+
+        // ---- Menu (same shape as GET /api/menu/:r) ----
+        const categories = await dbAll(
+            'SELECT id, category_en, category_ar FROM menu_categories WHERE restaurant = ? ORDER BY id ASC',
+            [safeName]
+        );
+        const items = await dbAll(
+            'SELECT id, category_id, name_en, name_ar, price, desc_en, desc_ar, image, sort, dietary FROM menu_items WHERE restaurant = ? ORDER BY category_id, sort ASC, rowid ASC',
+            [safeName]
+        );
+
+        const itemsByCat = {};
+        items.forEach(it => {
+            if (!itemsByCat[it.category_id]) itemsByCat[it.category_id] = [];
+            let dietaryArr = [];
+            try { dietaryArr = it.dietary ? JSON.parse(it.dietary) : []; } catch (e) { dietaryArr = []; }
+            itemsByCat[it.category_id].push({
+                id: it.id,
+                nameEn: it.name_en,
+                nameAr: it.name_ar,
+                price: it.price,
+                descEn: it.desc_en || '',
+                descAr: it.desc_ar || '',
+                image: it.image || undefined,
+                sort: it.sort == null ? 0 : Number(it.sort),
+                dietary: dietaryArr,
+            });
+        });
+
+        const menu = categories.map(c => ({
+            categoryEn: c.category_en,
+            categoryAr: c.category_ar || c.category_en,
+            items: itemsByCat[c.id] || [],
+        }));
+
+        // ---- Table state (read-only) ----
+        let tableState = null;
+        if (tableNumber) {
+            const row = await dbGet(
+                'SELECT is_open, can_order, status, idle_minutes FROM tables_state WHERE restaurant = ? AND table_number = ?',
+                [safeName, tableNumber]
+            );
+            if (row) {
+                tableState = {
+                    isOpen: !!row.is_open,
+                    canOrder: !!row.can_order,
+                    status: row.status,
+                    idleMinutes: (row.idle_minutes == null) ? 360 : row.idle_minutes,
+                };
+            }
+        }
+
+        // ---- Guest count (from activeSessions map) ----
+        const sessionKey = `${safeName}_${tableNumber}`;
+        const guestsConnected = (tableSockets[sessionKey] && tableSockets[sessionKey].size) || 0;
+
+        // ---- Settings ----
+        const settingsRows = await dbAll('SELECT key, value FROM settings WHERE restaurant = ?', [safeName]);
+        const settings = {};
+        settingsRows.forEach(r => { settings[r.key] = r.value; });
+        if (settings.show_photos == null) settings.show_photos = '1';
+
+        res.json({
+            success: true,
+            restaurant: safeName,
+            tableNumber,
+            menu,
+            table: tableState,
+            guestsConnected,
+            settings,
+        });
+    } catch (e) {
+        console.error('Preview error:', e);
+        res.status(500).json({ success: false, message: e.message });
     }
 });
 
@@ -1092,7 +1208,7 @@ app.delete('/api/menu/:restaurantName/:itemId', async (req, res) => {
     }
 });
 
-// ---------- Photo Upload (R2) ----------
+// ---------- Photo Upload (Cloudflare R2) ----------
 app.post('/api/menu/:restaurantName/:itemId/photo', upload.single('photo'), async (req, res) => {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
 
@@ -1168,42 +1284,6 @@ app.get('/api/revenue', async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).json({});
-    }
-});
-
-// ---------- Settings ----------
-app.get('/api/settings/:restaurantName', async (req, res) => {
-    try {
-        const safeName = path.basename(req.params.restaurantName);
-        const rows = await dbAll('SELECT key, value FROM settings WHERE restaurant = ?', [safeName]);
-        const out = {};
-        rows.forEach(r => { out[r.key] = r.value; });
-        // Defaults
-        if (out.show_photos == null) out.show_photos = '1';
-        res.json(out);
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({});
-    }
-});
-
-app.put('/api/settings/:restaurantName', express.json(), async (req, res) => {
-    try {
-        const safeName = path.basename(req.params.restaurantName);
-        const updates = req.body || {};
-        for (const [key, value] of Object.entries(updates)) {
-            await dbRun(
-                `INSERT INTO settings (restaurant, key, value) VALUES (?, ?, ?)
-                 ON CONFLICT(restaurant, key) DO UPDATE SET value = excluded.value`,
-                [safeName, String(key), String(value)]
-            );
-        }
-        // Notify all clients of the change
-        io.emit('settings_updated', { restaurant: safeName, settings: updates });
-        res.json({ success: true });
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({ success: false, message: e.message });
     }
 });
 

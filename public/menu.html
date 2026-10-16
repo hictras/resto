@@ -35,6 +35,7 @@
             -webkit-font-smoothing: antialiased;
         }
         body { padding-bottom: 130px; }
+        body.preview-mode { padding-bottom: 0; }
         .hidden { display: none !important; }
 
         .sticky-top-wrapper {
@@ -59,7 +60,7 @@
             font-size: 0.75rem; color: var(--menu-paper-muted);
             margin-top: 0.375rem; line-height: 1.4;
         }
-        .header-actions { display: flex; align-items: center; gap: 0.375rem; flex-shrink: 0; }
+        .header-actions { display: flex; align-items: center; gap: 0.375rem; flex-shrink: 0; flex-wrap: wrap; }
         .icon-btn-header {
             height: 2.75rem; min-width: 2.75rem; padding: 0 0.9rem;
             border-radius: 999px; background: var(--menu-accent-soft);
@@ -75,6 +76,39 @@
             font-size: 0.75rem; font-weight: 600;
             display: inline-flex; align-items: center; white-space: nowrap;
             letter-spacing: -0.01em;
+        }
+        /* Guest counter */
+        .guest-pill {
+            height: 2.75rem; padding: 0 0.9rem; border-radius: 999px;
+            background: var(--menu-accent-soft);
+            color: var(--menu-accent);
+            font-size: 0.8rem; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+            transition: background 0.2s;
+        }
+        .guest-pill.pulse {
+            animation: guest-pulse 1s ease-out;
+        }
+        @keyframes guest-pulse {
+            0% { background: var(--menu-accent); color: white; }
+            100% { background: var(--menu-accent-soft); color: var(--menu-accent); }
+        }
+
+        /* Preview banner */
+        .preview-banner {
+            background: #F59E0B;
+            color: white;
+            text-align: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .search-row {
@@ -147,7 +181,6 @@
         .container { max-width: 960px; margin: 0 auto; padding: 0 1rem; }
         .menu-section { margin-bottom: 1.5rem; }
 
-        /* Category heading (restored) */
         .menu-category-heading {
             font-family: var(--menu-display-font);
             font-weight: 600;
@@ -639,6 +672,25 @@
             font-size: 0.875rem; color: var(--menu-paper-muted); line-height: 1.6;
         }
 
+        #bootScreen {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; gap: 1rem;
+            background: var(--menu-paper);
+            color: var(--menu-paper-muted);
+            font-size: 0.85rem;
+        }
+        #bootScreen .spinner {
+            width: 36px; height: 36px;
+            border: 3px solid var(--menu-accent-soft);
+            border-top-color: var(--menu-accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         html[dir="rtl"] .search-wrap svg { left: auto; right: 1rem; }
         html[dir="rtl"] #menuSearchInput { padding: 0 2.75rem 0 1rem; }
         html[dir="rtl"] .dish-row { text-align: right; }
@@ -649,43 +701,52 @@
 </head>
 <body>
 
-    <div id="sessionTimerBanner" class="hidden">
-        <span>⏳ Session expires in:</span>
-        <span id="countdownDisplay">--:--</span>
+    <div id="bootScreen">
+        <div class="spinner"></div>
+        <div id="bootMsg">Loading your table…</div>
     </div>
 
-    <div id="customModal" class="modal-backdrop hidden">
-        <div class="modal-card">
-            <div id="modalIcon" class="modal-icon">🔔</div>
-            <h3 id="modalTitle">Notification</h3>
-            <p id="modalMessage">Message goes here...</p>
-            <button onclick="closeCustomModal()" class="modal-btn-primary">OK</button>
+    <div id="mainInterfaceWrapper" class="hidden">
+        <div id="sessionTimerBanner" class="hidden">
+            <span>⏳ Session expires in:</span>
+            <span id="countdownDisplay">--:--</span>
         </div>
-    </div>
 
-    <div id="itemModal" class="item-modal-backdrop hidden" onclick="if(event.target===this) closeItemModal();">
-        <div class="item-modal">
-            <button class="item-modal-close" onclick="closeItemModal()">✕</button>
-            <div class="item-modal-photo" id="itemModalPhoto"></div>
-            <div class="item-modal-body">
-                <div class="item-modal-name" id="itemModalName"></div>
-                <div class="item-modal-name-alt hidden" id="itemModalNameAlt"></div>
-                <div class="item-modal-price" id="itemModalPrice"></div>
-                <div class="item-modal-desc hidden" id="itemModalDesc"></div>
-                <div class="item-modal-dietary hidden" id="itemModalDietary"></div>
-                <div class="item-modal-actions">
-                    <div class="item-modal-qty">
-                        <button onclick="modalQtyDelta(-1)">−</button>
-                        <span class="qty-val" id="itemModalQty">0</span>
-                        <button onclick="modalQtyDelta(1)">+</button>
+        <div id="previewBanner" class="preview-banner hidden">
+            👁️ Preview Mode — read only, not connected as a guest
+        </div>
+
+        <div id="customModal" class="modal-backdrop hidden">
+            <div class="modal-card">
+                <div id="modalIcon" class="modal-icon">🔔</div>
+                <h3 id="modalTitle">Notification</h3>
+                <p id="modalMessage">Message goes here...</p>
+                <button onclick="closeCustomModal()" class="modal-btn-primary">OK</button>
+            </div>
+        </div>
+
+        <div id="itemModal" class="item-modal-backdrop hidden" onclick="if(event.target===this) closeItemModal();">
+            <div class="item-modal">
+                <button class="item-modal-close" onclick="closeItemModal()">✕</button>
+                <div class="item-modal-photo" id="itemModalPhoto"></div>
+                <div class="item-modal-body">
+                    <div class="item-modal-name" id="itemModalName"></div>
+                    <div class="item-modal-name-alt hidden" id="itemModalNameAlt"></div>
+                    <div class="item-modal-price" id="itemModalPrice"></div>
+                    <div class="item-modal-desc hidden" id="itemModalDesc"></div>
+                    <div class="item-modal-dietary hidden" id="itemModalDietary"></div>
+                    <div class="item-modal-actions" id="itemModalActions">
+                        <div class="item-modal-qty">
+                            <button onclick="modalQtyDelta(-1)">−</button>
+                            <span class="qty-val" id="itemModalQty">0</span>
+                            <button onclick="modalQtyDelta(1)">+</button>
+                        </div>
+                        <button class="item-modal-add" id="itemModalAddBtn" onclick="modalAddToCart()">Add to Order</button>
                     </div>
-                    <button class="item-modal-add" id="itemModalAddBtn" onclick="modalAddToCart()">Add to Order</button>
                 </div>
             </div>
         </div>
-    </div>
 
-        <div id="mainInterfaceWrapper" class="hidden">
         <div class="sticky-top-wrapper">
             <header class="diner-header">
                 <div class="header-titles">
@@ -693,8 +754,11 @@
                     <p id="brandSubtitle">Prices in USD (Includes VAT & Service)</p>
                 </div>
                 <div class="header-actions">
-                    <button class="icon-btn-header" onclick="subscribeToPush()" title="Enable notifications">🔔</button>
+                    <button class="icon-btn-header" id="pushBtn" onclick="subscribeToPush()" title="Enable notifications">🔔</button>
                     <div class="table-pill-display" id="tableBtnDisplay">Table --</div>
+                    <div class="guest-pill hidden" id="guestCounter" title="Guests on this table">
+                        <span>👥</span><span id="guestCount">1</span>
+                    </div>
                     <button class="icon-btn-header" id="langToggleBtn" onclick="toggleLanguage()">عربي</button>
                 </div>
             </header>
@@ -804,7 +868,7 @@
         let cart = {};
         let menuCategories = [];
         let itemLookup = {};
-        let latestServerState = { tables: {}, tableRequests: {}, orders: [] };
+        let latestServerState = { tables: {}, tableRequests: {}, orders: [], activeSessions: {} };
         let countdownInterval = null;
 
         let messages = [];
@@ -812,9 +876,15 @@
 
         let menuSearchFilter = '';
         let menuViewMode = 'list';
-        let showPhotos = true;
 
         let modalItemId = null;
+        let showPhotos = true;
+
+        // Preview mode
+        let isPreview = false;
+
+        // Guest counter
+        let lastGuestCount = -1;
 
         const activationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3');
 
@@ -884,7 +954,6 @@
 
         function renderDishThumb(item, containerEl) {
             if (!showPhotos) {
-                // Hide the thumbnail completely when photos are off
                 containerEl.style.display = 'none';
                 return;
             }
@@ -950,8 +1019,51 @@
                 </div>`;
         }
 
+        // ============ Boot ============
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
+            isPreview = urlParams.get('preview') === '1';
+
+            if (isPreview) {
+                // Preview flow — no token, no session
+                currentRestaurant = urlParams.get('rst');
+                currentTable = urlParams.get('tbl');
+                if (!currentRestaurant || !currentTable) {
+                    showErrorPage("Preview requires rst and tbl parameters.");
+                    return;
+                }
+
+                document.body.classList.add('preview-mode');
+                document.getElementById('previewBanner').classList.remove('hidden');
+
+                await loadSettings();
+                await loadPreviewData();
+
+                document.getElementById('brandTitle').innerText = currentRestaurant.toUpperCase();
+                document.getElementById('tableBtnDisplay').innerText = `Table #${currentTable}`;
+                document.getElementById('statusTableLabel').innerText = `#${currentTable}`;
+                document.getElementById('servedTableLabel').innerText = `#${currentTable}`;
+
+                try {
+                    const saved = localStorage.getItem('menuViewMode');
+                    if (saved === 'grid' || saved === 'list') menuViewMode = saved;
+                } catch (e) {}
+                updateViewToggleButton();
+
+                document.getElementById('bootScreen').classList.add('hidden');
+                document.getElementById('mainInterfaceWrapper').classList.remove('hidden');
+
+                const searchInput = document.getElementById('menuSearchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        menuSearchFilter = String(e.target.value || '').trim().toLowerCase();
+                        renderMenu();
+                    });
+                }
+                return;
+            }
+
+            // ---- Normal customer flow ----
             currentToken = urlParams.get('token');
             if (!currentToken) { showErrorPage("No session token was provided in the URL."); return; }
 
@@ -965,13 +1077,14 @@
                 sessionStart = data.sessionStart || Date.now();
             } catch (e) { showErrorPage("Unable to verify session with the server."); return; }
 
+            // Reveal the interface only after verification succeeds
+            document.getElementById('mainInterfaceWrapper').classList.remove('hidden');
+            document.getElementById('bootScreen').classList.add('hidden');
+
             socket.emit('register_session', { token: currentToken }, (res) => {
                 if (!res.success) showErrorPage("Session registration failed.");
             });
 
-            // Show the interface now that we know the session is valid
-            document.getElementById('mainInterfaceWrapper').classList.remove('hidden');
-                        
             startSessionCountdown();
 
             document.getElementById('brandTitle').innerText = currentRestaurant.toUpperCase();
@@ -998,10 +1111,61 @@
             } catch (e) {}
             updateViewToggleButton();
 
+            await loadSettings();
             await loadMenuFromServer(currentRestaurant);
             await loadMessageHistory();
-            await loadSettings();
         };
+
+        // ============ Settings ============
+        async function loadSettings() {
+            if (isExpired) return;
+            try {
+                const res = await fetch(`/api/settings/${encodeURIComponent(currentRestaurant)}`);
+                const data = await res.json();
+                showPhotos = String(data.show_photos) !== '0';
+            } catch (e) {
+                console.error('Failed to load settings', e);
+                showPhotos = true;
+            }
+        }
+
+        // ============ Preview data ============
+        async function loadPreviewData() {
+            try {
+                const url = `/api/preview/${encodeURIComponent(currentRestaurant)}?table=${encodeURIComponent(currentTable)}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message || 'Preview failed');
+
+                menuCategories = data.menu || [];
+                if (data.settings && data.settings.show_photos != null) {
+                    showPhotos = String(data.settings.show_photos) !== '0';
+                }
+                if (data.table) {
+                    tableIsOpen = !!data.table.isOpen;
+                    canOrder = false; // preview is always read-only
+                }
+                updateGuestCounter(data.guestsConnected || 0);
+
+                rebuildLookup();
+                renderCategoryPills();
+                renderMenu();
+                renderPreviewTableState();
+            } catch (e) {
+                console.error('Preview load failed:', e);
+                showErrorPage('Preview could not be loaded. ' + (e.message || ''));
+            }
+        }
+
+        function renderPreviewTableState() {
+            // Simple state rendering for the preview header area
+            const sub = document.getElementById('brandSubtitle');
+            if (sub) {
+                sub.textContent = tableIsOpen
+                    ? 'Preview · Menu is open to guests'
+                    : 'Preview · Menu is currently locked';
+            }
+        }
 
         function startSessionCountdown() {
             const banner = document.getElementById('sessionTimerBanner');
@@ -1083,6 +1247,7 @@
 
         async function loadMessageHistory() {
             if (isExpired) return;
+            if (isPreview) return; // preview has no messages
             try {
                 const res = await fetch(`/api/messages/${encodeURIComponent(currentRestaurant)}/${encodeURIComponent(currentTable)}`);
                 const history = await res.json();
@@ -1091,18 +1256,6 @@
                 renderMessages();
                 updateMessagesBadge();
             } catch (e) {}
-        }
-
-        async function loadSettings() {
-            if (isExpired) return;
-            try {
-                const res = await fetch(`/api/settings/${encodeURIComponent(currentRestaurant)}`);
-                const data = await res.json();
-                showPhotos = String(data.show_photos) !== '0';
-            } catch (e) {
-                console.error('Failed to load settings', e);
-                showPhotos = true;
-            }
         }
 
         function rebuildLookup() {
@@ -1172,12 +1325,10 @@
                 });
 
                 if (list.children.length > 0) {
-                    // Category heading (restored)
                     const heading = document.createElement('h2');
                     heading.className = 'menu-category-heading';
                     heading.textContent = catName;
                     secDiv.appendChild(heading);
-
                     secDiv.appendChild(list);
                     container.appendChild(secDiv);
                 }
@@ -1242,12 +1393,14 @@
                     right.style.gap = '0.5rem';
                     right.style.alignItems = 'center';
                     right.innerHTML = `<span class="variant-price">$${v.price.toFixed(2)}</span>`;
-                    const addBtn = document.createElement('button');
-                    addBtn.type = 'button';
-                    addBtn.className = 'variant-add';
-                    addBtn.textContent = i18n[currentLang].add;
-                    addBtn.onclick = (ev) => { ev.stopPropagation(); addToCart(v.id); };
-                    right.appendChild(addBtn);
+                    if (!isPreview) {
+                        const addBtn = document.createElement('button');
+                        addBtn.type = 'button';
+                        addBtn.className = 'variant-add';
+                        addBtn.textContent = i18n[currentLang].add;
+                        addBtn.onclick = (ev) => { ev.stopPropagation(); addToCart(v.id); };
+                        right.appendChild(addBtn);
+                    }
 
                     vRow.appendChild(left);
                     vRow.appendChild(right);
@@ -1272,14 +1425,15 @@
                 priceEl.setAttribute('data-price', String(parseFloat(item.price) || 0));
                 priceEl.innerHTML = `$${(parseFloat(item.price) || 0).toFixed(2)}${qty > 0 ? ` <span class="qty-badge-red">x${qty}</span>` : ''}`;
 
-                const addBtn = document.createElement('button');
-                addBtn.type = 'button';
-                addBtn.className = 'add-btn';
-                addBtn.innerHTML = `＋ ${i18n[currentLang].add.replace('+ ', '')}`;
-                addBtn.onclick = (ev) => { ev.stopPropagation(); addToCart(item.id); };
-
                 priceRow.appendChild(priceEl);
-                priceRow.appendChild(addBtn);
+                if (!isPreview) {
+                    const addBtn = document.createElement('button');
+                    addBtn.type = 'button';
+                    addBtn.className = 'add-btn';
+                    addBtn.innerHTML = `＋ ${i18n[currentLang].add.replace('+ ', '')}`;
+                    addBtn.onclick = (ev) => { ev.stopPropagation(); addToCart(item.id); };
+                    priceRow.appendChild(addBtn);
+                }
                 info.appendChild(priceRow);
             }
 
@@ -1287,6 +1441,7 @@
             return row;
         }
 
+        // ============ Item Detail Modal ============
         function openItemModal(item) {
             if (isExpired) return;
             modalItemId = item.id;
@@ -1315,6 +1470,7 @@
             const priceEl = document.getElementById('itemModalPrice');
             const descEl = document.getElementById('itemModalDesc');
             const dietEl = document.getElementById('itemModalDietary');
+            const actionsEl = document.getElementById('itemModalActions');
 
             const displayName = getItemDisplayName(item, currentLang);
             const altName = currentLang === 'ar' ? (item.nameEn || '') : (item.nameAr || '');
@@ -1350,6 +1506,8 @@
                 dietEl.classList.add('hidden');
             }
 
+            actionsEl.style.display = isPreview ? 'none' : '';
+
             updateModalQty();
             document.getElementById('itemModal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -1371,6 +1529,7 @@
         }
 
         function modalQtyDelta(delta) {
+            if (isPreview) return;
             if (!modalItemId) return;
             if (delta > 0) addToCart(modalItemId);
             else {
@@ -1386,6 +1545,7 @@
         }
 
         function modalAddToCart() {
+            if (isPreview) return;
             if (!modalItemId) return;
             addToCart(modalItemId);
             updateModalQty();
@@ -1415,15 +1575,36 @@
             });
         }
 
-        function broadcastCart() { if (currentToken) socket.emit('update_cart', { token: currentToken, cart }); }
+        // ============ Guest counter ============
+        function updateGuestCounter(count) {
+            const pill = document.getElementById('guestCounter');
+            const num = document.getElementById('guestCount');
+            if (isPreview) { pill.classList.add('hidden'); return; }
+            pill.classList.remove('hidden');
+            num.textContent = String(count);
+            if (count !== lastGuestCount && lastGuestCount !== -1) {
+                pill.classList.remove('pulse');
+                void pill.offsetWidth; // force reflow so animation restarts
+                pill.classList.add('pulse');
+            }
+            lastGuestCount = count;
+        }
+
+        // ============ Cart ============
+        function broadcastCart() {
+            if (isPreview) return;
+            if (currentToken) socket.emit('update_cart', { token: currentToken, cart });
+        }
         function toggleCartDrawer() {
             if (isExpired) return;
+            if (isPreview) return;
             isCartOpen = !isCartOpen;
             document.getElementById('cartDetails').classList.toggle('hidden', !isCartOpen);
             document.getElementById('chevronIcon').style.transform = isCartOpen ? 'rotate(180deg)' : 'rotate(0deg)';
         }
         function addToCart(id) {
             if (isExpired) return;
+            if (isPreview) return;
             if (!itemLookup[id]) return;
             cart[id] = (cart[id] || 0) + 1;
             updateCartUI();
@@ -1432,6 +1613,7 @@
         }
         function changeQty(id, delta) {
             if (isExpired) return;
+            if (isPreview) return;
             if (cart[id]) {
                 cart[id] += delta;
                 if (cart[id] <= 0) delete cart[id];
@@ -1449,6 +1631,7 @@
         });
         function updateCartUI() {
             if (isExpired) return;
+            if (isPreview) return;
             const t = i18n[currentLang];
             const itemIds = Object.keys(cart);
             let total = 0, count = 0;
@@ -1543,6 +1726,7 @@
 
         socket.on('cart_synced', (data) => {
             if (isExpired) return;
+            if (isPreview) return;
             cart = data.cart || {};
             updateCartUI();
             updateQtyBadges();
@@ -1550,6 +1734,7 @@
         });
         socket.on('order_placed_success', () => {
             if (isExpired) return;
+            if (isPreview) return;
             cart = {}; isCartOpen = false; isWaitingForOrderPermission = false;
             document.getElementById('cartDetails').classList.add('hidden');
             document.getElementById('chevronIcon').style.transform = 'rotate(0deg)';
@@ -1560,6 +1745,7 @@
         });
         socket.on('session_ended', (data) => {
             if (isExpired) return;
+            if (isPreview) return;
             const reason = (data && data.reason) || 'paid';
             let title, message, icon;
             if (reason === 'reset') { title = 'Session Reset 🔄'; message = 'Your table session has been reset by the manager.\n\nPlease scan the QR code again to start a new session.'; icon = '🔄'; }
@@ -1590,7 +1776,8 @@
         socket.on('menu_updated', (data) => {
             if (isExpired) return;
             if (data && data.restaurant === currentRestaurant) {
-                loadMenuFromServer(currentRestaurant);
+                if (isPreview) loadPreviewData();
+                else loadMenuFromServer(currentRestaurant);
             }
         });
         socket.on('settings_updated', (data) => {
@@ -1607,11 +1794,13 @@
         });
         socket.on('admin_message', (data) => {
             if (isExpired) return;
+            if (isPreview) return;
             if (!data || !data.message) return;
             addMessage({ id: data.id, message: data.message, icon: data.icon || '💬', createdAt: data.createdAt || Date.now() }, true);
         });
         socket.on('admin_messages_bulk', (payload) => {
             if (isExpired) return;
+            if (isPreview) return;
             const list = (payload && payload.messages) || [];
             list.forEach(m => addMessage({ id: m.id, message: m.message, icon: m.icon || '💬', createdAt: m.createdAt || Date.now() }, true));
         });
@@ -1668,11 +1857,16 @@
         socket.on('state_update', (data) => {
             if (isExpired) return;
             latestServerState = data;
+            // Update guest counter for this table
+            const restoActive = (data.activeSessions && data.activeSessions[currentRestaurant]) || {};
+            const guests = restoActive[currentTable] || 0;
+            updateGuestCounter(guests);
             evaluateTableState();
         });
 
         function evaluateTableState() {
             if (isExpired || !currentTable || !currentRestaurant) return;
+            if (isPreview) return;
             const data = latestServerState;
             const restoTables = (data.tables && data.tables[currentRestaurant]) || {};
             const restoTable = restoTables[currentTable] || { isOpen: false, canOrder: false, status: 'Valid' };
@@ -1827,6 +2021,7 @@
 
         function requestOrderApproval() {
             if (isExpired) return;
+            if (isPreview) return;
             socket.emit('table_request', { token: currentToken });
             isWaitingForOrderPermission = true;
             updateCartUI();
@@ -1835,6 +2030,7 @@
 
         function sendOrder() {
             if (isExpired) return;
+            if (isPreview) return;
             if (!canOrder) { requestOrderApproval(); return; }
 
             let total = 0, orderItems = [];

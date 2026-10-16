@@ -41,6 +41,7 @@
             const rawTbl = urlParams.get('tbl');
             const rawRst = urlParams.get('rst');
             const lifetimeParam = urlParams.get('lifetime') || '15';
+            const isPreview = urlParams.get('preview') === '1';
 
             if (!rawTbl || !rawRst) {
                 showError('Please scan the official QR code located on your table.');
@@ -54,6 +55,18 @@
                 return;
             }
 
+            // ============ PREVIEW MODE ============
+            // Admin is peeking at the customer view — no session is created,
+            // no device is registered, no guest counter is affected.
+            if (isPreview) {
+                const previewUrl = `/menu.html?preview=1`
+                    + `&rst=${encodeURIComponent(currentRestaurant)}`
+                    + `&tbl=${encodeURIComponent(currentTable)}`;
+                window.location.replace(previewUrl);
+                return;
+            }
+
+            // ============ NORMAL CUSTOMER FLOW ============
             try {
                 const res = await fetch('/api/create-session', {
                     method: 'POST',

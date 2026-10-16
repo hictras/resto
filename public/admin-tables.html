@@ -477,7 +477,6 @@
         .pill-valid    { background: rgba(16, 185, 129, 0.15); color: #065f46; }
         .table-pills { display: flex; gap: 0.3rem; flex-wrap: wrap; }
 
-        /* Small icon button in top-right of table card (Open as customer) */
         .open-customer-btn {
             width: 32px; height: 32px; border-radius: 10px;
             border: 1px solid var(--menu-hairline);
@@ -749,18 +748,16 @@
             return String(k).toLowerCase().includes(tableSearchFilter);
         }
 
-        // -------- OPEN AS CUSTOMER --------
+        // -------- OPEN AS CUSTOMER (preview mode — no session, no device) --------
         function openAsCustomer(tableNum) {
             const resto = currentAdminRestaurant;
             if (!resto) return showModal('No Restaurant', 'Select a restaurant first.', '⚠️');
 
-            // Same encoding as the QR code generator
             const tableNumStr = String(tableNum);
             const encodedTbl = btoa(tableNumStr).split('').reverse().join('');
             const encodedResto = btoa(resto).split('').reverse().join('');
-            const url = `/customer.html?tbl=${encodeURIComponent(encodedTbl)}&rst=${encodeURIComponent(encodedResto)}`;
+            const url = `/customer.html?tbl=${encodeURIComponent(encodedTbl)}&rst=${encodeURIComponent(encodedResto)}&preview=1`;
 
-            // Open in a new tab
             window.open(url, '_blank', 'noopener');
         }
 
@@ -925,7 +922,7 @@
                             </div>
 
                             <button class="btn btn-soft btn-lg" onclick="openAsCustomer('${esc(focusedTable)}')">
-                                <span>🔗 Open as Customer</span>
+                                <span>👁️ Open as Customer</span>
                                 <span>→</span>
                             </button>
                             <button class="btn btn-soft btn-lg" onclick="openMsgComposer()">
@@ -1027,7 +1024,7 @@
                                     ${isMenuOpen ? `${openCount} device${openCount > 1 ? 's' : ''}` : 'no devices'}
                                 </div>
                             </div>
-                            <button class="open-customer-btn" title="Open as customer" onclick="event.stopPropagation(); openAsCustomer('${esc(k)}')">👁️</button>
+                            <button class="open-customer-btn" title="Open as customer (preview)" onclick="event.stopPropagation(); openAsCustomer('${esc(k)}')">👁️</button>
                         </div>
 
                         <div class="table-pills">
