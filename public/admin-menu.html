@@ -160,6 +160,23 @@
         }
         .menu-item-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .menu-item-photo .placeholder { font-size: 2.5rem; opacity: 0.35; }
+
+        .dietary-overlay {
+            position: absolute; bottom: 0.5rem; right: 0.5rem;
+            display: flex; gap: 3px;
+            pointer-events: none;
+        }
+        .dietary-abbr {
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 5px;
+            letter-spacing: 0.03em;
+            font-family: ui-monospace, monospace;
+        }
+
         .menu-item-body {
             padding: 0.9rem 1rem 1rem;
             display: flex; flex-direction: column; gap: 0.4rem;
@@ -238,6 +255,18 @@
         let currentAdminRestaurant = '';
         let menuCategories = [];
         let menuSearchFilter = '';
+
+        const DIETARY_LABELS = {
+            'vegetarian':    { en: 'Vegetarian',     ar: 'نباتي',              abbr: 'V'  },
+            'vegan':         { en: 'Vegan',          ar: 'نباتي صرف',          abbr: 'VG' },
+            'gluten-free':   { en: 'Gluten-Free',    ar: 'خالٍ من الغلوتين',   abbr: 'GF' },
+            'dairy-free':    { en: 'Dairy-Free',     ar: 'خالٍ من الألبان',    abbr: 'DF' },
+            'contains-nuts': { en: 'Contains Nuts',  ar: 'يحتوي مكسرات',       abbr: 'N'  },
+            'spicy':         { en: 'Spicy',          ar: 'حار',                abbr: 'SP' },
+            'halal':         { en: 'Halal',          ar: 'حلال',               abbr: 'H'  },
+            'pescatarian':   { en: 'Pescatarian',    ar: 'بحري',               abbr: 'P'  },
+            'raw':           { en: 'Raw',            ar: 'نيء',                abbr: 'R'  }
+        };
 
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -363,21 +392,7 @@
                     <span class="count">${cat.items.length} item${cat.items.length > 1 ? 's' : ''}</span>
                 </h3>
                 <div class="menu-list-grid">
-                    ${cat.items.map(item => `
-                        <div class="menu-item-card" data-item-id="${esc(item.id)}">
-                            <div class="menu-item-photo" data-photo-for="${esc(item.id)}">
-                                <div class="placeholder">🍽️</div>
-                            </div>
-                            <div class="menu-item-body">
-                                <div class="menu-item-name">
-                                    ${esc(item.nameEn || '')}
-                                    ${item.nameAr ? `<small>${esc(item.nameAr)}</small>` : ''}
-                                </div>
-                                ${item.descEn ? `<div class="menu-item-desc">${esc(item.descEn)}</div>` : ''}
-                                <div class="menu-item-price">$${(parseFloat(item.price) || 0).toFixed(2)}</div>
-                            </div>
-                        </div>
-                    `).join('')}
+                    ${cat.items.map(item => renderItemCard(item)).join('')}
                 </div>`).join('');
 
             filtered.forEach(cat => {
@@ -388,35 +403,62 @@
             });
         }
 
+        function renderItemCard(item) {
+            const dietary = Array.isArray(item.dietary) ? item.dietary : [];
+            const abbrHtml = dietary.length > 0
+                ? `<div class="dietary-overlay">${
+                    dietary.map(t => {
+                        const def = DIETARY_LABELS[t];
+                        if (!def) return '';
+                        return `<span class="dietary-abbr" title="${esc(def.en)}">${def.abbr}</span>`;
+                    }).join('')
+                }</div>`
+                : '';
+
+            return `
+                <div class="menu-item-card" data-item-id="${esc(item.id)}">
+                    <div class="menu-item-photo" data-photo-for="${esc(item.id)}">
+                        <div class="placeholder">🍽️</div>
+                        ${abbrHtml}
+                    </div>
+                    <div class="menu-item-body">
+                        <div class="menu-item-name">
+                            ${esc(item.nameEn || '')}
+                            ${item.nameAr ? `<small>${esc(item.nameAr)}</small>` : ''}
+                        </div>
+                        ${item.descEn ? `<div class="menu-item-desc">${esc(item.descEn)}</div>` : ''}
+                        <div class="menu-item-price">$${(parseFloat(item.price) || 0).toFixed(2)}</div>
+                    </div>
+                </div>`;
+        }
+
         function cssEscape(s) {
             return String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
         }
 
-        // ============ Photo resolution (R2-aware) ============
-        // If the item already has a full http(s) URL in .image, use it directly.
-        // Otherwise fall back to guessing local files (legacy items).
-        const PHOTO_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
+        // ============ Photo resolution (no more guessing) ============
         function loadItemPhoto(item, containerEl) {
-            if (item.image && /^https?:\/\//i.test(item.image)) {
-                const img = new Image();
-                img.onload = () => { containerEl.innerHTML = `<img src="${esc(item.image)}" alt="">`; };
-                img.onerror = () => { containerEl.innerHTML = '<div class="placeholder">🍽️</div>'; };
-                img.src = item.image;
+            if (!item.image || !/^https?:\/\//i.test(item.image)) {
+                // No image URL → placeholder only, no network requests
+                containerEl.innerHTML = '<div class="placeholder">🍽️</div>' +
+                    (containerEl.querySelector('.dietary-overlay') ? containerEl.querySelector('.dietary-overlay').outerHTML : '');
                 return;
             }
-            const itemId = item.id;
-            function tryNext(idx) {
-                if (idx >= PHOTO_EXTS.length) {
-                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>';
-                    return;
-                }
-                const src = `/dish-photos/${itemId}.${PHOTO_EXTS[idx]}?t=${Date.now()}`;
-                const img = new Image();
-                img.onload = () => { containerEl.innerHTML = `<img src="${esc(src)}" alt="">`; };
-                img.onerror = () => tryNext(idx + 1);
-                img.src = src;
-            }
-            tryNext(0);
+
+            const img = new Image();
+            img.onload = () => {
+                const existingBadges = containerEl.querySelectorAll('.dietary-overlay');
+                containerEl.innerHTML = '';
+                const imgEl = document.createElement('img');
+                imgEl.src = item.image;
+                containerEl.appendChild(imgEl);
+                existingBadges.forEach(b => containerEl.appendChild(b.cloneNode(true)));
+            };
+            img.onerror = () => {
+                containerEl.innerHTML = '<div class="placeholder">🍽️</div>' +
+                    (containerEl.querySelector('.dietary-overlay') ? containerEl.querySelector('.dietary-overlay').outerHTML : '');
+            };
+            img.src = item.image;
         }
 
         adminAuth.requireLogin(() => {
