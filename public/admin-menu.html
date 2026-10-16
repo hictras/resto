@@ -87,7 +87,6 @@
             flex-wrap: wrap;
         }
 
-        /* Search box */
         .search-box {
             display: flex; align-items: center; gap: 0.5rem;
             background: var(--menu-paper);
@@ -384,7 +383,7 @@
             filtered.forEach(cat => {
                 (cat.items || []).forEach(item => {
                     const container = document.querySelector(`[data-photo-for="${cssEscape(item.id)}"]`);
-                    if (container) loadItemPhoto(item.id, container);
+                    if (container) loadItemPhoto(item, container);
                 });
             });
         }
@@ -393,8 +392,19 @@
             return String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
         }
 
+        // ============ Photo resolution (R2-aware) ============
+        // If the item already has a full http(s) URL in .image, use it directly.
+        // Otherwise fall back to guessing local files (legacy items).
         const PHOTO_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
-        function loadItemPhoto(itemId, containerEl) {
+        function loadItemPhoto(item, containerEl) {
+            if (item.image && /^https?:\/\//i.test(item.image)) {
+                const img = new Image();
+                img.onload = () => { containerEl.innerHTML = `<img src="${esc(item.image)}" alt="">`; };
+                img.onerror = () => { containerEl.innerHTML = '<div class="placeholder">🍽️</div>'; };
+                img.src = item.image;
+                return;
+            }
+            const itemId = item.id;
             function tryNext(idx) {
                 if (idx >= PHOTO_EXTS.length) {
                     containerEl.innerHTML = '<div class="placeholder">🍽️</div>';
