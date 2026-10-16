@@ -160,7 +160,6 @@
         .dish-row:hover { background: var(--menu-accent-soft); }
         .dish-row:last-child { border-bottom: none; }
 
-        /* Thumb becomes clickable for modal */
         .dish-thumb {
             position: relative; width: 6.5rem; height: 6.5rem;
             border-radius: 12px; overflow: hidden;
@@ -172,7 +171,6 @@
         .dish-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .dish-thumb .thumb-placeholder { font-size: 2rem; opacity: 0.5; }
 
-        /* Dietary abbreviation badges on the thumb */
         .dietary-overlay {
             position: absolute; bottom: 4px; right: 4px;
             display: flex; gap: 3px;
@@ -207,7 +205,6 @@
             overflow: hidden;
         }
 
-        /* Price + Add button row */
         .dish-price-row {
             display: flex; justify-content: space-between; align-items: center;
             gap: 0.5rem; margin-top: 0.4rem;
@@ -234,7 +231,6 @@
         .add-btn:hover { background: var(--primary-dark); }
         .add-btn:active { transform: scale(0.96); }
 
-        /* Variants */
         .variant-list { margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem; }
         .variant-row {
             display: flex; align-items: center; justify-content: space-between;
@@ -263,7 +259,6 @@
         }
         .variant-add:hover { background: var(--primary-dark); }
 
-        /* Grid view */
         .dish-list.grid-view {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -656,7 +651,6 @@
         </div>
     </div>
 
-    <!-- Item detail modal (populated dynamically) -->
     <div id="itemModal" class="item-modal-backdrop hidden" onclick="if(event.target===this) closeItemModal();">
         <div class="item-modal">
             <button class="item-modal-close" onclick="closeItemModal()">✕</button>
@@ -807,7 +801,6 @@
         let menuSearchFilter = '';
         let menuViewMode = 'list';
 
-        // Modal state
         let modalItemId = null;
 
         const activationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3');
@@ -833,7 +826,6 @@
             ar: { brandSubtitle: "الأسعار بالدولار شاملة الخدمة والضريبة", langBtnText: "English", viewList: "🛒 عرض تفاصيل الطلب", items: "أصناف", add: "+ إضافة", addToOrder: "أضف إلى الطلب", emptyCart: "سلة الطلبات فارغة.", sendOrder: "إرسال الطلب 🚀", notifyManager: "طلب إذن إرسال الطلب من المدير 🛎️", waitingOrderPermission: "⏳ في انتظار تفعيل زر الطلب من المدير...", noMessages: "لا توجد رسائل بعد.", searchPlaceholder: "ابحث في القائمة", noResults: "لا توجد أطباق مطابقة للبحث." }
         };
 
-        // ============ Variadic parser ============
         const ARABIC_DIGITS = { '٠':'0','١':'1','٢':'2','٣':'3','٤':'4','٥':'5','٦':'6','٧':'7','٨':'8','٩':'9',
                                 '۰':'0','۱':'1','۲':'2','۳':'3','۴':'4','۵':'5','۶':'6','۷':'7','۸':'8','۹':'9' };
         function normalizeDigits(str) { return String(str).replace(/[٠-٩۰-۹]/g, d => ARABIC_DIGITS[d] || d); }
@@ -873,7 +865,6 @@
             return lang === 'ar' ? (variantOrItem.nameAr || variantOrItem.nameEn || '') : (variantOrItem.nameEn || variantOrItem.nameAr || '');
         }
 
-        // ============ Photo resolution ============
         function getDishPhotoCandidates(item) {
             if (item.image && /^https?:\/\//i.test(item.image)) return [item.image];
             const explicit = item.image || item.photo;
@@ -885,7 +876,6 @@
             const candidates = getDishPhotoCandidates(item);
             const dietary = Array.isArray(item.dietary) ? item.dietary : [];
 
-            // Build the overlay HTML once
             const overlayHtml = dietary.length > 0
                 ? `<div class="dietary-overlay">${
                     dietary.map(t => {
@@ -917,7 +907,6 @@
             tryNext(0);
         }
 
-        // ============ View toggle ============
         function toggleViewMode() {
             menuViewMode = menuViewMode === 'list' ? 'grid' : 'list';
             try { localStorage.setItem('menuViewMode', menuViewMode); } catch (e) {}
@@ -932,7 +921,6 @@
             btn.title = menuViewMode === 'list' ? 'Switch to grid view' : 'Switch to list view';
         }
 
-        // ============ Error page ============
         function showErrorPage(message = "Invalid or expired session token.") {
             if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
             isExpired = true;
@@ -946,7 +934,6 @@
                 </div>`;
         }
 
-        // ============ Boot ============
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
             currentToken = urlParams.get('token');
@@ -1019,7 +1006,6 @@
             countdownInterval = setInterval(tick, 1000);
         }
 
-        // ============ Push notifications ============
         async function subscribeToPush() {
             if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
                 return showModal('Not Supported', 'Push notifications are not supported in this browser.', '⚠️');
@@ -1064,7 +1050,6 @@
             return outputArray;
         }
 
-        // ============ Menu loading ============
         async function loadMenuFromServer(restaurantName) {
             if (isExpired) return;
             try {
@@ -1171,8 +1156,8 @@
 
             const row = document.createElement('div');
             row.className = 'dish-row';
+            row.setAttribute('data-item-id', item.id);
 
-            // Thumbnail (clickable → opens modal)
             const thumb = document.createElement('div');
             thumb.className = 'dish-thumb';
             thumb.title = 'Tap to view details';
@@ -1180,7 +1165,6 @@
             renderDishThumb(item, thumb);
             row.appendChild(thumb);
 
-            // Info
             const info = document.createElement('div');
             info.className = 'dish-info';
 
@@ -1201,17 +1185,18 @@
             }
 
             if (isVariadic) {
-                // Variants list
                 const variantsWrap = document.createElement('div');
                 variantsWrap.className = 'variant-list';
                 lookupEntry.variants.forEach(v => {
                     const vRow = document.createElement('div');
                     vRow.className = 'variant-row';
+                    vRow.setAttribute('data-variant-id', v.id);
                     const qty = cart[v.id] || 0;
                     const vName = getItemDisplayName(v, currentLang);
 
                     const left = document.createElement('div');
                     left.className = 'variant-name';
+                    left.setAttribute('data-base-text', vName);
                     left.innerHTML = `${esc(vName)}${qty > 0 ? ` <span class="variant-qty">x${qty}</span>` : ''}`;
 
                     const right = document.createElement('div');
@@ -1241,12 +1226,12 @@
 
                 const qty = cart[item.id] || 0;
 
-                // Price + Add button row
                 const priceRow = document.createElement('div');
                 priceRow.className = 'dish-price-row';
 
                 const priceEl = document.createElement('div');
                 priceEl.className = 'dish-price';
+                priceEl.setAttribute('data-price', String(parseFloat(item.price) || 0));
                 priceEl.innerHTML = `$${(parseFloat(item.price) || 0).toFixed(2)}${qty > 0 ? ` <span class="qty-badge-red">x${qty}</span>` : ''}`;
 
                 const addBtn = document.createElement('button');
@@ -1351,7 +1336,7 @@
                     cart[modalItemId] += delta;
                     if (cart[modalItemId] <= 0) delete cart[modalItemId];
                     updateCartUI();
-                    renderMenu();
+                    updateQtyBadges();
                     broadcastCart();
                 }
             }
@@ -1362,6 +1347,33 @@
             if (!modalItemId) return;
             addToCart(modalItemId);
             updateModalQty();
+        }
+
+        // ============ Qty badge updater (no full re-render) ============
+        function updateQtyBadges() {
+            if (isExpired) return;
+
+            // Simple items — update the "x2" badge next to the price
+            document.querySelectorAll('.dish-row').forEach(row => {
+                const itemId = row.getAttribute('data-item-id');
+                if (!itemId) return;
+                const priceEl = row.querySelector('.dish-price');
+                if (!priceEl) return;
+                const price = parseFloat(priceEl.getAttribute('data-price') || '0');
+                const qty = cart[itemId] || 0;
+                priceEl.innerHTML = `$${price.toFixed(2)}${qty > 0 ? ` <span class="qty-badge-red">x${qty}</span>` : ''}`;
+            });
+
+            // Variant rows
+            document.querySelectorAll('.variant-row').forEach(vRow => {
+                const variantId = vRow.getAttribute('data-variant-id');
+                if (!variantId) return;
+                const nameEl = vRow.querySelector('.variant-name');
+                if (!nameEl) return;
+                const baseText = nameEl.getAttribute('data-base-text') || '';
+                const qty = cart[variantId] || 0;
+                nameEl.innerHTML = `${esc(baseText)}${qty > 0 ? ` <span class="variant-qty">x${qty}</span>` : ''}`;
+            });
         }
 
         // ============ Cart ============
@@ -1377,7 +1389,7 @@
             if (!itemLookup[id]) return;
             cart[id] = (cart[id] || 0) + 1;
             updateCartUI();
-            renderMenu();
+            updateQtyBadges();
             broadcastCart();
         }
         function changeQty(id, delta) {
@@ -1387,7 +1399,7 @@
                 if (cart[id] <= 0) delete cart[id];
             }
             updateCartUI();
-            renderMenu();
+            updateQtyBadges();
             broadcastCart();
         }
         document.getElementById('cartItemsList').addEventListener('click', (e) => {
@@ -1433,7 +1445,6 @@
             else { sendBtn.innerText = t.notifyManager; sendBtn.style.background = '#f59e0b'; sendBtn.style.cursor = 'pointer'; }
         }
 
-        // ============ Tabs ============
         function switchMainTab(tab) {
             if (isExpired) return;
             const isMenu = tab === 'menu';
@@ -1459,7 +1470,6 @@
             if (isMessages) { unreadMsgIds.clear(); updateMessagesBadge(); renderMessages(); }
         }
 
-        // ============ Language ============
         function toggleLanguage() {
             if (isExpired) return;
             currentLang = currentLang === 'en' ? 'ar' : 'en';
@@ -1481,7 +1491,6 @@
             }
         }
 
-        // ============ Modals ============
         function showModal(title, message, icon = '🔔') {
             if (isExpired) return;
             document.getElementById('modalTitle').innerText = title;
@@ -1494,12 +1503,11 @@
             if ('Notification' in window && Notification.permission === 'granted') new Notification(title, { body });
         }
 
-        // ============ Socket handlers ============
         socket.on('cart_synced', (data) => {
             if (isExpired) return;
             cart = data.cart || {};
             updateCartUI();
-            renderMenu();
+            updateQtyBadges();
             if (modalItemId) updateModalQty();
         });
         socket.on('order_placed_success', () => {
@@ -1509,7 +1517,7 @@
             document.getElementById('chevronIcon').style.transform = 'rotate(0deg)';
             closeItemModal();
             updateCartUI();
-            renderMenu();
+            updateQtyBadges();
             switchMainTab('status');
         });
         socket.on('session_ended', (data) => {
@@ -1607,7 +1615,6 @@
             return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
-        // ============ State ============
         socket.on('state_update', (data) => {
             if (isExpired) return;
             latestServerState = data;
@@ -1800,7 +1807,7 @@
                     document.getElementById('chevronIcon').style.transform = 'rotate(0deg)';
                     broadcastCart();
                     showModal('Success!', 'Order sent successfully to the kitchen!', '🚀');
-                    updateCartUI(); renderMenu();
+                    updateCartUI(); updateQtyBadges();
                     switchMainTab('status');
                 } else { showModal('Notice', res.message, '⚠️'); }
             });
