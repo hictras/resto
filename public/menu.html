@@ -147,6 +147,19 @@
         .container { max-width: 960px; margin: 0 auto; padding: 0 1rem; }
         .menu-section { margin-bottom: 1.5rem; }
 
+        /* Category heading (restored) */
+        .menu-category-heading {
+            font-family: var(--menu-display-font);
+            font-weight: 600;
+            font-size: 1.35rem;
+            color: var(--menu-accent);
+            margin: 2rem 0 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--menu-hairline);
+            letter-spacing: -0.01em;
+        }
+        .menu-section:first-of-type .menu-category-heading { margin-top: 0.5rem; }
+
         .dish-list { list-style: none; padding: 0; margin: 0; }
         .dish-row {
             display: flex; align-items: center; gap: 1rem;
@@ -863,9 +876,6 @@
             return lang === 'ar' ? (variantOrItem.nameAr || variantOrItem.nameEn || '') : (variantOrItem.nameEn || variantOrItem.nameAr || '');
         }
 
-        // ============ Photo resolution (no more guessing) ============
-        // Returns an array with a single element if the item has an image URL.
-        // Returns an empty array if there's no image → placeholder shown instantly.
         function getDishPhotoCandidates(item) {
             if (item.image && /^https?:\/\//i.test(item.image)) return [item.image];
             return [];
@@ -1139,6 +1149,12 @@
                 });
 
                 if (list.children.length > 0) {
+                    // Category heading (restored)
+                    const heading = document.createElement('h2');
+                    heading.className = 'menu-category-heading';
+                    heading.textContent = catName;
+                    secDiv.appendChild(heading);
+
                     secDiv.appendChild(list);
                     container.appendChild(secDiv);
                 }
