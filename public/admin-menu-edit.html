@@ -175,7 +175,6 @@
         .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--menu-accent); }
         .field textarea { resize: vertical; min-height: 68px; }
 
-        /* Dietary chips */
         .dietary-picker {
             display: flex; flex-wrap: wrap; gap: 0.4rem;
             padding-top: 0.15rem;
@@ -442,16 +441,13 @@
                 </div>
                 <div class="field">
                     <label>Category</label>
-                    <select id="mCat">
-                        <option value="Starters">Starters</option>
-                        <option value="Mains">Mains</option>
-                        <option value="Desserts">Desserts</option>
-                        <option value="Drinks">Drinks</option>
-                        <option value="Salads & Veggies">Salads &amp; Veggies</option>
-                        <option value="Cold Mezza">Cold Mezza</option>
-                        <option value="Coffee, Tea & Shisha">Coffee, Tea &amp; Shisha</option>
-                    </select>
+                    <select id="mCat" onchange="onCategoryChange(this.value)"></select>
                 </div>
+            </div>
+
+            <div class="field hidden" id="newCategoryWrap">
+                <label>New Category Name</label>
+                <input type="text" id="mNewCategory" placeholder="e.g. Breakfast, Sushi, Grill">
             </div>
 
             <div class="field">
@@ -577,6 +573,68 @@
             if (data && data.restaurant === currentAdminRestaurant) loadMenu();
         });
 
+        // ============ Dynamic category dropdown ============
+        function populateCategoryDropdown(selectedValue) {
+            const sel = document.getElementById('mCat');
+            const cats = (menuCategories || []).map(c => c.categoryEn).filter(Boolean);
+
+            // Include selected value even if it's not in the loaded list
+            if (selectedValue && !cats.includes(selectedValue)) cats.push(selectedValue);
+
+            // Sort alphabetically
+            cats.sort((a, b) => a.localeCompare(b));
+
+            sel.innerHTML = '';
+
+            if (cats.length === 0) {
+                const empty = document.createElement('option');
+                empty.value = '';
+                empty.disabled = true;
+                empty.textContent = '— No categories yet —';
+                sel.appendChild(empty);
+            } else {
+                // Placeholder (disabled) shown only when nothing is selected
+                const placeholder = document.createElement('option');
+                placeholder.value = '';
+                placeholder.disabled = true;
+                placeholder.textContent = '— Choose a category —';
+                if (!selectedValue) sel.appendChild(placeholder);
+
+                cats.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    sel.appendChild(opt);
+                });
+            }
+
+            // "+ Add new category" option
+            const addOpt = document.createElement('option');
+            addOpt.value = '__NEW__';
+            addOpt.textContent = '➕ Add new category…';
+            sel.appendChild(addOpt);
+
+            // Restore the selected value
+            if (selectedValue && cats.includes(selectedValue)) {
+                sel.value = selectedValue;
+            } else if (cats.length > 0) {
+                sel.value = cats[0];
+            } else {
+                sel.value = '';
+            }
+        }
+
+        function onCategoryChange(val) {
+            const wrap = document.getElementById('newCategoryWrap');
+            if (val === '__NEW__') {
+                wrap.classList.remove('hidden');
+                setTimeout(() => document.getElementById('mNewCategory').focus(), 50);
+            } else {
+                wrap.classList.add('hidden');
+                document.getElementById('mNewCategory').value = '';
+            }
+        }
+
         // ============ Dietary picker ============
         function renderDietaryPicker() {
             const wrap = document.getElementById('dietaryPicker');
@@ -631,6 +689,12 @@
                 const res = await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}`);
                 menuCategories = await res.json();
                 renderMenuList();
+
+                // Refresh the category dropdown with the latest categories,
+                // but only if we're not currently editing an item
+                if (!document.getElementById('mId').value) {
+                    populateCategoryDropdown(document.getElementById('mCat').value || '');
+                }
             } catch (e) {
                 console.error(e);
                 document.getElementById('menuList').innerHTML = `<p class="empty-state">Failed to load menu.</p>`;
@@ -768,20 +832,14 @@
                     containerEl.appendChild(imgEl);
                     existingBadges.forEach(b => containerEl.appendChild(b.cloneNode(true)));
                 };
-                img.onerror = () => {
-                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>' +
-                        (containerEl.querySelector('.sort-badge') ? containerEl.querySelector('.sort-badge').outerHTML : '') +
-                        (containerEl.querySelector('.dietary-overlay') ? containerEl.querySelector('.dietary-overlay').outerHTML : '');
-                };
+                img.onerror = () => { containerEl.innerHTML = '<div class="placeholder">🍽️</div>'; };
                 img.src = item.image;
                 return;
             }
             const itemId = item.id;
             function tryNext(idx) {
                 if (idx >= PHOTO_EXTS.length) {
-                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>' +
-                        (containerEl.querySelector('.sort-badge') ? containerEl.querySelector('.sort-badge').outerHTML : '') +
-                        (containerEl.querySelector('.dietary-overlay') ? containerEl.querySelector('.dietary-overlay').outerHTML : '');
+                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>';
                     return;
                 }
                 const src = `/dish-photos/${itemId}.${PHOTO_EXTS[idx]}?t=${Date.now()}`;
@@ -800,9 +858,8 @@
             tryNext(0);
         }
 
-        // ============ Drag-and-drop reorder ============
         function enableDragAndDrop() {
-            if (menuSearchFilter) return; // Don't allow reorder while filtering
+            if (menuSearchFilter) return;
             document.querySelectorAll('.menu-list-grid').forEach(grid => {
                 Sortable.create(grid, {
                     animation: 150,
@@ -835,7 +892,6 @@
             document.getElementById('mName').value = '';
             document.getElementById('mNameAr').value = '';
             document.getElementById('mPrice').value = '';
-            document.getElementById('mCat').value = 'Starters';
             document.getElementById('mSort').value = '';
             document.getElementById('mDesc').value = '';
             document.getElementById('mDescAr').value = '';
@@ -845,8 +901,11 @@
             document.getElementById('formTitle').innerText = '➕ Add New Item';
             document.getElementById('submitBtn').innerText = '➕ Add Item';
             document.getElementById('cancelEditBtn').classList.add('hidden');
+            document.getElementById('newCategoryWrap').classList.add('hidden');
+            document.getElementById('mNewCategory').value = '';
             selectedDietary = new Set();
             renderDietaryPicker();
+            populateCategoryDropdown('');
         }
 
         function startEditItem(category, itemId) {
@@ -864,13 +923,17 @@
             document.getElementById('mName').value = found.nameEn || '';
             document.getElementById('mNameAr').value = found.nameAr || '';
             document.getElementById('mPrice').value = found.price || '';
-            document.getElementById('mCat').value = category;
             document.getElementById('mSort').value = found.sort != null ? found.sort : '';
             document.getElementById('mDesc').value = found.descEn || '';
             document.getElementById('mDescAr').value = found.descAr || '';
             document.getElementById('formTitle').innerText = `✏️ Edit: ${found.nameEn}`;
             document.getElementById('submitBtn').innerText = '💾 Save Changes';
             document.getElementById('cancelEditBtn').classList.remove('hidden');
+
+            // Populate category dropdown with this item's category selected
+            populateCategoryDropdown(category);
+            document.getElementById('newCategoryWrap').classList.add('hidden');
+            document.getElementById('mNewCategory').value = '';
 
             selectedDietary = new Set(Array.isArray(found.dietary) ? found.dietary : []);
             renderDietaryPicker();
@@ -921,10 +984,21 @@
             const nameEn = document.getElementById('mName').value.trim();
             const nameAr = document.getElementById('mNameAr').value.trim();
             const price = document.getElementById('mPrice').value;
-            const category = document.getElementById('mCat').value;
             const sort = document.getElementById('mSort').value;
             const descEn = document.getElementById('mDesc').value.trim();
             const descAr = document.getElementById('mDescAr').value.trim();
+
+            // Resolve category (handles "Add new category")
+            let category = document.getElementById('mCat').value;
+            if (category === '__NEW__') {
+                category = (document.getElementById('mNewCategory').value || '').trim();
+                if (!category) {
+                    return showModal('Missing Category', 'Please type a name for the new category.', '⚠️');
+                }
+            }
+            if (!category) {
+                return showModal('Missing Category', 'Please choose or create a category.', '⚠️');
+            }
 
             if (!nameEn) return showModal('Missing Name', 'Please enter the item name in English.', '⚠️');
             if (!price) return showModal('Missing Price', 'Please enter the price.', '⚠️');
