@@ -812,6 +812,7 @@
 
         let menuSearchFilter = '';
         let menuViewMode = 'list';
+        let showPhotos = true;
 
         let modalItemId = null;
 
@@ -882,6 +883,12 @@
         }
 
         function renderDishThumb(item, containerEl) {
+            if (!showPhotos) {
+                // Hide the thumbnail completely when photos are off
+                containerEl.style.display = 'none';
+                return;
+            }
+            containerEl.style.display = '';
             const candidates = getDishPhotoCandidates(item);
             const dietary = Array.isArray(item.dietary) ? item.dietary : [];
 
@@ -990,6 +997,7 @@
 
             await loadMenuFromServer(currentRestaurant);
             await loadMessageHistory();
+            await loadSettings();
         };
 
         function startSessionCountdown() {
@@ -1080,6 +1088,18 @@
                 renderMessages();
                 updateMessagesBadge();
             } catch (e) {}
+        }
+
+        async function loadSettings() {
+            if (isExpired) return;
+            try {
+                const res = await fetch(`/api/settings/${encodeURIComponent(currentRestaurant)}`);
+                const data = await res.json();
+                showPhotos = String(data.show_photos) !== '0';
+            } catch (e) {
+                console.error('Failed to load settings', e);
+                showPhotos = true;
+            }
         }
 
         function rebuildLookup() {
@@ -1269,18 +1289,23 @@
             modalItemId = item.id;
 
             const photoEl = document.getElementById('itemModalPhoto');
-            photoEl.innerHTML = '<div class="placeholder">🍽️</div>';
-            const candidates = getDishPhotoCandidates(item);
-            (function tryNext(idx) {
-                if (idx >= candidates.length) return;
-                const src = candidates[idx];
-                const img = new Image();
-                img.onload = () => {
-                    photoEl.innerHTML = `<img src="${esc(src)}" alt="${esc(item.nameEn || '')}">`;
-                };
-                img.onerror = () => tryNext(idx + 1);
-                img.src = src;
-            })(0);
+            if (!showPhotos) {
+                photoEl.style.display = 'none';
+            } else {
+                photoEl.style.display = '';
+                photoEl.innerHTML = '<div class="placeholder">🍽️</div>';
+                const candidates = getDishPhotoCandidates(item);
+                (function tryNext(idx) {
+                    if (idx >= candidates.length) return;
+                    const src = candidates[idx];
+                    const img = new Image();
+                    img.onload = () => {
+                        photoEl.innerHTML = `<img src="${esc(src)}" alt="${esc(item.nameEn || '')}">`;
+                    };
+                    img.onerror = () => tryNext(idx + 1);
+                    img.src = src;
+                })(0);
+            }
 
             const nameEl = document.getElementById('itemModalName');
             const nameAltEl = document.getElementById('itemModalNameAlt');
@@ -1563,6 +1588,18 @@
             if (isExpired) return;
             if (data && data.restaurant === currentRestaurant) {
                 loadMenuFromServer(currentRestaurant);
+            }
+        });
+        socket.on('settings_updated', (data) => {
+            if (isExpired) return;
+            if (!data || data.restaurant !== currentRestaurant) return;
+            if (data.settings && data.settings.show_photos != null) {
+                showPhotos = String(data.settings.show_photos) !== '0';
+                renderMenu();
+                if (modalItemId) {
+                    const item = itemLookup[modalItemId];
+                    if (item) openItemModal(item);
+                }
             }
         });
         socket.on('admin_message', (data) => {

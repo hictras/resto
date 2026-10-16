@@ -122,6 +122,12 @@ async function ensureSchema() {
             created_at INTEGER NOT NULL,
             delivered INTEGER DEFAULT 0
         )`,
+        `CREATE TABLE IF NOT EXISTS settings (
+            restaurant TEXT NOT NULL,
+            key TEXT NOT NULL,
+            value TEXT,
+            PRIMARY KEY (restaurant, key)
+        )`,
         `CREATE TABLE IF NOT EXISTS menu_categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             restaurant TEXT NOT NULL,
@@ -1162,6 +1168,42 @@ app.get('/api/revenue', async (req, res) => {
     } catch (e) {
         console.error(e);
         res.status(500).json({});
+    }
+});
+
+// ---------- Settings ----------
+app.get('/api/settings/:restaurantName', async (req, res) => {
+    try {
+        const safeName = path.basename(req.params.restaurantName);
+        const rows = await dbAll('SELECT key, value FROM settings WHERE restaurant = ?', [safeName]);
+        const out = {};
+        rows.forEach(r => { out[r.key] = r.value; });
+        // Defaults
+        if (out.show_photos == null) out.show_photos = '1';
+        res.json(out);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({});
+    }
+});
+
+app.put('/api/settings/:restaurantName', express.json(), async (req, res) => {
+    try {
+        const safeName = path.basename(req.params.restaurantName);
+        const updates = req.body || {};
+        for (const [key, value] of Object.entries(updates)) {
+            await dbRun(
+                `INSERT INTO settings (restaurant, key, value) VALUES (?, ?, ?)
+                 ON CONFLICT(restaurant, key) DO UPDATE SET value = excluded.value`,
+                [safeName, String(key), String(value)]
+            );
+        }
+        // Notify all clients of the change
+        io.emit('settings_updated', { restaurant: safeName, settings: updates });
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ success: false, message: e.message });
     }
 });
 

@@ -55,6 +55,12 @@
         }
         .conn-dot.online { background: var(--menu-accent); box-shadow: 0 0 0 3px rgba(46, 125, 87, 0.2); }
         .topbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+        .sel-resto {
+            background: white; border: 1px solid var(--menu-hairline);
+            padding: 0.55rem 1rem; border-radius: 999px;
+            font-family: inherit; font-size: 0.8rem; font-weight: 600;
+            color: var(--menu-accent); cursor: pointer;
+        }
 
         .btn {
             border: none; cursor: pointer; font-family: inherit;
@@ -97,6 +103,45 @@
             margin-bottom: 1rem;
         }
         .row-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+        /* Photo toggle */
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem; flex-wrap: wrap;
+            padding: 1rem 1.1rem;
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            border-radius: 14px;
+        }
+        .toggle-row .label-block { flex: 1; min-width: 200px; }
+        .toggle-row .label-block .ttl {
+            font-weight: 700; font-size: 0.95rem;
+            color: var(--menu-paper-ink);
+            margin-bottom: 0.2rem;
+        }
+        .toggle-row .label-block .sub {
+            font-size: 0.78rem;
+            color: var(--menu-paper-muted);
+        }
+        .switch {
+            position: relative; display: inline-block;
+            width: 54px; height: 30px; flex-shrink: 0;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch .slider {
+            position: absolute; cursor: pointer;
+            inset: 0; background: #cbd5e1;
+            transition: 0.2s; border-radius: 999px;
+        }
+        .switch .slider:before {
+            content: ''; position: absolute;
+            height: 22px; width: 22px; left: 4px; top: 4px;
+            background: white; transition: 0.2s; border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .switch input:checked + .slider { background: var(--menu-accent); }
+        .switch input:checked + .slider:before { transform: translateX(24px); }
+        .switch input:disabled + .slider { opacity: 0.5; cursor: wait; }
 
         .resto-list { display: flex; flex-direction: column; gap: 0.5rem; }
         .resto-item {
@@ -251,15 +296,33 @@
             </div>
         </div>
         <div class="topbar-actions">
+            <select id="adminRestaurantSelector" class="sel-resto" onchange="switchAdminRestaurant(this.value)"></select>
             <button onclick="adminAuth.logout()" class="btn btn-danger">Logout</button>
         </div>
     </div>
 
-    <!-- NEW: Edit pages -->
+    <div class="card-section">
+        <h2>🖼️ Menu Photos</h2>
+        <p class="desc">
+            Control whether dish photos appear on the customer-facing menu for this restaurant.
+            Admin pages always show photos regardless of this setting.
+        </p>
+        <div class="toggle-row">
+            <div class="label-block">
+                <div class="ttl">Show dish photos on customer menu</div>
+                <div class="sub" id="photoToggleSub">Applies to <b id="photoToggleResto">—</b> only. Updates customers instantly.</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="showPhotosToggle" onchange="onPhotoToggleChange(this.checked)">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+
     <div class="card-section">
         <h2>✏️ Edit Tables</h2>
         <p class="desc">
-            Add, rename, or delete tables. This is a destructive area — use it only when you're setting up the restaurant or making structural changes. The daily <b>Tables</b> page is view-only for safety.
+            Add, rename, or delete tables. This is a destructive area — use it only when you're setting up the restaurant or making structural changes.
         </p>
         <div class="row-actions">
             <a href="/admin-tables-edit.html" class="btn btn-primary btn-lg">✏️ Open Tables Editor</a>
@@ -269,7 +332,7 @@
     <div class="card-section">
         <h2>✏️ Edit Menu</h2>
         <p class="desc">
-            Add new menu items, edit prices and descriptions, upload photos, delete items. The daily <b>Menu</b> page is view-only for safety.
+            Add new menu items, edit prices and descriptions, upload photos, delete items.
         </p>
         <div class="row-actions">
             <a href="/admin-menu-edit.html" class="btn btn-primary btn-lg">✏️ Open Menu Editor</a>
@@ -374,6 +437,85 @@
             });
         }
 
+        // ============ Restaurant selector ============
+        async function loadRestaurants() {
+            try {
+                const res = await fetch('/api/restaurants');
+                const list = await res.json();
+                const sel = document.getElementById('adminRestaurantSelector');
+                sel.innerHTML = '';
+                if (list.length === 0) {
+                    sel.innerHTML = '<option value="">No restaurants</option>';
+                    return;
+                }
+                list.forEach(r => {
+                    const o = document.createElement('option');
+                    o.value = r; o.textContent = r;
+                    sel.appendChild(o);
+                });
+                const saved = localStorage.getItem('adminRestaurant') || list[0];
+                currentAdminRestaurant = list.includes(saved) ? saved : list[0];
+                sel.value = currentAdminRestaurant;
+                onRestaurantChanged();
+            } catch (e) { console.error(e); }
+        }
+
+        function switchAdminRestaurant(name) {
+            currentAdminRestaurant = name;
+            localStorage.setItem('adminRestaurant', name);
+            onRestaurantChanged();
+        }
+
+        function onRestaurantChanged() {
+            document.getElementById('photoToggleResto').innerText = currentAdminRestaurant || '—';
+            document.getElementById('infoCurrentResto').innerText = currentAdminRestaurant;
+            loadSettings();
+        }
+
+        // ============ Settings ============
+        async function loadSettings() {
+            if (!currentAdminRestaurant) return;
+            const toggle = document.getElementById('showPhotosToggle');
+            toggle.disabled = true;
+            try {
+                const res = await fetch(`/api/settings/${encodeURIComponent(currentAdminRestaurant)}`);
+                const data = await res.json();
+                toggle.checked = String(data.show_photos) !== '0';
+            } catch (e) {
+                console.error(e);
+                toggle.checked = true;
+            } finally {
+                toggle.disabled = false;
+            }
+        }
+
+        async function onPhotoToggleChange(isOn) {
+            if (!currentAdminRestaurant) return;
+            const toggle = document.getElementById('showPhotosToggle');
+            toggle.disabled = true;
+            try {
+                await fetch(`/api/settings/${encodeURIComponent(currentAdminRestaurant)}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ show_photos: isOn ? '1' : '0' })
+                });
+                showModal(
+                    isOn ? 'Photos On 🖼️' : 'Photos Hidden 🚫',
+                    isOn
+                        ? `Dish photos will now appear on the customer menu for ${currentAdminRestaurant}.`
+                        : `Dish photos are now hidden from the customer menu for ${currentAdminRestaurant}.`,
+                    isOn ? '🖼️' : '🚫'
+                );
+            } catch (e) {
+                console.error(e);
+                showModal('Error', 'Could not save the setting.', '⚠️');
+                toggle.checked = !isOn;
+            } finally {
+                toggle.disabled = false;
+            }
+        }
+
+        // ============ Restaurant list (bottom card) ============
         async function loadRestoList() {
             try {
                 const res = await fetch('/api/restaurants');
@@ -393,17 +535,15 @@
                         </div>
                     </div>
                 `).join('');
-                const saved = localStorage.getItem('adminRestaurant') || list[0];
-                currentAdminRestaurant = list.includes(saved) ? saved : list[0];
-                document.getElementById('infoCurrentResto').innerText = currentAdminRestaurant;
             } catch (e) {
                 console.error(e);
                 document.getElementById('restoList').innerHTML = '<p style="color:#991b1b; font-size:0.85rem;">Failed to load restaurants.</p>';
             }
         }
 
+        // ============ QR Codes ============
         async function openPrintQRCodesModal() {
-            const resto = localStorage.getItem('adminRestaurant') || currentAdminRestaurant;
+            const resto = currentAdminRestaurant || localStorage.getItem('adminRestaurant');
             if (!resto) return showModal('No Restaurant', 'Select a restaurant first.', '⚠️');
             document.getElementById('qrModalTitle').innerText = `🖨️ QR Codes — ${resto}`;
             const container = document.getElementById('qrGridContainer');
@@ -434,7 +574,7 @@
         }
 
         async function downloadAllQRZip() {
-            const resto = localStorage.getItem('adminRestaurant') || currentAdminRestaurant;
+            const resto = currentAdminRestaurant || localStorage.getItem('adminRestaurant');
             const zip = new JSZip();
             const folder = zip.folder(`${resto}_QR_Codes`);
             const cards = document.querySelectorAll('.qr-card');
@@ -462,6 +602,7 @@
         });
 
         adminAuth.requireLogin(() => {
+            loadRestaurants();
             loadRestoList();
         });
     </script>
