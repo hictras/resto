@@ -26,6 +26,7 @@
             min-height: 100vh;
         }
         body { padding: 1.5rem 1rem; max-width: 900px; margin: 0 auto; }
+        .hidden { display: none !important; }
 
         .topbar {
             display: flex; flex-wrap: wrap; justify-content: space-between;
@@ -90,9 +91,9 @@
 
         .add-row {
             display: flex; gap: 0.5rem; margin-bottom: 1.25rem;
+            flex-wrap: wrap;
         }
         .add-row input {
-            flex: 1;
             background: var(--menu-paper);
             border: 1px solid var(--menu-hairline);
             padding: 0.65rem 1rem;
@@ -101,27 +102,84 @@
             outline: none;
         }
         .add-row input:focus { border-color: var(--menu-accent); }
+        .add-row .tbl-num { flex: 2; min-width: 140px; }
+        .add-row .tbl-loc { flex: 2; min-width: 140px; }
+        .add-row .tbl-cap { flex: 1; min-width: 90px; }
 
         .table-edit-row {
-            display: flex; justify-content: space-between; align-items: center;
+            display: grid;
+            grid-template-columns: minmax(70px, 1fr) minmax(120px, 1.2fr) minmax(90px, 0.8fr) auto;
+            align-items: center;
+            gap: 0.75rem;
             padding: 0.75rem 1rem;
             border: 1px solid var(--menu-hairline);
             border-radius: 12px;
             margin-bottom: 0.5rem;
             background: var(--menu-paper);
+            transition: border-color 0.15s;
         }
+        @media (max-width: 640px) {
+            .table-edit-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+            .table-edit-row .row-actions {
+                grid-column: 1 / -1;
+                justify-content: flex-end;
+            }
+        }
+        .table-edit-row.saving { border-color: var(--menu-accent); }
+        .table-edit-row.saved { border-color: #10b981; }
+
         .table-edit-row .tbl-name {
             font-weight: 700;
             font-size: 1rem;
+            display: flex; align-items: center; gap: 0.4rem;
         }
-        .table-edit-row .actions {
-            display: flex; gap: 0.4rem;
+        .table-edit-row .tbl-name .active-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+        .table-edit-row .tbl-name small {
+            font-size: 0.68rem; font-weight: 600;
+            color: var(--menu-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .table-edit-row select,
+        .table-edit-row input {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            padding: 0.5rem 0.7rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.82rem;
+            outline: none;
+            width: 100%;
+            color: var(--menu-paper-ink);
+        }
+        .table-edit-row select:focus,
+        .table-edit-row input:focus { border-color: var(--menu-accent); }
+
+        .table-edit-row .row-actions {
+            display: flex;
+            gap: 0.4rem;
         }
 
         .empty-state {
             text-align: center; padding: 2rem 1rem;
             color: var(--menu-paper-muted); font-style: italic;
             font-size: 0.9rem;
+        }
+
+        .field-label {
+            font-size: 0.62rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--menu-paper-muted);
+            margin-bottom: 0.15rem;
+            display: block;
         }
 
         .modal-backdrop {
@@ -149,7 +207,20 @@
         .modal-icon { font-size: 2rem; margin-bottom: 0.5rem; }
         .modal-actions { display: flex; gap: 0.5rem; }
         .modal-actions .btn { flex: 1; justify-content: center; padding: 0.7rem; font-size: 0.85rem; }
-        .hidden { display: none !important; }
+
+        .toast {
+            position: fixed; bottom: 1.25rem; right: 1.25rem;
+            background: var(--menu-accent); color: white;
+            font-size: 0.8rem; font-weight: 600;
+            padding: 0.6rem 1.1rem; border-radius: 999px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            opacity: 0; transform: translateY(10px);
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            z-index: 200;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: #dc2626; }
     </style>
 </head>
 <body>
@@ -177,6 +248,8 @@
         </div>
     </div>
 
+    <div id="toast" class="toast">Saved</div>
+
     <div class="topbar">
         <div class="topbar-left">
             <a href="/admin-settings.html" class="back-btn" title="Back to settings">←</a>
@@ -190,7 +263,20 @@
     <div class="section">
         <h2>Add a Table</h2>
         <form class="add-row" onsubmit="addNewTable(event)">
-            <input type="text" id="newTableNum" placeholder="Table number or name (e.g. 5 or Terrace A)" required>
+            <input type="text" id="newTableNum" class="tbl-num" placeholder="Table number or name (e.g. 5 or Terrace A)" required>
+            <input type="text" id="newTableLoc" class="tbl-loc" placeholder="Location (e.g. Terrace)" list="locationOptions" autocomplete="off">
+            <datalist id="locationOptions">
+                <option value="Indoor">
+                <option value="Outdoor">
+                <option value="Terrace">
+                <option value="Bar">
+                <option value="Non-Smoking">
+                <option value="Smoking">
+                <option value="Rooftop">
+                <option value="Window">
+                <option value="VIP">
+            </datalist>
+            <input type="number" id="newTableCap" class="tbl-cap" placeholder="Chairs" min="1" max="50">
             <button type="submit" class="btn btn-primary">+ Add Table</button>
         </form>
     </div>
@@ -208,6 +294,14 @@
         const socket = io();
         let currentAdminRestaurant = '';
         let globalData = { tables: {} };
+        let saveTimers = {}; // keyed by table number for debounce
+
+        const LOCATION_OPTIONS = [
+            'Indoor', 'Outdoor', 'Terrace', 'Bar', 'Non-Smoking',
+            'Smoking', 'Rooftop', 'Window', 'VIP'
+        ];
+
+        const CAPACITY_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20];
 
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -239,6 +333,15 @@
             const action = _confirmAction;
             closeConfirmModal();
             if (typeof action === 'function') action();
+        }
+
+        let toastTimer = null;
+        function showToast(msg, isError = false) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show' + (isError ? ' error' : '');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { el.className = 'toast'; }, 1800);
         }
 
         socket.on('state_update', (data) => {
@@ -289,36 +392,112 @@
             container.innerHTML = keys.map(k => {
                 const t = restoTables[k];
                 const isActive = !!(t.hasSession);
+                const loc = t.location || '';
+                const cap = t.capacity != null ? t.capacity : '';
+
                 return `
-                    <div class="table-edit-row">
+                    <div class="table-edit-row" data-table="${esc(k)}" id="row-${esc(k)}">
                         <div class="tbl-name">
-                            Table #${esc(k)}
-                            ${isActive ? '<span style="font-size:0.7rem; color:var(--menu-accent); margin-left:0.5rem; font-weight:600;">· active</span>' : ''}
+                            #${esc(k)}
+                            ${isActive ? '<span class="active-dot" title="Session active"></span>' : ''}
                         </div>
-                        <div class="actions">
-                            <button class="btn btn-outline btn-sm" onclick="renameTable('${esc(k)}')">✏️ Rename</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteTable('${esc(k)}')">🗑️ Delete</button>
+                        <div>
+                            <span class="field-label">Location</span>
+                            <input type="text" list="locationOptions" value="${esc(loc)}"
+                                   placeholder="—"
+                                   onchange="saveTableField('${esc(k)}', 'location', this.value)"
+                                   onblur="saveTableField('${esc(k)}', 'location', this.value)">
+                        </div>
+                        <div>
+                            <span class="field-label">Chairs</span>
+                            <input type="number" min="1" max="50" value="${cap}"
+                                   placeholder="—"
+                                   onchange="saveTableField('${esc(k)}', 'capacity', this.value)"
+                                   onblur="saveTableField('${esc(k)}', 'capacity', this.value)">
+                        </div>
+                        <div class="row-actions">
+                            <button class="btn btn-outline btn-sm" onclick="renameTable('${esc(k)}')" title="Rename">✏️</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteTable('${esc(k)}')" title="Delete">🗑️</button>
                         </div>
                     </div>`;
             }).join('');
+        }
+
+        async function saveTableField(tableNum, field, value) {
+            const row = document.getElementById('row-' + tableNum);
+            if (row) {
+                row.classList.add('saving');
+                row.classList.remove('saved');
+            }
+
+            // Normalize the value
+            let normalized = value;
+            if (field === 'capacity') {
+                normalized = value === '' || value == null ? null : parseInt(value);
+                if (normalized !== null && (isNaN(normalized) || normalized < 1)) normalized = null;
+            } else if (field === 'location') {
+                normalized = String(value || '').trim() || null;
+            }
+
+            // Skip if unchanged
+            const existing = (globalData.tables[currentAdminRestaurant] || {})[tableNum] || {};
+            const existingVal = field === 'capacity' ? existing.capacity : existing.location;
+            if ((existingVal || null) === (normalized || null)) {
+                if (row) row.classList.remove('saving');
+                return;
+            }
+
+            try {
+                const res = await fetch(
+                    `/api/tables/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(tableNum)}`,
+                    {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ [field]: normalized })
+                    }
+                );
+                const data = await res.json();
+                if (!data.success) throw new Error(data.message || 'Save failed');
+                if (row) {
+                    row.classList.remove('saving');
+                    row.classList.add('saved');
+                    setTimeout(() => row.classList.remove('saved'), 800);
+                }
+                showToast(field === 'location' ? 'Location saved' : 'Chairs saved');
+            } catch (e) {
+                console.error(e);
+                if (row) row.classList.remove('saving');
+                showToast('Could not save', true);
+            }
         }
 
         async function addNewTable(e) {
             e.preventDefault();
             if (!currentAdminRestaurant) return showModal('No Restaurant', 'Select a restaurant first.', '⚠️');
             const input = document.getElementById('newTableNum');
+            const locInput = document.getElementById('newTableLoc');
+            const capInput = document.getElementById('newTableCap');
             const tNum = input.value.trim();
             if (!tNum) return;
+
+            const payload = {
+                tableNumber: tNum,
+                location: locInput.value.trim() || null,
+                capacity: capInput.value === '' ? null : parseInt(capInput.value)
+            };
+
             try {
                 const res = await fetch(`/api/tables/${encodeURIComponent(currentAdminRestaurant)}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ tableNumber: tNum })
+                    body: JSON.stringify(payload)
                 });
                 const data = await res.json();
                 if (data.success) {
                     input.value = '';
-                    showModal('Table Added', `Table #${tNum} created.`, '🪑');
+                    locInput.value = '';
+                    capInput.value = '';
+                    showToast(`Table #${tNum} added`);
                 }
             } catch (err) { console.error(err); }
         }

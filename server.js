@@ -165,6 +165,10 @@ async function ensureSchema() {
         try { await db.execute(`ALTER TABLE menu_items ADD COLUMN ${col}`); }
         catch (e) { /* duplicate column — ignore */ }
     }
+    for (const col of ['location TEXT', 'capacity INTEGER', 'party_size INTEGER']) {
+        try { await db.execute(`ALTER TABLE tables_state ADD COLUMN ${col}`); }
+        catch (e) { /* duplicate column — ignore */ }
+    }
 
     schemaReady = true;
     console.log('✅ Schema ready');
@@ -224,6 +228,9 @@ async function buildAppState() {
             canOrder: !!r.can_order,
             status: r.status,
             idleMinutes: (r.idle_minutes == null) ? 360 : r.idle_minutes,
+            location: r.location || null,
+            capacity: (r.capacity == null) ? null : Number(r.capacity),
+            partySize: (r.party_size == null) ? null : Number(r.party_size),
             sessionStart: start || null,
             hasSession: !!start
         };
@@ -319,7 +326,7 @@ async function seedWelcomeMessage(resto, table) {
 
 async function endTableSession(resto, table) {
     const tKey = String(table);
-    await dbRun('UPDATE tables_state SET is_open = 0, can_order = 0 WHERE restaurant = ? AND table_number = ?', [resto, tKey]);
+    await dbRun('UPDATE tables_state SET is_open = 0, can_order = 0, party_size = NULL WHERE restaurant = ? AND table_number = ?', [resto, tKey]);
     await dbRun('DELETE FROM table_requests WHERE restaurant = ? AND table_number = ?', [resto, tKey]);
     await dbRun('DELETE FROM messages WHERE restaurant = ? AND table_number = ?', [resto, tKey]);
     await dbRun('DELETE FROM push_subs WHERE restaurant = ? AND table_number = ?', [resto, tKey]);
@@ -856,20 +863,75 @@ app.get('/api/qr-links', async (req, res) => {
 app.post('/api/tables/:restaurantName', async (req, res) => {
     try {
         const safeName = path.basename(req.params.restaurantName);
-        const { tableNumber } = req.body;
+        const { tableNumber, location, capacity } = req.body;
         if (!tableNumber) return res.status(400).json({ success: false, message: 'Table number required' });
 
+        const loc = location == null || location === '' ? null : String(location).slice(0, 40);
+        const cap = capacity == null || capacity === '' ? null : Math.max(1, Math.min(50, parseInt(capacity) || 1));
+
         await dbRun(
-            `INSERT INTO tables_state (restaurant, table_number, is_open, can_order, status, idle_minutes)
-             VALUES (?, ?, 0, 0, 'Valid', 360)
+            `INSERT INTO tables_state (restaurant, table_number, is_open, can_order, status, idle_minutes, location, capacity)
+             VALUES (?, ?, 0, 0, 'Valid', 360, ?, ?)
              ON CONFLICT(restaurant, table_number) DO NOTHING`,
-            [safeName, String(tableNumber)]
+            [safeName, String(tableNumber), loc, cap]
         );
         await broadcastState();
         res.json({ success: true });
     } catch (e) {
         console.error(e);
         res.status(500).json({ success: false });
+    }
+});
+
+app.put('/api/tables/:restaurantName/:tableNumber', express.json(), async (req, res) => {
+    try {
+        const safeName = path.basename(req.params.restaurantName);
+        const tKey = String(req.params.tableNumber);
+        const updates = req.body || {};
+
+        const existing = await dbGet(
+            'SELECT 1 AS ok FROM tables_state WHERE restaurant = ? AND table_number = ?',
+            [safeName, tKey]
+        );
+        if (!existing) return res.status(404).json({ success: false, message: 'Table not found' });
+
+        const fields = [];
+        const args = [];
+
+        if (updates.location !== undefined) {
+            const v = updates.location == null || updates.location === '' ? null : String(updates.location).slice(0, 40);
+            fields.push('location = ?');
+            args.push(v);
+        }
+        if (updates.capacity !== undefined) {
+            const v = updates.capacity == null || updates.capacity === ''
+                ? null
+                : Math.max(1, Math.min(50, parseInt(updates.capacity) || 1));
+            fields.push('capacity = ?');
+            args.push(v);
+        }
+        if (updates.party_size !== undefined || updates.partySize !== undefined) {
+            const raw = updates.party_size !== undefined ? updates.party_size : updates.partySize;
+            const v = raw == null || raw === ''
+                ? null
+                : Math.max(0, Math.min(100, parseInt(raw) || 0));
+            fields.push('party_size = ?');
+            args.push(v);
+        }
+
+        if (fields.length === 0) return res.json({ success: true, noChanges: true });
+
+        args.push(safeName, tKey);
+        await dbRun(
+            `UPDATE tables_state SET ${fields.join(', ')} WHERE restaurant = ? AND table_number = ?`,
+            args
+        );
+
+        await broadcastState();
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ success: false, message: e.message });
     }
 });
 
@@ -924,7 +986,7 @@ app.put('/api/settings/:restaurantName', express.json(), async (req, res) => {
     }
 });
 
-// ---------- Menu APIs (Turso-backed) ----------
+// ---------- Menu APIs ----------
 app.get('/api/menu/:restaurantName', async (req, res) => {
     try {
         const safeName = path.basename(req.params.restaurantName);
@@ -968,13 +1030,12 @@ app.get('/api/menu/:restaurantName', async (req, res) => {
     }
 });
 
-// ---------- Preview endpoint (read-only, no session, no writes) ----------
+// ---------- Preview endpoint ----------
 app.get('/api/preview/:restaurantName', async (req, res) => {
     try {
         const safeName = path.basename(req.params.restaurantName);
         const tableNumber = String(req.query.table || '');
 
-        // ---- Menu (same shape as GET /api/menu/:r) ----
         const categories = await dbAll(
             'SELECT id, category_en, category_ar FROM menu_categories WHERE restaurant = ? ORDER BY id ASC',
             [safeName]
@@ -1008,11 +1069,10 @@ app.get('/api/preview/:restaurantName', async (req, res) => {
             items: itemsByCat[c.id] || [],
         }));
 
-        // ---- Table state (read-only) ----
         let tableState = null;
         if (tableNumber) {
             const row = await dbGet(
-                'SELECT is_open, can_order, status, idle_minutes FROM tables_state WHERE restaurant = ? AND table_number = ?',
+                'SELECT is_open, can_order, status, idle_minutes, location, capacity, party_size FROM tables_state WHERE restaurant = ? AND table_number = ?',
                 [safeName, tableNumber]
             );
             if (row) {
@@ -1021,15 +1081,16 @@ app.get('/api/preview/:restaurantName', async (req, res) => {
                     canOrder: !!row.can_order,
                     status: row.status,
                     idleMinutes: (row.idle_minutes == null) ? 360 : row.idle_minutes,
+                    location: row.location || null,
+                    capacity: (row.capacity == null) ? null : Number(row.capacity),
+                    partySize: (row.party_size == null) ? null : Number(row.party_size),
                 };
             }
         }
 
-        // ---- Guest count (from activeSessions map) ----
         const sessionKey = `${safeName}_${tableNumber}`;
         const guestsConnected = (tableSockets[sessionKey] && tableSockets[sessionKey].size) || 0;
 
-        // ---- Settings ----
         const settingsRows = await dbAll('SELECT key, value FROM settings WHERE restaurant = ?', [safeName]);
         const settings = {};
         settingsRows.forEach(r => { settings[r.key] = r.value; });
@@ -1152,7 +1213,6 @@ app.put('/api/menu/:restaurantName/:itemId', async (req, res) => {
     }
 });
 
-// ---------- Reorder endpoint ----------
 app.post('/api/menu/:restaurantName/reorder', async (req, res) => {
     try {
         const safeName = path.basename(req.params.restaurantName);
@@ -1208,7 +1268,7 @@ app.delete('/api/menu/:restaurantName/:itemId', async (req, res) => {
     }
 });
 
-// ---------- Photo Upload (Cloudflare R2) ----------
+// ---------- Photo Upload (R2) ----------
 app.post('/api/menu/:restaurantName/:itemId/photo', upload.single('photo'), async (req, res) => {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
 

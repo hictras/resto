@@ -266,6 +266,55 @@
         .focus-timer.danger { color: #991b1b; background: rgba(220, 38, 38, 0.08); border-color: rgba(220, 38, 38, 0.3); }
         .focus-timer.none   { color: var(--menu-paper-muted); font-size: 1.1rem; padding: 0.75rem; }
 
+        /* Party size row */
+        .party-size-row {
+            background: var(--menu-paper);
+            border: 1px solid var(--menu-hairline);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .party-size-row .lbl {
+            font-size: 0.72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--menu-paper-muted);
+        }
+        .party-size-row .hint {
+            font-size: 0.7rem; color: var(--menu-paper-muted);
+            margin-top: 0.15rem;
+        }
+        .party-size-row .hint.warn { color: #92400e; font-weight: 700; }
+        .party-size-input-wrap {
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .party-size-input {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            padding: 0.5rem 0.7rem;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 700;
+            width: 70px;
+            text-align: center;
+            outline: none;
+            font-variant-numeric: tabular-nums;
+            color: var(--menu-paper-ink);
+        }
+        .party-size-input:focus { border-color: var(--menu-accent); }
+        .party-size-btn {
+            width: 34px; height: 34px; border-radius: 10px;
+            border: 1px solid var(--menu-hairline);
+            background: white; cursor: pointer;
+            font-weight: 700; font-size: 1rem;
+            color: var(--menu-paper-ink);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .party-size-btn:hover { background: var(--menu-accent-soft); border-color: var(--menu-accent); color: var(--menu-accent); }
+
         .focus-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -475,6 +524,9 @@
         .pill-occupied { background: #dc2626; color: white; }
         .pill-waiting  { background: #f59e0b; color: white; }
         .pill-valid    { background: rgba(16, 185, 129, 0.15); color: #065f46; }
+        .pill-info     { background: rgba(46, 125, 87, 0.10); color: var(--menu-accent); }
+        .pill-party    { background: rgba(46, 125, 87, 0.14); color: var(--menu-accent); }
+        .pill-party.warn { background: rgba(245, 158, 11, 0.18); color: #92400e; }
         .table-pills { display: flex; gap: 0.3rem; flex-wrap: wrap; }
 
         .open-customer-btn {
@@ -607,6 +659,7 @@
         let msgDraftText = '';
         let msgDraftIcon = '💬';
         let tableSearchFilter = '';
+        let partySizeDraft = null; // used for live editing
 
         const alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
@@ -682,7 +735,18 @@
                 }
             }
             previousPendingCount = pendingCount;
-            renderAll();
+
+            // Don't blow away the party-size input while the admin is typing
+            const activeEl = document.activeElement;
+            const isTypingParty = activeEl && activeEl.classList && activeEl.classList.contains('party-size-input');
+            if (!isTypingParty) {
+                renderAll();
+            } else {
+                // Still refresh the map and cards, just skip the focus panel
+                renderFloorMap();
+                renderTableCards();
+                updateCountdowns();
+            }
         });
 
         async function loadRestaurants() {
@@ -748,7 +812,7 @@
             return String(k).toLowerCase().includes(tableSearchFilter);
         }
 
-        // -------- OPEN AS CUSTOMER (preview mode — no session, no device) --------
+        // -------- OPEN AS CUSTOMER --------
         function openAsCustomer(tableNum) {
             const resto = currentAdminRestaurant;
             if (!resto) return showModal('No Restaurant', 'Select a restaurant first.', '⚠️');
@@ -759,6 +823,30 @@
             const url = `/customer.html?tbl=${encodeURIComponent(encodedTbl)}&rst=${encodeURIComponent(encodedResto)}&preview=1`;
 
             window.open(url, '_blank', 'noopener');
+        }
+
+        // -------- PARTY SIZE --------
+        function savePartySize(tableNum, value) {
+            const v = value === '' || value == null ? null : Math.max(0, Math.min(100, parseInt(value) || 0));
+            fetch(
+                `/api/tables/${encodeURIComponent(currentAdminRestaurant)}/${encodeURIComponent(tableNum)}`,
+                {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ party_size: v })
+                }
+            ).catch(err => console.error('party size save failed', err));
+        }
+        function partySizeDelta(tableNum, delta) {
+            const input = document.getElementById('partySizeInput');
+            if (!input) return;
+            const current = parseInt(input.value) || 0;
+            const next = Math.max(0, Math.min(100, current + delta));
+            input.value = next === 0 ? '' : String(next);
+            savePartySize(tableNum, input.value);
+        }
+        function onPartySizeInputChange(tableNum, value) {
+            savePartySize(tableNum, value);
         }
 
         // -------- FLOOR MAP --------
@@ -824,6 +912,9 @@
             const openCount = restoActiveSessions[focusedTable] || 0;
             const isMenuOpen = openCount > 0;
             const idleMinutes = (t.idleMinutes == null) ? 360 : t.idleMinutes;
+            const location = t.location || '';
+            const capacity = t.capacity != null ? t.capacity : null;
+            const partySize = t.partySize != null ? t.partySize : null;
 
             let statusLabel = 'Idle', statusColor = 'var(--menu-paper-muted)';
             if (isWaiting) { statusLabel = 'Requested'; statusColor = '#92400e'; }
@@ -886,12 +977,21 @@
                 </div>
             ` : '';
 
+            // Party size row
+            const partyValue = partySize != null ? String(partySize) : '';
+            const overCap = (partySize != null && capacity != null && partySize > capacity);
+            const partyHint = capacity != null
+                ? (overCap ? `⚠️ Over capacity (max ${capacity})` : `Capacity: ${capacity} chairs`)
+                : 'No capacity set';
+            const partyHintClass = 'hint' + (overCap ? ' warn' : '');
+
             wrapper.innerHTML = `
                 <div class="focus-panel">
                     <div class="focus-head">
                         <div class="focus-title-block">
                             <h2>Table <span>#${esc(focusedTable)}</span></h2>
                             <div class="sub">
+                                ${location ? esc(location) + ' · ' : ''}
                                 ${isMenuOpen ? `${openCount} device${openCount > 1 ? 's' : ''} connected` : 'no devices connected'}
                                 · <span style="color:${statusColor};">${statusLabel}</span>
                             </div>
@@ -900,6 +1000,24 @@
                     </div>
 
                     <div class="focus-timer none" id="focusTimer">—</div>
+
+                    <div class="party-size-row">
+                        <div>
+                            <div class="lbl">👥 Party Size</div>
+                            <div class="${partyHintClass}">${partyHint}</div>
+                        </div>
+                        <div class="party-size-input-wrap">
+                            <button class="party-size-btn" onclick="partySizeDelta('${esc(focusedTable)}', -1)">−</button>
+                            <input type="number" min="0" max="100"
+                                   class="party-size-input"
+                                   id="partySizeInput"
+                                   value="${partyValue}"
+                                   placeholder="—"
+                                   onchange="onPartySizeInputChange('${esc(focusedTable)}', this.value)"
+                                   onblur="onPartySizeInputChange('${esc(focusedTable)}', this.value)">
+                            <button class="party-size-btn" onclick="partySizeDelta('${esc(focusedTable)}', 1)">+</button>
+                        </div>
+                    </div>
 
                     <div class="focus-grid">
                         <div class="focus-col">
@@ -1012,6 +1130,11 @@
                 const openCount = restoActiveSessions[k] || 0;
                 const isMenuOpen = openCount > 0;
                 const cardCls = 'table-card' + (isOccupied ? ' occupied' : isWaiting ? ' waiting' : '');
+                const location = t.location || '';
+                const capacity = t.capacity != null ? t.capacity : null;
+                const partySize = t.partySize != null ? t.partySize : null;
+                const overCap = (partySize != null && capacity != null && partySize > capacity);
+
                 return `
                     <div class="${cardCls}" onclick="focusTable('${esc(k)}')">
                         <div class="table-header">
@@ -1030,6 +1153,9 @@
                         <div class="table-pills">
                             ${isOccupied ? '<span class="pill pill-occupied">Occupied</span>' : '<span class="pill pill-valid">Valid</span>'}
                             ${isWaiting ? '<span class="pill pill-waiting">🛎️ Wants to Order</span>' : ''}
+                            ${location ? `<span class="pill pill-info">📍 ${esc(location)}</span>` : ''}
+                            ${capacity != null ? `<span class="pill pill-info">🪑 ${capacity}</span>` : ''}
+                            ${partySize != null ? `<span class="pill pill-party${overCap ? ' warn' : ''}">👥 ${partySize}${capacity != null ? '/' + capacity : ''}</span>` : ''}
                         </div>
 
                         <div class="table-row-info">

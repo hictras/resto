@@ -74,10 +74,16 @@
             height: 2.75rem; padding: 0 1rem; border-radius: 999px;
             background: var(--menu-accent); color: var(--menu-accent-ink);
             font-size: 0.75rem; font-weight: 600;
-            display: inline-flex; align-items: center; white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 0.4rem; white-space: nowrap;
             letter-spacing: -0.01em;
+            max-width: 220px;
         }
-        /* Guest counter */
+        .table-pill-display .loc-sep { opacity: 0.7; }
+        .table-pill-display .loc-name {
+            overflow: hidden; text-overflow: ellipsis;
+            max-width: 110px;
+        }
+
         .guest-pill {
             height: 2.75rem; padding: 0 0.9rem; border-radius: 999px;
             background: var(--menu-accent-soft);
@@ -96,7 +102,6 @@
             100% { background: var(--menu-accent-soft); color: var(--menu-accent); }
         }
 
-        /* Preview banner */
         .preview-banner {
             background: #F59E0B;
             color: white;
@@ -879,11 +884,9 @@
 
         let modalItemId = null;
         let showPhotos = true;
+        let tableLocation = null;
 
-        // Preview mode
         let isPreview = false;
-
-        // Guest counter
         let lastGuestCount = -1;
 
         const activationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3');
@@ -1019,13 +1022,20 @@
                 </div>`;
         }
 
+        function updateTablePill() {
+            const pill = document.getElementById('tableBtnDisplay');
+            const safeLoc = tableLocation
+                ? `<span class="loc-sep">·</span><span class="loc-name">${esc(tableLocation)}</span>`
+                : '';
+            pill.innerHTML = `Table #${esc(currentTable)}${safeLoc}`;
+        }
+
         // ============ Boot ============
         window.onload = async () => {
             const urlParams = new URLSearchParams(window.location.search);
             isPreview = urlParams.get('preview') === '1';
 
             if (isPreview) {
-                // Preview flow — no token, no session
                 currentRestaurant = urlParams.get('rst');
                 currentTable = urlParams.get('tbl');
                 if (!currentRestaurant || !currentTable) {
@@ -1040,9 +1050,9 @@
                 await loadPreviewData();
 
                 document.getElementById('brandTitle').innerText = currentRestaurant.toUpperCase();
-                document.getElementById('tableBtnDisplay').innerText = `Table #${currentTable}`;
                 document.getElementById('statusTableLabel').innerText = `#${currentTable}`;
                 document.getElementById('servedTableLabel').innerText = `#${currentTable}`;
+                updateTablePill();
 
                 try {
                     const saved = localStorage.getItem('menuViewMode');
@@ -1063,7 +1073,6 @@
                 return;
             }
 
-            // ---- Normal customer flow ----
             currentToken = urlParams.get('token');
             if (!currentToken) { showErrorPage("No session token was provided in the URL."); return; }
 
@@ -1077,7 +1086,6 @@
                 sessionStart = data.sessionStart || Date.now();
             } catch (e) { showErrorPage("Unable to verify session with the server."); return; }
 
-            // Reveal the interface only after verification succeeds
             document.getElementById('mainInterfaceWrapper').classList.remove('hidden');
             document.getElementById('bootScreen').classList.add('hidden');
 
@@ -1088,9 +1096,9 @@
             startSessionCountdown();
 
             document.getElementById('brandTitle').innerText = currentRestaurant.toUpperCase();
-            document.getElementById('tableBtnDisplay').innerText = `Table #${currentTable}`;
             document.getElementById('statusTableLabel').innerText = `#${currentTable}`;
             document.getElementById('servedTableLabel').innerText = `#${currentTable}`;
+            updateTablePill();
 
             if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
             if ('serviceWorker' in navigator) {
@@ -1143,7 +1151,8 @@
                 }
                 if (data.table) {
                     tableIsOpen = !!data.table.isOpen;
-                    canOrder = false; // preview is always read-only
+                    canOrder = false;
+                    tableLocation = data.table.location || null;
                 }
                 updateGuestCounter(data.guestsConnected || 0);
 
@@ -1158,7 +1167,6 @@
         }
 
         function renderPreviewTableState() {
-            // Simple state rendering for the preview header area
             const sub = document.getElementById('brandSubtitle');
             if (sub) {
                 sub.textContent = tableIsOpen
@@ -1247,7 +1255,7 @@
 
         async function loadMessageHistory() {
             if (isExpired) return;
-            if (isPreview) return; // preview has no messages
+            if (isPreview) return;
             try {
                 const res = await fetch(`/api/messages/${encodeURIComponent(currentRestaurant)}/${encodeURIComponent(currentTable)}`);
                 const history = await res.json();
@@ -1441,7 +1449,6 @@
             return row;
         }
 
-        // ============ Item Detail Modal ============
         function openItemModal(item) {
             if (isExpired) return;
             modalItemId = item.id;
@@ -1575,7 +1582,6 @@
             });
         }
 
-        // ============ Guest counter ============
         function updateGuestCounter(count) {
             const pill = document.getElementById('guestCounter');
             const num = document.getElementById('guestCount');
@@ -1584,13 +1590,12 @@
             num.textContent = String(count);
             if (count !== lastGuestCount && lastGuestCount !== -1) {
                 pill.classList.remove('pulse');
-                void pill.offsetWidth; // force reflow so animation restarts
+                void pill.offsetWidth;
                 pill.classList.add('pulse');
             }
             lastGuestCount = count;
         }
 
-        // ============ Cart ============
         function broadcastCart() {
             if (isPreview) return;
             if (currentToken) socket.emit('update_cart', { token: currentToken, cart });
@@ -1857,7 +1862,17 @@
         socket.on('state_update', (data) => {
             if (isExpired) return;
             latestServerState = data;
-            // Update guest counter for this table
+
+            const restoTables = (data.tables && data.tables[currentRestaurant]) || {};
+            const tableInfo = restoTables[currentTable];
+            if (tableInfo && tableInfo.location !== undefined) {
+                const newLoc = tableInfo.location || null;
+                if (newLoc !== tableLocation) {
+                    tableLocation = newLoc;
+                    updateTablePill();
+                }
+            }
+
             const restoActive = (data.activeSessions && data.activeSessions[currentRestaurant]) || {};
             const guests = restoActive[currentTable] || 0;
             updateGuestCounter(guests);
