@@ -331,7 +331,6 @@
             font-size: 0.875rem; padding: 3rem 1rem;
         }
 
-        /* ============ Item Detail Modal ============ */
         .item-modal-backdrop {
             position: fixed; inset: 0;
             background: rgba(0, 0, 0, 0.7);
@@ -804,7 +803,6 @@
         let modalItemId = null;
 
         const activationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2870/2870-preview.mp3');
-        const PHOTO_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
 
         const DIETARY_LABELS = {
             'vegetarian':    { en: 'Vegetarian',     ar: 'نباتي',              abbr: 'V'  },
@@ -865,11 +863,12 @@
             return lang === 'ar' ? (variantOrItem.nameAr || variantOrItem.nameEn || '') : (variantOrItem.nameEn || variantOrItem.nameAr || '');
         }
 
+        // ============ Photo resolution (no more guessing) ============
+        // Returns an array with a single element if the item has an image URL.
+        // Returns an empty array if there's no image → placeholder shown instantly.
         function getDishPhotoCandidates(item) {
             if (item.image && /^https?:\/\//i.test(item.image)) return [item.image];
-            const explicit = item.image || item.photo;
-            const base = explicit ? String(explicit).replace(/\.[^.]+$/, '') : String(item.id);
-            return PHOTO_EXTS.map(ext => `/dish-photos/${base}.${ext}`);
+            return [];
         }
 
         function renderDishThumb(item, containerEl) {
@@ -1249,7 +1248,6 @@
             return row;
         }
 
-        // ============ Item Detail Modal ============
         function openItemModal(item) {
             if (isExpired) return;
             modalItemId = item.id;
@@ -1349,11 +1347,9 @@
             updateModalQty();
         }
 
-        // ============ Qty badge updater (no full re-render) ============
         function updateQtyBadges() {
             if (isExpired) return;
 
-            // Simple items — update the "x2" badge next to the price
             document.querySelectorAll('.dish-row').forEach(row => {
                 const itemId = row.getAttribute('data-item-id');
                 if (!itemId) return;
@@ -1364,7 +1360,6 @@
                 priceEl.innerHTML = `$${price.toFixed(2)}${qty > 0 ? ` <span class="qty-badge-red">x${qty}</span>` : ''}`;
             });
 
-            // Variant rows
             document.querySelectorAll('.variant-row').forEach(vRow => {
                 const variantId = vRow.getAttribute('data-variant-id');
                 if (!variantId) return;
@@ -1376,7 +1371,6 @@
             });
         }
 
-        // ============ Cart ============
         function broadcastCart() { if (currentToken) socket.emit('update_cart', { token: currentToken, cart }); }
         function toggleCartDrawer() {
             if (isExpired) return;

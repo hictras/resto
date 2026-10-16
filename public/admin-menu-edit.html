@@ -578,10 +578,7 @@
             const sel = document.getElementById('mCat');
             const cats = (menuCategories || []).map(c => c.categoryEn).filter(Boolean);
 
-            // Include selected value even if it's not in the loaded list
             if (selectedValue && !cats.includes(selectedValue)) cats.push(selectedValue);
-
-            // Sort alphabetically
             cats.sort((a, b) => a.localeCompare(b));
 
             sel.innerHTML = '';
@@ -593,7 +590,6 @@
                 empty.textContent = '— No categories yet —';
                 sel.appendChild(empty);
             } else {
-                // Placeholder (disabled) shown only when nothing is selected
                 const placeholder = document.createElement('option');
                 placeholder.value = '';
                 placeholder.disabled = true;
@@ -608,13 +604,11 @@
                 });
             }
 
-            // "+ Add new category" option
             const addOpt = document.createElement('option');
             addOpt.value = '__NEW__';
             addOpt.textContent = '➕ Add new category…';
             sel.appendChild(addOpt);
 
-            // Restore the selected value
             if (selectedValue && cats.includes(selectedValue)) {
                 sel.value = selectedValue;
             } else if (cats.length > 0) {
@@ -690,8 +684,6 @@
                 menuCategories = await res.json();
                 renderMenuList();
 
-                // Refresh the category dropdown with the latest categories,
-                // but only if we're not currently editing an item
                 if (!document.getElementById('mId').value) {
                     populateCategoryDropdown(document.getElementById('mCat').value || '');
                 }
@@ -820,42 +812,31 @@
             return String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
         }
 
-        const PHOTO_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
+        // ============ Photo resolution (no more guessing) ============
         function loadItemPhoto(item, containerEl) {
-            if (item.image && /^https?:\/\//i.test(item.image)) {
-                const img = new Image();
-                img.onload = () => {
-                    const existingBadges = containerEl.querySelectorAll('.photo-badge, .sort-badge, .dietary-overlay');
-                    containerEl.innerHTML = '';
-                    const imgEl = document.createElement('img');
-                    imgEl.src = item.image;
-                    containerEl.appendChild(imgEl);
-                    existingBadges.forEach(b => containerEl.appendChild(b.cloneNode(true)));
-                };
-                img.onerror = () => { containerEl.innerHTML = '<div class="placeholder">🍽️</div>'; };
-                img.src = item.image;
+            // No image URL → show placeholder immediately. No network requests.
+            if (!item.image || !/^https?:\/\//i.test(item.image)) {
+                containerEl.innerHTML = '<div class="placeholder">🍽️</div>' +
+                    (containerEl.querySelector('.sort-badge') ? containerEl.querySelector('.sort-badge').outerHTML : '') +
+                    (containerEl.querySelector('.dietary-overlay') ? containerEl.querySelector('.dietary-overlay').outerHTML : '');
                 return;
             }
-            const itemId = item.id;
-            function tryNext(idx) {
-                if (idx >= PHOTO_EXTS.length) {
-                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>';
-                    return;
-                }
-                const src = `/dish-photos/${itemId}.${PHOTO_EXTS[idx]}?t=${Date.now()}`;
-                const img = new Image();
-                img.onload = () => {
-                    const existingBadges = containerEl.querySelectorAll('.sort-badge, .dietary-overlay');
-                    containerEl.innerHTML = '';
-                    const imgEl = document.createElement('img');
-                    imgEl.src = src;
-                    containerEl.appendChild(imgEl);
-                    existingBadges.forEach(b => containerEl.appendChild(b.cloneNode(true)));
-                };
-                img.onerror = () => tryNext(idx + 1);
-                img.src = src;
-            }
-            tryNext(0);
+
+            const img = new Image();
+            img.onload = () => {
+                const existingBadges = containerEl.querySelectorAll('.photo-badge, .sort-badge, .dietary-overlay');
+                containerEl.innerHTML = '';
+                const imgEl = document.createElement('img');
+                imgEl.src = item.image;
+                containerEl.appendChild(imgEl);
+                existingBadges.forEach(b => containerEl.appendChild(b.cloneNode(true)));
+            };
+            img.onerror = () => {
+                containerEl.innerHTML = '<div class="placeholder">🍽️</div>' +
+                    (containerEl.querySelector('.sort-badge') ? containerEl.querySelector('.sort-badge').outerHTML : '') +
+                    (containerEl.querySelector('.dietary-overlay') ? containerEl.querySelector('.dietary-overlay').outerHTML : '');
+            };
+            img.src = item.image;
         }
 
         function enableDragAndDrop() {
@@ -930,7 +911,6 @@
             document.getElementById('submitBtn').innerText = '💾 Save Changes';
             document.getElementById('cancelEditBtn').classList.remove('hidden');
 
-            // Populate category dropdown with this item's category selected
             populateCategoryDropdown(category);
             document.getElementById('newCategoryWrap').classList.add('hidden');
             document.getElementById('mNewCategory').value = '';
@@ -950,19 +930,8 @@
                 };
                 img.onerror = () => { preview.innerHTML = '🍽️'; };
                 img.src = found.image;
-            } else {
-                (function tryNext(idx) {
-                    if (idx >= PHOTO_EXTS.length) return;
-                    const src = `/dish-photos/${found.id}.${PHOTO_EXTS[idx]}?t=${Date.now()}`;
-                    const img = new Image();
-                    img.onload = () => {
-                        preview.innerHTML = `<img src="${esc(src)}" alt="">`;
-                        document.getElementById('removePhotoBtn').classList.remove('hidden');
-                    };
-                    img.onerror = () => tryNext(idx + 1);
-                    img.src = src;
-                })(0);
             }
+            // no else — no image → leave the 🍽️ placeholder
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -988,7 +957,6 @@
             const descEn = document.getElementById('mDesc').value.trim();
             const descAr = document.getElementById('mDescAr').value.trim();
 
-            // Resolve category (handles "Add new category")
             let category = document.getElementById('mCat').value;
             if (category === '__NEW__') {
                 category = (document.getElementById('mNewCategory').value || '').trim();
