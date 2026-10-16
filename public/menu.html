@@ -685,7 +685,7 @@
         </div>
     </div>
 
-    <div id="mainInterfaceWrapper">
+        <div id="mainInterfaceWrapper" class="hidden">
         <div class="sticky-top-wrapper">
             <header class="diner-header">
                 <div class="header-titles">
@@ -969,6 +969,9 @@
                 if (!res.success) showErrorPage("Session registration failed.");
             });
 
+            // Show the interface now that we know the session is valid
+            document.getElementById('mainInterfaceWrapper').classList.remove('hidden');
+                        
             startSessionCountdown();
 
             document.getElementById('brandTitle').innerText = currentRestaurant.toUpperCase();
