@@ -18,13 +18,13 @@ const io = new Server(server);
 // ---------- Admin auth ----------
 const ADMIN_PASSWORD = 'admin123';   // ← change this to your password
 const adminSessions = new Map();
-const ADMIN_SESSION_MS = 12 * 60 * 60 * 1000;   // 12 hours
+const ADMIN_SESSION_MS = 12 * 60 * 60 * 1000;
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ---------- Data dirs (used only for VAPID keys now) ----------
+// ---------- Data dirs ----------
 const dataDir = path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const restaurantsDir = path.join(__dirname, 'restaurants');
@@ -38,10 +38,7 @@ const db = createClient({
     authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-// Helper wrappers so we can keep "run/get/all" style used everywhere
-async function dbRun(sql, args = []) {
-    return db.execute({ sql, args });
-}
+async function dbRun(sql, args = []) { return db.execute({ sql, args }); }
 async function dbGet(sql, args = []) {
     const res = await db.execute({ sql, args });
     return res.rows[0] || null;
@@ -61,7 +58,7 @@ const r2Client = new S3Client({
     },
 });
 
-// ---------- Multer (memory storage → upload to R2) ----------
+// ---------- Multer ----------
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 },
@@ -86,7 +83,7 @@ app.get('/api/vapid-public-key', (req, res) => res.json({ publicKey: vapidKeys.p
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'customer.html')));
 app.get('/menu.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'menu.html')));
 
-// ---------- Schema bootstrap ----------
+// ---------- Schema ----------
 let schemaReady = false;
 async function ensureSchema() {
     if (schemaReady) return;
@@ -156,6 +153,13 @@ async function ensureSchema() {
     for (const stmt of statements) {
         await db.execute(stmt);
     }
+
+    // Graceful column additions for existing DBs
+    for (const col of ['sort INTEGER DEFAULT 0', 'dietary TEXT']) {
+        try { await db.execute(`ALTER TABLE menu_items ADD COLUMN ${col}`); }
+        catch (e) { /* duplicate column — ignore */ }
+    }
+
     schemaReady = true;
     console.log('✅ Schema ready');
 }
@@ -438,9 +442,8 @@ app.get('/api/messages/:restaurantName/:tableNumber', async (req, res) => {
 // ---------- Socket.IO ----------
 io.on('connection', (socket) => {
     (async () => {
-        try {
-            socket.emit('state_update', await getAppState());
-        } catch (e) { console.error(e); }
+        try { socket.emit('state_update', await getAppState()); }
+        catch (e) { console.error(e); }
     })();
 
     socket.on('register_session', async ({ token }, callback) => {
@@ -489,9 +492,7 @@ io.on('connection', (socket) => {
         const sessionKey = socket.tableSessionKey;
         if (sessionKey && tableSockets[sessionKey]) {
             tableSockets[sessionKey].delete(socket.id);
-            if (tableSockets[sessionKey].size === 0) {
-                delete tableSockets[sessionKey];
-            }
+            if (tableSockets[sessionKey].size === 0) delete tableSockets[sessionKey];
             await broadcastState();
         }
     });
@@ -772,7 +773,6 @@ app.get('/api/restaurants', async (req, res) => {
     try {
         let files = fs.readdirSync(restaurantsDir).filter(f => f.endsWith('.json'));
         if (files.length === 0) {
-            // No JSON files, but maybe Turso has restaurants — derive from menu_categories
             const rows = await dbAll('SELECT DISTINCT restaurant FROM menu_categories');
             if (rows.length > 0) {
                 return res.json(rows.map(r => r.restaurant));
@@ -884,7 +884,7 @@ app.delete('/api/tables/:restaurantName/:tableNumber', async (req, res) => {
     }
 });
 
-// ---------- Menu APIs (now backed by Turso) ----------
+// ---------- Menu APIs (Turso-backed) ----------
 app.get('/api/menu/:restaurantName', async (req, res) => {
     try {
         const safeName = path.basename(req.params.restaurantName);
@@ -893,13 +893,15 @@ app.get('/api/menu/:restaurantName', async (req, res) => {
             [safeName]
         );
         const items = await dbAll(
-            'SELECT id, category_id, name_en, name_ar, price, desc_en, desc_ar, image FROM menu_items WHERE restaurant = ? ORDER BY category_id, rowid ASC',
+            'SELECT id, category_id, name_en, name_ar, price, desc_en, desc_ar, image, sort, dietary FROM menu_items WHERE restaurant = ? ORDER BY category_id, sort ASC, rowid ASC',
             [safeName]
         );
 
         const itemsByCat = {};
         items.forEach(it => {
             if (!itemsByCat[it.category_id]) itemsByCat[it.category_id] = [];
+            let dietaryArr = [];
+            try { dietaryArr = it.dietary ? JSON.parse(it.dietary) : []; } catch (e) { dietaryArr = []; }
             itemsByCat[it.category_id].push({
                 id: it.id,
                 nameEn: it.name_en,
@@ -908,6 +910,8 @@ app.get('/api/menu/:restaurantName', async (req, res) => {
                 descEn: it.desc_en || '',
                 descAr: it.desc_ar || '',
                 image: it.image || undefined,
+                sort: it.sort == null ? 0 : Number(it.sort),
+                dietary: dietaryArr,
             });
         });
 
@@ -927,10 +931,9 @@ app.get('/api/menu/:restaurantName', async (req, res) => {
 app.post('/api/menu/:restaurantName', async (req, res) => {
     try {
         const safeName = path.basename(req.params.restaurantName);
-        const { category, nameEn, nameAr, price, descEn, descAr } = req.body;
+        const { category, nameEn, nameAr, price, descEn, descAr, dietary } = req.body;
         if (!category || !nameEn) return res.status(400).json({ success: false, message: 'Missing fields' });
 
-        // Find or create category
         let cat = await dbGet(
             'SELECT id FROM menu_categories WHERE restaurant = ? AND category_en = ?',
             [safeName, category]
@@ -944,10 +947,22 @@ app.post('/api/menu/:restaurantName', async (req, res) => {
         }
 
         const newId = uuidv4();
+        const maxRow = await dbGet(
+            'SELECT COALESCE(MAX(sort), 0) AS m FROM menu_items WHERE restaurant = ? AND category_id = ?',
+            [safeName, cat.id]
+        );
+        const nextSort = (maxRow && maxRow.m ? Number(maxRow.m) : 0) + 10;
+
+        const dietaryJson = Array.isArray(dietary) ? JSON.stringify(dietary) : '[]';
+
         await dbRun(
-            `INSERT INTO menu_items (id, restaurant, category_id, name_en, name_ar, price, desc_en, desc_ar, image)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)`,
-            [newId, safeName, cat.id, nameEn, nameAr || nameEn, parseFloat(price) || 0, descEn || '', descAr || '']
+            `INSERT INTO menu_items (id, restaurant, category_id, name_en, name_ar, price, desc_en, desc_ar, image, sort, dietary)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?)`,
+            [
+                newId, safeName, cat.id, nameEn, nameAr || nameEn,
+                parseFloat(price) || 0, descEn || '', descAr || '',
+                nextSort, dietaryJson
+            ]
         );
 
         await broadcastState();
@@ -963,7 +978,7 @@ app.put('/api/menu/:restaurantName/:itemId', async (req, res) => {
     try {
         const safeName = path.basename(req.params.restaurantName);
         const itemId = req.params.itemId;
-        const { category, nameEn, nameAr, price, descEn, descAr } = req.body;
+        const { category, nameEn, nameAr, price, descEn, descAr, dietary, sort } = req.body;
 
         const existing = await dbGet(
             'SELECT id, category_id FROM menu_items WHERE restaurant = ? AND id = ?',
@@ -971,7 +986,6 @@ app.put('/api/menu/:restaurantName/:itemId', async (req, res) => {
         );
         if (!existing) return res.status(404).json({ success: false, message: 'Item not found' });
 
-        // Find or create target category
         let cat = await dbGet(
             'SELECT id FROM menu_categories WHERE restaurant = ? AND category_en = ?',
             [safeName, category]
@@ -984,12 +998,59 @@ app.put('/api/menu/:restaurantName/:itemId', async (req, res) => {
             cat = { id: Number(r.lastInsertRowid) };
         }
 
+        const dietaryJson = Array.isArray(dietary) ? JSON.stringify(dietary) : '[]';
+
+        let finalSort = sort;
+        if (finalSort == null || finalSort === '') {
+            const sortRow = await dbGet(
+                'SELECT sort FROM menu_items WHERE restaurant = ? AND id = ?',
+                [safeName, itemId]
+            );
+            finalSort = sortRow && sortRow.sort != null ? Number(sortRow.sort) : 0;
+        } else {
+            finalSort = Number(finalSort) || 0;
+        }
+
         await dbRun(
             `UPDATE menu_items
-             SET category_id = ?, name_en = ?, name_ar = ?, price = ?, desc_en = ?, desc_ar = ?
+             SET category_id = ?, name_en = ?, name_ar = ?, price = ?, desc_en = ?, desc_ar = ?, sort = ?, dietary = ?
              WHERE restaurant = ? AND id = ?`,
-            [cat.id, nameEn, nameAr || nameEn, parseFloat(price) || 0, descEn || '', descAr || '', safeName, itemId]
+            [
+                cat.id, nameEn, nameAr || nameEn, parseFloat(price) || 0, descEn || '', descAr || '',
+                finalSort, dietaryJson, safeName, itemId
+            ]
         );
+
+        await broadcastState();
+        io.emit('menu_updated', { restaurant: safeName });
+        res.json({ success: true });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+// ---------- Reorder endpoint ----------
+app.post('/api/menu/:restaurantName/reorder', async (req, res) => {
+    try {
+        const safeName = path.basename(req.params.restaurantName);
+        const { category, orderedIds } = req.body;
+        if (!category || !Array.isArray(orderedIds)) {
+            return res.status(400).json({ success: false, message: 'category and orderedIds required' });
+        }
+
+        const catRow = await dbGet(
+            'SELECT id FROM menu_categories WHERE restaurant = ? AND category_en = ?',
+            [safeName, category]
+        );
+        if (!catRow) return res.status(404).json({ success: false, message: 'Category not found' });
+
+        for (let i = 0; i < orderedIds.length; i++) {
+            await dbRun(
+                'UPDATE menu_items SET sort = ? WHERE restaurant = ? AND id = ? AND category_id = ?',
+                [(i + 1) * 10, safeName, orderedIds[i], catRow.id]
+            );
+        }
 
         await broadcastState();
         io.emit('menu_updated', { restaurant: safeName });
@@ -1006,7 +1067,6 @@ app.delete('/api/menu/:restaurantName/:itemId', async (req, res) => {
         const itemId = req.params.itemId;
         await dbRun('DELETE FROM menu_items WHERE restaurant = ? AND id = ?', [safeName, itemId]);
 
-        // Clean up empty categories
         const emptyCats = await dbAll(
             `SELECT c.id FROM menu_categories c
              WHERE c.restaurant = ?
@@ -1026,7 +1086,7 @@ app.delete('/api/menu/:restaurantName/:itemId', async (req, res) => {
     }
 });
 
-// ---------- Photo Upload (Cloudflare R2) ----------
+// ---------- Photo Upload (R2) ----------
 app.post('/api/menu/:restaurantName/:itemId/photo', upload.single('photo'), async (req, res) => {
     if (!req.file) return res.status(400).json({ success: false, message: 'No file uploaded' });
 

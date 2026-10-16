@@ -6,6 +6,7 @@
     <title>Edit Menu</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
         :root {
             --menu-paper: #FBF8F1;
@@ -152,7 +153,7 @@
             display: grid; gap: 0.9rem;
             grid-template-columns: 1fr;
         }
-        @media (min-width: 640px) {
+        @media (min-width: 720px) {
             .form-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
         }
         .field { display: flex; flex-direction: column; gap: 0.3rem; }
@@ -174,6 +175,33 @@
         .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--menu-accent); }
         .field textarea { resize: vertical; min-height: 68px; }
 
+        /* Dietary chips */
+        .dietary-picker {
+            display: flex; flex-wrap: wrap; gap: 0.4rem;
+            padding-top: 0.15rem;
+        }
+        .dietary-chip {
+            background: white;
+            border: 1px solid var(--menu-hairline);
+            color: var(--menu-paper-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 999px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .dietary-chip:hover { background: var(--menu-accent-soft); }
+        .dietary-chip.on {
+            background: var(--menu-accent);
+            color: white;
+            border-color: var(--menu-accent);
+        }
+
         .photo-uploader {
             display: flex; gap: 1rem; align-items: center;
             padding: 0.9rem; border: 1px dashed var(--menu-hairline);
@@ -194,10 +222,6 @@
             display: flex; flex-direction: column; gap: 0.4rem;
         }
         .photo-uploader-body small { font-size: 0.68rem; color: var(--menu-paper-muted); line-height: 1.4; }
-        .photo-uploader-body small code {
-            background: var(--menu-accent-soft); color: var(--menu-accent);
-            padding: 1px 5px; border-radius: 4px; font-size: 0.66rem;
-        }
         .photo-uploader-body .row { display: flex; gap: 0.4rem; flex-wrap: wrap; }
         .photo-uploader input[type=file] { display: none; }
 
@@ -232,7 +256,11 @@
             border-radius: 16px;
             overflow: hidden;
             display: flex; flex-direction: column;
+            position: relative;
         }
+        .menu-item-card.dragging { opacity: 0.4; }
+        .menu-item-card.drag-over { border-color: var(--menu-accent); border-width: 2px; }
+
         .menu-item-photo {
             position: relative;
             width: 100%; aspect-ratio: 16/10;
@@ -249,6 +277,30 @@
             padding: 3px 8px; border-radius: 999px;
         }
         .menu-item-photo .photo-badge.has-photo { background: var(--menu-accent); }
+        .menu-item-photo .sort-badge {
+            position: absolute; top: 0.5rem; left: 0.5rem;
+            background: rgba(0,0,0,0.7); color: white;
+            font-size: 0.65rem; font-weight: 700;
+            padding: 3px 8px; border-radius: 999px;
+            font-family: ui-monospace, monospace;
+        }
+
+        .dietary-overlay {
+            position: absolute; bottom: 0.5rem; right: 0.5rem;
+            display: flex; gap: 3px;
+            pointer-events: none;
+        }
+        .dietary-abbr {
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            font-size: 0.58rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 5px;
+            letter-spacing: 0.03em;
+            font-family: ui-monospace, monospace;
+        }
+
         .menu-item-body {
             padding: 0.9rem 1rem 1rem;
             display: flex; flex-direction: column; gap: 0.4rem;
@@ -281,6 +333,17 @@
             border-top: 1px solid var(--menu-hairline);
         }
         .menu-item-actions .btn { flex: 1; justify-content: center; }
+
+        .drag-handle {
+            position: absolute; top: 0.5rem; left: 0.5rem;
+            width: 32px; height: 32px; border-radius: 8px;
+            background: rgba(255,255,255,0.9); color: var(--menu-paper-ink);
+            border: 1px solid var(--menu-hairline);
+            cursor: grab; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; z-index: 2;
+            touch-action: none;
+        }
+        .drag-handle:active { cursor: grabbing; }
 
         .empty-state {
             text-align: center; padding: 3rem 1rem;
@@ -392,12 +455,22 @@
             </div>
 
             <div class="field">
+                <label>Sort Order <small style="text-transform:none; font-weight:500; opacity:0.7;">(lower = higher up; leave blank for auto)</small></label>
+                <input type="number" step="1" id="mSort" placeholder="e.g. 10">
+            </div>
+
+            <div class="field">
                 <label>Description (EN)</label>
                 <textarea id="mDesc" placeholder="Creamy burrata, basil oil, charred sourdough."></textarea>
             </div>
             <div class="field">
                 <label>Description (AR)</label>
                 <textarea id="mDescAr" placeholder="بوراتا كريمية، زيت ريحان، خبز محمص."></textarea>
+            </div>
+
+            <div class="field">
+                <label>Dietary Tags</label>
+                <div id="dietaryPicker" class="dietary-picker"></div>
             </div>
 
             <div class="field">
@@ -451,6 +524,19 @@
         let currentAdminRestaurant = '';
         let menuCategories = [];
         let menuSearchFilter = '';
+        let selectedDietary = new Set();
+
+        const DIETARY_TAGS = [
+            { id: 'vegetarian',    label: '🌱 Vegetarian',     abbr: 'V'  },
+            { id: 'vegan',         label: '🌿 Vegan',          abbr: 'VG' },
+            { id: 'gluten-free',   label: '🌾 Gluten-Free',    abbr: 'GF' },
+            { id: 'dairy-free',    label: '🥛 Dairy-Free',     abbr: 'DF' },
+            { id: 'contains-nuts', label: '🥜 Nuts',           abbr: 'N'  },
+            { id: 'spicy',         label: '🌶️ Spicy',          abbr: 'SP' },
+            { id: 'halal',         label: '☪️ Halal',          abbr: 'H'  },
+            { id: 'pescatarian',   label: '🐟 Pescatarian',    abbr: 'P'  },
+            { id: 'raw',           label: '🥗 Raw',            abbr: 'R'  }
+        ];
 
         const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
             ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -490,6 +576,22 @@
         socket.on('menu_updated', (data) => {
             if (data && data.restaurant === currentAdminRestaurant) loadMenu();
         });
+
+        // ============ Dietary picker ============
+        function renderDietaryPicker() {
+            const wrap = document.getElementById('dietaryPicker');
+            wrap.innerHTML = DIETARY_TAGS.map(tag => `
+                <button type="button"
+                        class="dietary-chip ${selectedDietary.has(tag.id) ? 'on' : ''}"
+                        data-tag="${tag.id}"
+                        onclick="toggleDietary('${tag.id}')">${tag.label}</button>
+            `).join('');
+        }
+        function toggleDietary(tag) {
+            if (selectedDietary.has(tag)) selectedDietary.delete(tag);
+            else selectedDietary.add(tag);
+            renderDietaryPicker();
+        }
 
         async function loadRestaurants() {
             try {
@@ -572,12 +674,8 @@
         function itemMatchesSearch(item, cat) {
             if (!menuSearchFilter) return true;
             const haystack = [
-                item.nameEn,
-                item.nameAr,
-                item.descEn,
-                item.descAr,
-                cat && cat.categoryEn,
-                cat && cat.categoryAr
+                item.nameEn, item.nameAr, item.descEn, item.descAr,
+                cat && cat.categoryEn, cat && cat.categoryAr
             ].filter(Boolean).join(' ').toLowerCase();
             return haystack.includes(menuSearchFilter);
         }
@@ -606,71 +704,129 @@
                     <span>${esc(cat.categoryEn)}</span>
                     <span class="count">${cat.items.length} item${cat.items.length > 1 ? 's' : ''}</span>
                 </h3>
-                <div class="menu-list-grid">
-                    ${cat.items.map(item => `
-                        <div class="menu-item-card" data-item-id="${esc(item.id)}">
-                            <div class="menu-item-photo" data-photo-for="${esc(item.id)}">
-                                <div class="placeholder">🍽️</div>
-                            </div>
-                            <div class="menu-item-body">
-                                <div class="menu-item-name">
-                                    ${esc(item.nameEn || '')}
-                                    ${item.nameAr ? `<small>${esc(item.nameAr)}</small>` : ''}
-                                </div>
-                                ${item.descEn ? `<div class="menu-item-desc">${esc(item.descEn)}</div>` : ''}
-                                <div class="menu-item-price">$${(parseFloat(item.price) || 0).toFixed(2)}</div>
-                                <div class="menu-item-actions">
-                                    <button class="btn btn-outline btn-sm" onclick="startEditItem('${esc(cat.categoryEn)}', '${esc(item.id)}')">✏️ Edit</button>
-                                    <button class="btn btn-danger btn-sm" onclick="deleteItem('${esc(item.id)}')">🗑️ Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
+                <div class="menu-list-grid" data-category="${esc(cat.categoryEn)}">
+                    ${cat.items.map(item => renderItemCard(item, cat.categoryEn)).join('')}
                 </div>`).join('');
 
             filtered.forEach(cat => {
                 (cat.items || []).forEach(item => {
-                    const container = document.querySelector(`[data-photo-for="${cssEscape(item.id)}"]`);
-                    if (container) loadItemPhoto(item, container);
+                    const card = document.querySelector(`[data-item-id="${cssEscape(item.id)}"]`);
+                    if (card) loadItemPhoto(item, card.querySelector('.menu-item-photo'));
                 });
             });
+
+            enableDragAndDrop();
+        }
+
+        function renderItemCard(item, category) {
+            const dietary = Array.isArray(item.dietary) ? item.dietary : [];
+            const abbrHtml = dietary.length > 0
+                ? `<div class="dietary-overlay">${
+                    dietary.map(t => {
+                        const def = DIETARY_TAGS.find(x => x.id === t);
+                        return def ? `<span class="dietary-abbr" title="${esc(def.label)}">${def.abbr}</span>` : '';
+                    }).join('')
+                }</div>`
+                : '';
+
+            return `
+                <div class="menu-item-card" data-item-id="${esc(item.id)}">
+                    <div class="drag-handle" title="Drag to reorder">☰</div>
+                    <div class="menu-item-photo" data-photo-for="${esc(item.id)}">
+                        <div class="placeholder">🍽️</div>
+                        <div class="sort-badge">#${item.sort != null ? item.sort : '—'}</div>
+                        ${abbrHtml}
+                    </div>
+                    <div class="menu-item-body">
+                        <div class="menu-item-name">
+                            ${esc(item.nameEn || '')}
+                            ${item.nameAr ? `<small>${esc(item.nameAr)}</small>` : ''}
+                        </div>
+                        ${item.descEn ? `<div class="menu-item-desc">${esc(item.descEn)}</div>` : ''}
+                        <div class="menu-item-price">$${(parseFloat(item.price) || 0).toFixed(2)}</div>
+                        <div class="menu-item-actions">
+                            <button class="btn btn-outline btn-sm" onclick="startEditItem('${esc(category)}', '${esc(item.id)}')">✏️ Edit</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteItem('${esc(item.id)}')">🗑️ Delete</button>
+                        </div>
+                    </div>
+                </div>`;
         }
 
         function cssEscape(s) {
             return String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
         }
 
-        // ============ Photo resolution (R2-aware) ============
         const PHOTO_EXTS = ['jpg', 'jpeg', 'png', 'webp'];
         function loadItemPhoto(item, containerEl) {
             if (item.image && /^https?:\/\//i.test(item.image)) {
                 const img = new Image();
                 img.onload = () => {
-                    containerEl.innerHTML = `
-                        <img src="${esc(item.image)}" alt="">
-                        <span class="photo-badge has-photo">✓ photo</span>`;
+                    const existingBadges = containerEl.querySelectorAll('.photo-badge, .sort-badge, .dietary-overlay');
+                    containerEl.innerHTML = '';
+                    const imgEl = document.createElement('img');
+                    imgEl.src = item.image;
+                    containerEl.appendChild(imgEl);
+                    existingBadges.forEach(b => containerEl.appendChild(b.cloneNode(true)));
                 };
-                img.onerror = () => { containerEl.innerHTML = '<div class="placeholder">🍽️</div>'; };
+                img.onerror = () => {
+                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>' +
+                        (containerEl.querySelector('.sort-badge') ? containerEl.querySelector('.sort-badge').outerHTML : '') +
+                        (containerEl.querySelector('.dietary-overlay') ? containerEl.querySelector('.dietary-overlay').outerHTML : '');
+                };
                 img.src = item.image;
                 return;
             }
             const itemId = item.id;
             function tryNext(idx) {
                 if (idx >= PHOTO_EXTS.length) {
-                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>';
+                    containerEl.innerHTML = '<div class="placeholder">🍽️</div>' +
+                        (containerEl.querySelector('.sort-badge') ? containerEl.querySelector('.sort-badge').outerHTML : '') +
+                        (containerEl.querySelector('.dietary-overlay') ? containerEl.querySelector('.dietary-overlay').outerHTML : '');
                     return;
                 }
                 const src = `/dish-photos/${itemId}.${PHOTO_EXTS[idx]}?t=${Date.now()}`;
                 const img = new Image();
                 img.onload = () => {
-                    containerEl.innerHTML = `
-                        <img src="${esc(src)}" alt="">
-                        <span class="photo-badge has-photo">✓ photo</span>`;
+                    const existingBadges = containerEl.querySelectorAll('.sort-badge, .dietary-overlay');
+                    containerEl.innerHTML = '';
+                    const imgEl = document.createElement('img');
+                    imgEl.src = src;
+                    containerEl.appendChild(imgEl);
+                    existingBadges.forEach(b => containerEl.appendChild(b.cloneNode(true)));
                 };
                 img.onerror = () => tryNext(idx + 1);
                 img.src = src;
             }
             tryNext(0);
+        }
+
+        // ============ Drag-and-drop reorder ============
+        function enableDragAndDrop() {
+            if (menuSearchFilter) return; // Don't allow reorder while filtering
+            document.querySelectorAll('.menu-list-grid').forEach(grid => {
+                Sortable.create(grid, {
+                    animation: 150,
+                    handle: '.drag-handle',
+                    ghostClass: 'dragging',
+                    dragClass: 'drag-over',
+                    onEnd: async (evt) => {
+                        const category = grid.getAttribute('data-category');
+                        const orderedIds = Array.from(grid.querySelectorAll('[data-item-id]'))
+                            .map(el => el.getAttribute('data-item-id'));
+                        try {
+                            await fetch(`/api/menu/${encodeURIComponent(currentAdminRestaurant)}/reorder`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ category, orderedIds })
+                            });
+                        } catch (e) {
+                            console.error('Reorder failed:', e);
+                            showModal('Reorder Failed', 'Could not save the new order. Reloading...', '⚠️');
+                            loadMenu();
+                        }
+                    }
+                });
+            });
         }
 
         function resetMenuForm() {
@@ -680,6 +836,7 @@
             document.getElementById('mNameAr').value = '';
             document.getElementById('mPrice').value = '';
             document.getElementById('mCat').value = 'Starters';
+            document.getElementById('mSort').value = '';
             document.getElementById('mDesc').value = '';
             document.getElementById('mDescAr').value = '';
             document.getElementById('photoPreview').innerHTML = '🍽️';
@@ -688,6 +845,8 @@
             document.getElementById('formTitle').innerText = '➕ Add New Item';
             document.getElementById('submitBtn').innerText = '➕ Add Item';
             document.getElementById('cancelEditBtn').classList.add('hidden');
+            selectedDietary = new Set();
+            renderDietaryPicker();
         }
 
         function startEditItem(category, itemId) {
@@ -706,17 +865,20 @@
             document.getElementById('mNameAr').value = found.nameAr || '';
             document.getElementById('mPrice').value = found.price || '';
             document.getElementById('mCat').value = category;
+            document.getElementById('mSort').value = found.sort != null ? found.sort : '';
             document.getElementById('mDesc').value = found.descEn || '';
             document.getElementById('mDescAr').value = found.descAr || '';
             document.getElementById('formTitle').innerText = `✏️ Edit: ${found.nameEn}`;
             document.getElementById('submitBtn').innerText = '💾 Save Changes';
             document.getElementById('cancelEditBtn').classList.remove('hidden');
 
+            selectedDietary = new Set(Array.isArray(found.dietary) ? found.dietary : []);
+            renderDietaryPicker();
+
             const preview = document.getElementById('photoPreview');
             preview.innerHTML = '🍽️';
             document.getElementById('removePhotoBtn').classList.add('hidden');
 
-            // Prefer the stored R2 URL if we have one
             if (found.image && /^https?:\/\//i.test(found.image)) {
                 const img = new Image();
                 img.onload = () => {
@@ -726,7 +888,7 @@
                 img.onerror = () => { preview.innerHTML = '🍽️'; };
                 img.src = found.image;
             } else {
-                function tryNext(idx) {
+                (function tryNext(idx) {
                     if (idx >= PHOTO_EXTS.length) return;
                     const src = `/dish-photos/${found.id}.${PHOTO_EXTS[idx]}?t=${Date.now()}`;
                     const img = new Image();
@@ -736,8 +898,7 @@
                     };
                     img.onerror = () => tryNext(idx + 1);
                     img.src = src;
-                }
-                tryNext(0);
+                })(0);
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -761,13 +922,19 @@
             const nameAr = document.getElementById('mNameAr').value.trim();
             const price = document.getElementById('mPrice').value;
             const category = document.getElementById('mCat').value;
+            const sort = document.getElementById('mSort').value;
             const descEn = document.getElementById('mDesc').value.trim();
             const descAr = document.getElementById('mDescAr').value.trim();
 
             if (!nameEn) return showModal('Missing Name', 'Please enter the item name in English.', '⚠️');
             if (!price) return showModal('Missing Price', 'Please enter the price.', '⚠️');
 
-            const payload = { nameEn, nameAr: nameAr || nameEn, price, category, descEn, descAr };
+            const payload = {
+                nameEn, nameAr: nameAr || nameEn, price, category,
+                descEn, descAr,
+                dietary: Array.from(selectedDietary),
+                sort: sort === '' ? undefined : Number(sort)
+            };
             const btn = document.getElementById('submitBtn');
             const originalLabel = btn.innerText;
             btn.disabled = true; btn.innerText = 'Saving…';
@@ -789,7 +956,6 @@
                     });
                     const data = await res.json();
                     if (data && data.item && data.item.id) savedItemId = data.item.id;
-                    else if (data && data.id) savedItemId = data.id;
                 }
 
                 const photoInput = document.getElementById('photoFileInput');
@@ -871,6 +1037,7 @@
         });
 
         adminAuth.requireLogin(() => {
+            renderDietaryPicker();
             loadRestaurants();
             document.getElementById('menuSearchInput').addEventListener('input', onMenuSearchInput);
         });
